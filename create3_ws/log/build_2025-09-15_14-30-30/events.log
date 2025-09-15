@@ -1,0 +1,409 @@
+[0.000000] (-) TimerEvent: {}
+[0.006085] (line_laser) JobQueued: {'identifier': 'line_laser', 'dependencies': OrderedDict()}
+[0.006254] (line_laser) JobStarted: {'identifier': 'line_laser'}
+[0.031085] (line_laser) JobProgress: {'identifier': 'line_laser', 'progress': 'cmake'}
+[0.031433] (line_laser) Command: {'cmd': ['/usr/bin/cmake', '/home/hsy/Mypro/create3_ws/src/line_laser', '-DCMAKE_INSTALL_PREFIX=/home/hsy/Mypro/create3_ws/install/line_laser'], 'cwd': '/home/hsy/Mypro/create3_ws/build/line_laser', 'env': OrderedDict([('GJS_DEBUG_TOPICS', 'JS ERROR;JS LOG'), ('LESSOPEN', '| /usr/bin/lesspipe %s'), ('USER', 'hsy'), ('SSH_AGENT_PID', '1545'), ('XDG_SESSION_TYPE', 'x11'), ('SHLVL', '1'), ('LD_LIBRARY_PATH', '/opt/ros/galactic/opt/yaml_cpp_vendor/lib:/opt/ros/galactic/opt/rviz_ogre_vendor/lib:/opt/ros/galactic/lib/x86_64-linux-gnu:/opt/ros/galactic/lib'), ('HOME', '/home/hsy'), ('OLDPWD', '/home/hsy/Mypro'), ('DESKTOP_SESSION', 'ubuntu'), ('GIO_LAUNCHED_DESKTOP_FILE', '/usr/share/applications/terminator.desktop'), ('ROS_PYTHON_VERSION', '3'), ('GNOME_SHELL_SESSION_MODE', 'ubuntu'), ('GTK_MODULES', 'gail:atk-bridge'), ('MANAGERPID', '1446'), ('DBUS_SESSION_BUS_ADDRESS', 'unix:path=/run/user/1000/bus'), ('COLORTERM', 'truecolor'), ('TERMINATOR_DBUS_NAME', 'net.tenshu.Terminator21a9d5db22c73a993ff0b42f64b396873'), ('GIO_LAUNCHED_DESKTOP_FILE_PID', '5583'), ('IM_CONFIG_PHASE', '1'), ('COLCON_PREFIX_PATH', '/home/hsy/Mypro/create3_ws/install:/home/hsy/ros2_ws/install'), ('ROS_DISTRO', 'galactic'), ('LOGNAME', 'hsy'), ('JOURNAL_STREAM', '8:49750'), ('_', '/usr/bin/colcon'), ('ROS_VERSION', '2'), ('XDG_SESSION_CLASS', 'user'), ('USERNAME', 'hsy'), ('TERM', 'xterm-256color'), ('GNOME_DESKTOP_SESSION_ID', 'this-is-deprecated'), ('ROS_LOCALHOST_ONLY', '0'), ('WINDOWPATH', '2'), ('PATH', '/opt/ros/galactic/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:/usr/games:/usr/local/games:/snap/bin'), ('SESSION_MANAGER', 'local/hsy:@/tmp/.ICE-unix/1580,unix/hsy:/tmp/.ICE-unix/1580'), ('INVOCATION_ID', '15f2841e84184282be83c598e86779c5'), ('XDG_MENU_PREFIX', 'gnome-'), ('XDG_RUNTIME_DIR', '/run/user/1000'), ('DISPLAY', ':0'), ('TERMINATOR_DBUS_PATH', '/net/tenshu/Terminator2'), ('LANG', 'en_US.UTF-8'), ('XDG_CURRENT_DESKTOP', 'ubuntu:GNOME'), ('RMW_IMPLEMENTATION', 'rmw_fastrtps_cpp'), ('XMODIFIERS', '@im=ibus'), ('XDG_SESSION_DESKTOP', 'ubuntu'), ('XAUTHORITY', '/run/user/1000/gdm/Xauthority'), ('LS_COLORS', 'rs=0:di=01;34:ln=01;36:mh=00:pi=40;33:so=01;35:do=01;35:bd=40;33;01:cd=40;33;01:or=40;31;01:mi=00:su=37;41:sg=30;43:ca=30;41:tw=30;42:ow=34;42:st=37;44:ex=01;32:*.tar=01;31:*.tgz=01;31:*.arc=01;31:*.arj=01;31:*.taz=01;31:*.lha=01;31:*.lz4=01;31:*.lzh=01;31:*.lzma=01;31:*.tlz=01;31:*.txz=01;31:*.tzo=01;31:*.t7z=01;31:*.zip=01;31:*.z=01;31:*.dz=01;31:*.gz=01;31:*.lrz=01;31:*.lz=01;31:*.lzo=01;31:*.xz=01;31:*.zst=01;31:*.tzst=01;31:*.bz2=01;31:*.bz=01;31:*.tbz=01;31:*.tbz2=01;31:*.tz=01;31:*.deb=01;31:*.rpm=01;31:*.jar=01;31:*.war=01;31:*.ear=01;31:*.sar=01;31:*.rar=01;31:*.alz=01;31:*.ace=01;31:*.zoo=01;31:*.cpio=01;31:*.7z=01;31:*.rz=01;31:*.cab=01;31:*.wim=01;31:*.swm=01;31:*.dwm=01;31:*.esd=01;31:*.jpg=01;35:*.jpeg=01;35:*.mjpg=01;35:*.mjpeg=01;35:*.gif=01;35:*.bmp=01;35:*.pbm=01;35:*.pgm=01;35:*.ppm=01;35:*.tga=01;35:*.xbm=01;35:*.xpm=01;35:*.tif=01;35:*.tiff=01;35:*.png=01;35:*.svg=01;35:*.svgz=01;35:*.mng=01;35:*.pcx=01;35:*.mov=01;35:*.mpg=01;35:*.mpeg=01;35:*.m2v=01;35:*.mkv=01;35:*.webm=01;35:*.ogm=01;35:*.mp4=01;35:*.m4v=01;35:*.mp4v=01;35:*.vob=01;35:*.qt=01;35:*.nuv=01;35:*.wmv=01;35:*.asf=01;35:*.rm=01;35:*.rmvb=01;35:*.flc=01;35:*.avi=01;35:*.fli=01;35:*.flv=01;35:*.gl=01;35:*.dl=01;35:*.xcf=01;35:*.xwd=01;35:*.yuv=01;35:*.cgm=01;35:*.emf=01;35:*.ogv=01;35:*.ogx=01;35:*.aac=00;36:*.au=00;36:*.flac=00;36:*.m4a=00;36:*.mid=00;36:*.midi=00;36:*.mka=00;36:*.mp3=00;36:*.mpc=00;36:*.ogg=00;36:*.ra=00;36:*.wav=00;36:*.oga=00;36:*.opus=00;36:*.spx=00;36:*.xspf=00;36:'), ('SSH_AUTH_SOCK', '/run/user/1000/keyring/ssh'), ('ROS_DOMAIN_ID', '25'), ('AMENT_PREFIX_PATH', '/home/hsy/Mypro/create3_ws/install/line_laser:/home/hsy/ros2_ws/install/line_laser:/opt/ros/galactic'), ('SHELL', '/bin/bash'), ('TERMINATOR_UUID', 'urn:uuid:5cfd2df7-ae6b-4259-bb8f-2d728fd8b021'), ('QT_ACCESSIBILITY', '1'), ('GDMSESSION', 'ubuntu'), ('LESSCLOSE', '/usr/bin/lesspipe %s %s'), ('GPG_AGENT_INFO', '/run/user/1000/gnupg/S.gpg-agent:0:1'), ('GJS_DEBUG_OUTPUT', 'stderr'), ('QT_IM_MODULE', 'ibus'), ('PWD', '/home/hsy/Mypro/create3_ws/build/line_laser'), ('LC_ALL', 'en_US.UTF-8'), ('XDG_CONFIG_DIRS', '/etc/xdg/xdg-ubuntu:/etc/xdg'), ('XDG_DATA_DIRS', '/usr/share/ubuntu:/usr/local/share/:/usr/share/:/var/lib/snapd/desktop'), ('PYTHONPATH', '/opt/ros/galactic/lib/python3.8/site-packages'), ('COLCON', '1'), ('VTE_VERSION', '6003'), ('CMAKE_PREFIX_PATH', '/home/hsy/Mypro/create3_ws/install/line_laser:/home/hsy/ros2_ws/install/line_laser:/opt/ros/galactic')]), 'shell': False}
+[0.114095] (-) TimerEvent: {}
+[0.215112] (-) TimerEvent: {}
+[0.229267] (line_laser) StdoutLine: {'line': b'-- The C compiler identification is GNU 9.4.0\n'}
+[0.330131] (-) TimerEvent: {}
+[0.383768] (line_laser) StdoutLine: {'line': b'-- The CXX compiler identification is GNU 9.4.0\n'}
+[0.398236] (line_laser) StdoutLine: {'line': b'-- Check for working C compiler: /usr/bin/cc\n'}
+[0.439998] (-) TimerEvent: {}
+[0.547283] (-) TimerEvent: {}
+[0.620487] (line_laser) StdoutLine: {'line': b'-- Check for working C compiler: /usr/bin/cc -- works\n'}
+[0.621457] (line_laser) StdoutLine: {'line': b'-- Detecting C compiler ABI info\n'}
+[0.654216] (-) TimerEvent: {}
+[0.757807] (-) TimerEvent: {}
+[0.854203] (line_laser) StdoutLine: {'line': b'-- Detecting C compiler ABI info - done\n'}
+[0.871107] (-) TimerEvent: {}
+[0.887353] (line_laser) StdoutLine: {'line': b'-- Detecting C compile features\n'}
+[0.891139] (line_laser) StdoutLine: {'line': b'-- Detecting C compile features - done\n'}
+[0.898676] (line_laser) StdoutLine: {'line': b'-- Check for working CXX compiler: /usr/bin/c++\n'}
+[0.980102] (-) TimerEvent: {}
+[1.089733] (-) TimerEvent: {}
+[1.113284] (line_laser) StdoutLine: {'line': b'-- Check for working CXX compiler: /usr/bin/c++ -- works\n'}
+[1.116127] (line_laser) StdoutLine: {'line': b'-- Detecting CXX compiler ABI info\n'}
+[1.190492] (-) TimerEvent: {}
+[1.291563] (-) TimerEvent: {}
+[1.366404] (line_laser) StdoutLine: {'line': b'-- Detecting CXX compiler ABI info - done\n'}
+[1.394370] (-) TimerEvent: {}
+[1.395160] (line_laser) StdoutLine: {'line': b'-- Detecting CXX compile features\n'}
+[1.395783] (line_laser) StdoutLine: {'line': b'-- Detecting CXX compile features - done\n'}
+[1.400334] (line_laser) StdoutLine: {'line': b'-- Found ament_cmake: 1.1.6 (/opt/ros/galactic/share/ament_cmake/cmake)\n'}
+[1.465529] (line_laser) StdoutLine: {'line': b'-- Found PythonInterp: /usr/bin/python3 (found suitable version "3.8.10", minimum required is "3") \n'}
+[1.465772] (line_laser) StdoutLine: {'line': b'-- Using PYTHON_EXECUTABLE: /usr/bin/python3\n'}
+[1.496134] (-) TimerEvent: {}
+[1.605399] (-) TimerEvent: {}
+[1.651482] (line_laser) StdoutLine: {'line': b'-- Found rclcpp: 9.2.2 (/opt/ros/galactic/share/rclcpp/cmake)\n'}
+[1.712666] (-) TimerEvent: {}
+[1.770977] (line_laser) StdoutLine: {'line': b'-- Using all available rosidl_typesupport_c: rosidl_typesupport_fastrtps_c;rosidl_typesupport_introspection_c\n'}
+[1.786837] (line_laser) StdoutLine: {'line': b'-- Found rosidl_adapter: 2.2.3 (/opt/ros/galactic/share/rosidl_adapter/cmake)\n'}
+[1.822562] (-) TimerEvent: {}
+[1.928728] (-) TimerEvent: {}
+[1.963585] (line_laser) StdoutLine: {'line': b'-- Found OpenSSL: /usr/lib/x86_64-linux-gnu/libcrypto.so (found version "1.1.1f")  \n'}
+[2.036838] (line_laser) StdoutLine: {'line': b'-- Found FastRTPS: /opt/ros/galactic/include  \n'}
+[2.037249] (-) TimerEvent: {}
+[2.148566] (-) TimerEvent: {}
+[2.232661] (line_laser) StdoutLine: {'line': b'-- Using all available rosidl_typesupport_cpp: rosidl_typesupport_fastrtps_cpp;rosidl_typesupport_introspection_cpp\n'}
+[2.258431] (-) TimerEvent: {}
+[2.368401] (-) TimerEvent: {}
+[2.397054] (line_laser) StdoutLine: {'line': b'-- Found rmw_implementation_cmake: 3.3.1 (/opt/ros/galactic/share/rmw_implementation_cmake/cmake)\n'}
+[2.409099] (line_laser) StdoutLine: {'line': b'-- Found rmw_fastrtps_cpp: 5.0.2 (/opt/ros/galactic/share/rmw_fastrtps_cpp/cmake)\n'}
+[2.469429] (-) TimerEvent: {}
+[2.577117] (-) TimerEvent: {}
+[2.679196] (-) TimerEvent: {}
+[2.721310] (line_laser) StdoutLine: {'line': b"-- Using RMW implementation 'rmw_fastrtps_cpp' as default\n"}
+[2.722321] (line_laser) StdoutLine: {'line': b'-- Looking for pthread.h\n'}
+[2.786691] (-) TimerEvent: {}
+[2.897585] (-) TimerEvent: {}
+[2.913141] (line_laser) StdoutLine: {'line': b'-- Looking for pthread.h - found\n'}
+[2.914247] (line_laser) StdoutLine: {'line': b'-- Performing Test CMAKE_HAVE_LIBC_PTHREAD\n'}
+[3.008221] (-) TimerEvent: {}
+[3.112199] (-) TimerEvent: {}
+[3.147711] (line_laser) StdoutLine: {'line': b'-- Performing Test CMAKE_HAVE_LIBC_PTHREAD - Failed\n'}
+[3.149047] (line_laser) StdoutLine: {'line': b'-- Looking for pthread_create in pthreads\n'}
+[3.226129] (-) TimerEvent: {}
+[3.335067] (-) TimerEvent: {}
+[3.345717] (line_laser) StdoutLine: {'line': b'-- Looking for pthread_create in pthreads - not found\n'}
+[3.346136] (line_laser) StdoutLine: {'line': b'-- Looking for pthread_create in pthread\n'}
+[3.443942] (-) TimerEvent: {}
+[3.543402] (line_laser) StdoutLine: {'line': b'-- Looking for pthread_create in pthread - found\n'}
+[3.544236] (line_laser) StdoutLine: {'line': b'-- Found Threads: TRUE  \n'}
+[3.544608] (-) TimerEvent: {}
+[3.647477] (-) TimerEvent: {}
+[3.756336] (-) TimerEvent: {}
+[3.864735] (-) TimerEvent: {}
+[3.973775] (-) TimerEvent: {}
+[4.015489] (line_laser) StdoutLine: {'line': b'-- Found sensor_msgs: 2.2.4 (/opt/ros/galactic/share/sensor_msgs/cmake)\n'}
+[4.084644] (-) TimerEvent: {}
+[4.194796] (-) TimerEvent: {}
+[4.303260] (-) TimerEvent: {}
+[4.343528] (line_laser) StdoutLine: {'line': b'-- Found tf2_ros: 0.17.5 (/opt/ros/galactic/share/tf2_ros/cmake)\n'}
+[4.413263] (-) TimerEvent: {}
+[4.520468] (-) TimerEvent: {}
+[4.629427] (-) TimerEvent: {}
+[4.737797] (-) TimerEvent: {}
+[4.846259] (-) TimerEvent: {}
+[4.954619] (-) TimerEvent: {}
+[5.062654] (-) TimerEvent: {}
+[5.172688] (-) TimerEvent: {}
+[5.281327] (-) TimerEvent: {}
+[5.383283] (-) TimerEvent: {}
+[5.389039] (line_laser) StdoutLine: {'line': b'-- Found laser_geometry: 2.2.1 (/opt/ros/galactic/share/laser_geometry/cmake)\n'}
+[5.404640] (line_laser) StdoutLine: {'line': b'-- Found tf2_sensor_msgs: 0.17.5 (/opt/ros/galactic/share/tf2_sensor_msgs/cmake)\n'}
+[5.459682] (line_laser) StdoutLine: {'line': b'-- Found tf2_geometry_msgs: 0.17.5 (/opt/ros/galactic/share/tf2_geometry_msgs/cmake)\n'}
+[5.481118] (line_laser) StdoutLine: {'line': b'-- Found Eigen3: TRUE (found version "3.3.7") \n'}
+[5.493675] (-) TimerEvent: {}
+[5.585741] (line_laser) StdoutLine: {'line': b'-- Found ament_lint_auto: 0.10.7 (/opt/ros/galactic/share/ament_lint_auto/cmake)\n'}
+[5.605488] (-) TimerEvent: {}
+[5.714759] (-) TimerEvent: {}
+[5.790431] (line_laser) StdoutLine: {'line': b"-- Added test 'copyright' to check source files copyright and LICENSE\n"}
+[5.793450] (line_laser) StdoutLine: {'line': b"-- Added test 'cppcheck' to perform static code analysis on C / C++ code\n"}
+[5.794976] (line_laser) StdoutLine: {'line': b'-- Configured cppcheck include dirs: $<BUILD_INTERFACE:/home/hsy/Mypro/create3_ws/src/line_laser/include>\n'}
+[5.795279] (line_laser) StdoutLine: {'line': b'-- Configured cppcheck exclude dirs and/or files: \n'}
+[5.798335] (line_laser) StdoutLine: {'line': b"-- Added test 'cpplint' to check C / C++ code against the Google style\n"}
+[5.799330] (line_laser) StdoutLine: {'line': b'-- Configured cpplint exclude dirs and/or files: \n'}
+[5.800198] (line_laser) StdoutLine: {'line': b"-- Added test 'lint_cmake' to check CMake code style\n"}
+[5.802400] (line_laser) StdoutLine: {'line': b"-- Added test 'uncrustify' to check C / C++ code style\n"}
+[5.802732] (line_laser) StdoutLine: {'line': b'-- Configured uncrustify additional arguments: \n'}
+[5.804680] (line_laser) StdoutLine: {'line': b"-- Added test 'xmllint' to check XML markup files\n"}
+[5.813348] (line_laser) StdoutLine: {'line': b'-- Configuring done\n'}
+[5.825515] (-) TimerEvent: {}
+[5.848423] (line_laser) StdoutLine: {'line': b'-- Generating done\n'}
+[5.864715] (line_laser) StdoutLine: {'line': b'-- Build files have been written to: /home/hsy/Mypro/create3_ws/build/line_laser\n'}
+[5.881249] (line_laser) CommandEnded: {'returncode': 0}
+[5.882909] (line_laser) JobProgress: {'identifier': 'line_laser', 'progress': 'build'}
+[5.889084] (line_laser) Command: {'cmd': ['/usr/bin/cmake', '--build', '/home/hsy/Mypro/create3_ws/build/line_laser', '--', '-j8', '-l8'], 'cwd': '/home/hsy/Mypro/create3_ws/build/line_laser', 'env': OrderedDict([('GJS_DEBUG_TOPICS', 'JS ERROR;JS LOG'), ('LESSOPEN', '| /usr/bin/lesspipe %s'), ('USER', 'hsy'), ('SSH_AGENT_PID', '1545'), ('XDG_SESSION_TYPE', 'x11'), ('SHLVL', '1'), ('LD_LIBRARY_PATH', '/opt/ros/galactic/opt/yaml_cpp_vendor/lib:/opt/ros/galactic/opt/rviz_ogre_vendor/lib:/opt/ros/galactic/lib/x86_64-linux-gnu:/opt/ros/galactic/lib'), ('HOME', '/home/hsy'), ('OLDPWD', '/home/hsy/Mypro'), ('DESKTOP_SESSION', 'ubuntu'), ('GIO_LAUNCHED_DESKTOP_FILE', '/usr/share/applications/terminator.desktop'), ('ROS_PYTHON_VERSION', '3'), ('GNOME_SHELL_SESSION_MODE', 'ubuntu'), ('GTK_MODULES', 'gail:atk-bridge'), ('MANAGERPID', '1446'), ('DBUS_SESSION_BUS_ADDRESS', 'unix:path=/run/user/1000/bus'), ('COLORTERM', 'truecolor'), ('TERMINATOR_DBUS_NAME', 'net.tenshu.Terminator21a9d5db22c73a993ff0b42f64b396873'), ('GIO_LAUNCHED_DESKTOP_FILE_PID', '5583'), ('IM_CONFIG_PHASE', '1'), ('COLCON_PREFIX_PATH', '/home/hsy/Mypro/create3_ws/install:/home/hsy/ros2_ws/install'), ('ROS_DISTRO', 'galactic'), ('LOGNAME', 'hsy'), ('JOURNAL_STREAM', '8:49750'), ('_', '/usr/bin/colcon'), ('ROS_VERSION', '2'), ('XDG_SESSION_CLASS', 'user'), ('USERNAME', 'hsy'), ('TERM', 'xterm-256color'), ('GNOME_DESKTOP_SESSION_ID', 'this-is-deprecated'), ('ROS_LOCALHOST_ONLY', '0'), ('WINDOWPATH', '2'), ('PATH', '/opt/ros/galactic/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:/usr/games:/usr/local/games:/snap/bin'), ('SESSION_MANAGER', 'local/hsy:@/tmp/.ICE-unix/1580,unix/hsy:/tmp/.ICE-unix/1580'), ('INVOCATION_ID', '15f2841e84184282be83c598e86779c5'), ('XDG_MENU_PREFIX', 'gnome-'), ('XDG_RUNTIME_DIR', '/run/user/1000'), ('DISPLAY', ':0'), ('TERMINATOR_DBUS_PATH', '/net/tenshu/Terminator2'), ('LANG', 'en_US.UTF-8'), ('XDG_CURRENT_DESKTOP', 'ubuntu:GNOME'), ('RMW_IMPLEMENTATION', 'rmw_fastrtps_cpp'), ('XMODIFIERS', '@im=ibus'), ('XDG_SESSION_DESKTOP', 'ubuntu'), ('XAUTHORITY', '/run/user/1000/gdm/Xauthority'), ('LS_COLORS', 'rs=0:di=01;34:ln=01;36:mh=00:pi=40;33:so=01;35:do=01;35:bd=40;33;01:cd=40;33;01:or=40;31;01:mi=00:su=37;41:sg=30;43:ca=30;41:tw=30;42:ow=34;42:st=37;44:ex=01;32:*.tar=01;31:*.tgz=01;31:*.arc=01;31:*.arj=01;31:*.taz=01;31:*.lha=01;31:*.lz4=01;31:*.lzh=01;31:*.lzma=01;31:*.tlz=01;31:*.txz=01;31:*.tzo=01;31:*.t7z=01;31:*.zip=01;31:*.z=01;31:*.dz=01;31:*.gz=01;31:*.lrz=01;31:*.lz=01;31:*.lzo=01;31:*.xz=01;31:*.zst=01;31:*.tzst=01;31:*.bz2=01;31:*.bz=01;31:*.tbz=01;31:*.tbz2=01;31:*.tz=01;31:*.deb=01;31:*.rpm=01;31:*.jar=01;31:*.war=01;31:*.ear=01;31:*.sar=01;31:*.rar=01;31:*.alz=01;31:*.ace=01;31:*.zoo=01;31:*.cpio=01;31:*.7z=01;31:*.rz=01;31:*.cab=01;31:*.wim=01;31:*.swm=01;31:*.dwm=01;31:*.esd=01;31:*.jpg=01;35:*.jpeg=01;35:*.mjpg=01;35:*.mjpeg=01;35:*.gif=01;35:*.bmp=01;35:*.pbm=01;35:*.pgm=01;35:*.ppm=01;35:*.tga=01;35:*.xbm=01;35:*.xpm=01;35:*.tif=01;35:*.tiff=01;35:*.png=01;35:*.svg=01;35:*.svgz=01;35:*.mng=01;35:*.pcx=01;35:*.mov=01;35:*.mpg=01;35:*.mpeg=01;35:*.m2v=01;35:*.mkv=01;35:*.webm=01;35:*.ogm=01;35:*.mp4=01;35:*.m4v=01;35:*.mp4v=01;35:*.vob=01;35:*.qt=01;35:*.nuv=01;35:*.wmv=01;35:*.asf=01;35:*.rm=01;35:*.rmvb=01;35:*.flc=01;35:*.avi=01;35:*.fli=01;35:*.flv=01;35:*.gl=01;35:*.dl=01;35:*.xcf=01;35:*.xwd=01;35:*.yuv=01;35:*.cgm=01;35:*.emf=01;35:*.ogv=01;35:*.ogx=01;35:*.aac=00;36:*.au=00;36:*.flac=00;36:*.m4a=00;36:*.mid=00;36:*.midi=00;36:*.mka=00;36:*.mp3=00;36:*.mpc=00;36:*.ogg=00;36:*.ra=00;36:*.wav=00;36:*.oga=00;36:*.opus=00;36:*.spx=00;36:*.xspf=00;36:'), ('SSH_AUTH_SOCK', '/run/user/1000/keyring/ssh'), ('ROS_DOMAIN_ID', '25'), ('AMENT_PREFIX_PATH', '/home/hsy/Mypro/create3_ws/install/line_laser:/home/hsy/ros2_ws/install/line_laser:/opt/ros/galactic'), ('SHELL', '/bin/bash'), ('TERMINATOR_UUID', 'urn:uuid:5cfd2df7-ae6b-4259-bb8f-2d728fd8b021'), ('QT_ACCESSIBILITY', '1'), ('GDMSESSION', 'ubuntu'), ('LESSCLOSE', '/usr/bin/lesspipe %s %s'), ('GPG_AGENT_INFO', '/run/user/1000/gnupg/S.gpg-agent:0:1'), ('GJS_DEBUG_OUTPUT', 'stderr'), ('QT_IM_MODULE', 'ibus'), ('PWD', '/home/hsy/Mypro/create3_ws/build/line_laser'), ('LC_ALL', 'en_US.UTF-8'), ('XDG_CONFIG_DIRS', '/etc/xdg/xdg-ubuntu:/etc/xdg'), ('XDG_DATA_DIRS', '/usr/share/ubuntu:/usr/local/share/:/usr/share/:/var/lib/snapd/desktop'), ('PYTHONPATH', '/opt/ros/galactic/lib/python3.8/site-packages'), ('COLCON', '1'), ('VTE_VERSION', '6003'), ('CMAKE_PREFIX_PATH', '/home/hsy/Mypro/create3_ws/install/line_laser:/home/hsy/ros2_ws/install/line_laser:/opt/ros/galactic')]), 'shell': False}
+[5.934086] (-) TimerEvent: {}
+[6.026465] (line_laser) StdoutLine: {'line': b'\x1b[35m\x1b[1mScanning dependencies of target line_laser_node\x1b[0m\n'}
+[6.039974] (-) TimerEvent: {}
+[6.150366] (-) TimerEvent: {}
+[6.229042] (line_laser) StdoutLine: {'line': b'[ 50%] \x1b[32mBuilding CXX object CMakeFiles/line_laser_node.dir/src/line_laser_node.cpp.o\x1b[0m\n'}
+[6.251166] (-) TimerEvent: {}
+[6.365764] (-) TimerEvent: {}
+[6.474781] (-) TimerEvent: {}
+[6.586852] (-) TimerEvent: {}
+[6.694996] (-) TimerEvent: {}
+[6.801885] (-) TimerEvent: {}
+[6.910297] (-) TimerEvent: {}
+[7.022740] (-) TimerEvent: {}
+[7.129539] (-) TimerEvent: {}
+[7.235733] (-) TimerEvent: {}
+[7.344049] (-) TimerEvent: {}
+[7.453909] (-) TimerEvent: {}
+[7.556578] (-) TimerEvent: {}
+[7.662113] (-) TimerEvent: {}
+[7.765725] (-) TimerEvent: {}
+[7.875596] (-) TimerEvent: {}
+[7.982615] (-) TimerEvent: {}
+[8.089010] (-) TimerEvent: {}
+[8.200847] (-) TimerEvent: {}
+[8.308987] (-) TimerEvent: {}
+[8.416794] (-) TimerEvent: {}
+[8.526699] (-) TimerEvent: {}
+[8.636426] (-) TimerEvent: {}
+[8.747156] (-) TimerEvent: {}
+[8.848175] (-) TimerEvent: {}
+[8.950158] (-) TimerEvent: {}
+[9.057877] (-) TimerEvent: {}
+[9.164254] (-) TimerEvent: {}
+[9.275564] (-) TimerEvent: {}
+[9.382087] (-) TimerEvent: {}
+[9.484360] (-) TimerEvent: {}
+[9.588069] (-) TimerEvent: {}
+[9.692830] (-) TimerEvent: {}
+[9.804500] (-) TimerEvent: {}
+[9.912978] (-) TimerEvent: {}
+[10.021478] (-) TimerEvent: {}
+[10.129075] (-) TimerEvent: {}
+[10.239248] (-) TimerEvent: {}
+[10.346774] (-) TimerEvent: {}
+[10.455684] (-) TimerEvent: {}
+[10.563278] (-) TimerEvent: {}
+[10.675879] (-) TimerEvent: {}
+[10.780584] (-) TimerEvent: {}
+[10.889720] (-) TimerEvent: {}
+[10.998339] (-) TimerEvent: {}
+[11.105382] (-) TimerEvent: {}
+[11.214069] (-) TimerEvent: {}
+[11.323081] (-) TimerEvent: {}
+[11.433012] (-) TimerEvent: {}
+[11.538453] (-) TimerEvent: {}
+[11.647324] (-) TimerEvent: {}
+[11.749985] (-) TimerEvent: {}
+[11.859384] (-) TimerEvent: {}
+[11.973491] (-) TimerEvent: {}
+[12.085474] (-) TimerEvent: {}
+[12.192273] (-) TimerEvent: {}
+[12.301571] (-) TimerEvent: {}
+[12.411197] (-) TimerEvent: {}
+[12.519065] (-) TimerEvent: {}
+[12.626062] (-) TimerEvent: {}
+[12.737256] (-) TimerEvent: {}
+[12.848899] (-) TimerEvent: {}
+[12.962634] (-) TimerEvent: {}
+[13.066507] (-) TimerEvent: {}
+[13.176026] (-) TimerEvent: {}
+[13.284703] (-) TimerEvent: {}
+[13.392770] (-) TimerEvent: {}
+[13.503472] (-) TimerEvent: {}
+[13.613576] (-) TimerEvent: {}
+[13.716674] (-) TimerEvent: {}
+[13.832154] (-) TimerEvent: {}
+[13.942253] (-) TimerEvent: {}
+[14.050926] (-) TimerEvent: {}
+[14.160686] (-) TimerEvent: {}
+[14.262439] (-) TimerEvent: {}
+[14.365095] (-) TimerEvent: {}
+[14.470369] (-) TimerEvent: {}
+[14.571346] (-) TimerEvent: {}
+[14.687951] (-) TimerEvent: {}
+[14.798621] (-) TimerEvent: {}
+[14.906800] (-) TimerEvent: {}
+[15.016108] (-) TimerEvent: {}
+[15.126705] (-) TimerEvent: {}
+[15.233305] (-) TimerEvent: {}
+[15.346214] (-) TimerEvent: {}
+[15.455670] (-) TimerEvent: {}
+[15.559986] (-) TimerEvent: {}
+[15.673827] (-) TimerEvent: {}
+[15.776939] (-) TimerEvent: {}
+[15.891487] (-) TimerEvent: {}
+[15.998895] (-) TimerEvent: {}
+[16.100415] (-) TimerEvent: {}
+[16.204018] (-) TimerEvent: {}
+[16.306832] (-) TimerEvent: {}
+[16.415681] (-) TimerEvent: {}
+[16.516089] (-) TimerEvent: {}
+[16.635511] (-) TimerEvent: {}
+[16.736928] (-) TimerEvent: {}
+[16.839510] (-) TimerEvent: {}
+[16.948717] (-) TimerEvent: {}
+[17.060311] (-) TimerEvent: {}
+[17.168943] (-) TimerEvent: {}
+[17.278343] (-) TimerEvent: {}
+[17.386723] (-) TimerEvent: {}
+[17.494843] (-) TimerEvent: {}
+[17.595737] (-) TimerEvent: {}
+[17.698990] (-) TimerEvent: {}
+[17.808211] (-) TimerEvent: {}
+[17.916112] (-) TimerEvent: {}
+[18.025922] (-) TimerEvent: {}
+[18.134846] (-) TimerEvent: {}
+[18.244995] (-) TimerEvent: {}
+[18.355856] (-) TimerEvent: {}
+[18.462440] (-) TimerEvent: {}
+[18.570985] (-) TimerEvent: {}
+[18.679277] (-) TimerEvent: {}
+[18.789581] (-) TimerEvent: {}
+[18.901746] (-) TimerEvent: {}
+[19.010820] (-) TimerEvent: {}
+[19.120176] (-) TimerEvent: {}
+[19.227021] (-) TimerEvent: {}
+[19.338217] (-) TimerEvent: {}
+[19.440078] (-) TimerEvent: {}
+[19.541914] (-) TimerEvent: {}
+[19.650002] (-) TimerEvent: {}
+[19.758055] (-) TimerEvent: {}
+[19.866436] (-) TimerEvent: {}
+[19.974213] (-) TimerEvent: {}
+[20.082575] (-) TimerEvent: {}
+[20.193759] (-) TimerEvent: {}
+[20.304157] (-) TimerEvent: {}
+[20.413257] (-) TimerEvent: {}
+[20.513936] (-) TimerEvent: {}
+[20.615762] (-) TimerEvent: {}
+[20.717821] (-) TimerEvent: {}
+[20.831296] (-) TimerEvent: {}
+[20.941940] (-) TimerEvent: {}
+[21.051041] (-) TimerEvent: {}
+[21.158597] (-) TimerEvent: {}
+[21.268293] (-) TimerEvent: {}
+[21.378544] (-) TimerEvent: {}
+[21.485575] (-) TimerEvent: {}
+[21.597597] (-) TimerEvent: {}
+[21.706195] (-) TimerEvent: {}
+[21.817788] (-) TimerEvent: {}
+[21.928906] (-) TimerEvent: {}
+[22.034427] (-) TimerEvent: {}
+[22.145289] (-) TimerEvent: {}
+[22.254459] (-) TimerEvent: {}
+[22.362562] (-) TimerEvent: {}
+[22.468486] (-) TimerEvent: {}
+[22.572318] (-) TimerEvent: {}
+[22.674455] (-) TimerEvent: {}
+[22.784135] (-) TimerEvent: {}
+[22.892890] (-) TimerEvent: {}
+[22.993827] (-) TimerEvent: {}
+[23.096375] (-) TimerEvent: {}
+[23.204130] (-) TimerEvent: {}
+[23.312295] (-) TimerEvent: {}
+[23.416154] (-) TimerEvent: {}
+[23.519982] (-) TimerEvent: {}
+[23.622871] (-) TimerEvent: {}
+[23.730736] (-) TimerEvent: {}
+[23.837958] (-) TimerEvent: {}
+[23.943947] (-) TimerEvent: {}
+[24.054699] (-) TimerEvent: {}
+[24.163479] (-) TimerEvent: {}
+[24.271338] (-) TimerEvent: {}
+[24.381183] (-) TimerEvent: {}
+[24.490117] (-) TimerEvent: {}
+[24.599485] (-) TimerEvent: {}
+[24.706611] (-) TimerEvent: {}
+[24.818482] (-) TimerEvent: {}
+[24.927074] (-) TimerEvent: {}
+[25.027903] (-) TimerEvent: {}
+[25.143514] (-) TimerEvent: {}
+[25.253415] (-) TimerEvent: {}
+[25.362778] (-) TimerEvent: {}
+[25.464711] (-) TimerEvent: {}
+[25.566312] (-) TimerEvent: {}
+[25.668450] (-) TimerEvent: {}
+[25.771554] (-) TimerEvent: {}
+[25.875409] (-) TimerEvent: {}
+[25.980077] (-) TimerEvent: {}
+[26.094602] (-) TimerEvent: {}
+[26.205043] (-) TimerEvent: {}
+[26.306545] (-) TimerEvent: {}
+[26.420345] (-) TimerEvent: {}
+[26.521131] (-) TimerEvent: {}
+[26.623518] (-) TimerEvent: {}
+[26.731490] (-) TimerEvent: {}
+[26.840511] (-) TimerEvent: {}
+[26.948253] (-) TimerEvent: {}
+[27.058869] (-) TimerEvent: {}
+[27.168789] (-) TimerEvent: {}
+[27.276986] (-) TimerEvent: {}
+[27.377697] (-) TimerEvent: {}
+[27.480474] (-) TimerEvent: {}
+[27.580929] (-) TimerEvent: {}
+[27.682198] (-) TimerEvent: {}
+[27.784426] (-) TimerEvent: {}
+[27.899869] (-) TimerEvent: {}
+[28.006752] (-) TimerEvent: {}
+[28.115282] (-) TimerEvent: {}
+[28.216228] (-) TimerEvent: {}
+[28.319671] (-) TimerEvent: {}
+[28.420892] (-) TimerEvent: {}
+[28.534454] (-) TimerEvent: {}
+[28.642438] (-) TimerEvent: {}
+[28.752090] (-) TimerEvent: {}
+[28.855194] (-) TimerEvent: {}
+[28.956188] (-) TimerEvent: {}
+[29.058767] (-) TimerEvent: {}
+[29.171275] (-) TimerEvent: {}
+[29.275686] (-) TimerEvent: {}
+[29.376707] (-) TimerEvent: {}
+[29.480094] (-) TimerEvent: {}
+[29.589901] (-) TimerEvent: {}
+[29.698800] (-) TimerEvent: {}
+[29.808440] (-) TimerEvent: {}
+[29.909535] (-) TimerEvent: {}
+[30.018287] (-) TimerEvent: {}
+[30.122591] (-) TimerEvent: {}
+[30.224157] (-) TimerEvent: {}
+[30.328621] (-) TimerEvent: {}
+[30.429332] (-) TimerEvent: {}
+[30.538246] (-) TimerEvent: {}
+[30.645549] (-) TimerEvent: {}
+[30.748190] (-) TimerEvent: {}
+[30.852697] (-) TimerEvent: {}
+[30.955625] (-) TimerEvent: {}
+[31.063281] (-) TimerEvent: {}
+[31.165769] (-) TimerEvent: {}
+[31.276289] (-) TimerEvent: {}
+[31.386501] (-) TimerEvent: {}
+[31.487371] (-) TimerEvent: {}
+[31.588883] (-) TimerEvent: {}
+[31.698217] (-) TimerEvent: {}
+[31.806002] (-) TimerEvent: {}
+[31.914920] (-) TimerEvent: {}
+[32.018679] (-) TimerEvent: {}
+[32.131136] (-) TimerEvent: {}
+[32.241235] (-) TimerEvent: {}
+[32.350306] (-) TimerEvent: {}
+[32.460844] (-) TimerEvent: {}
+[32.567060] (-) TimerEvent: {}
+[32.676611] (-) TimerEvent: {}
+[32.778662] (-) TimerEvent: {}
+[32.829662] (line_laser) StdoutLine: {'line': b'[100%] \x1b[32m\x1b[1mLinking CXX executable line_laser_node\x1b[0m\n'}
+[32.878844] (-) TimerEvent: {}
+[32.986640] (-) TimerEvent: {}
+[33.095922] (-) TimerEvent: {}
+[33.204776] (-) TimerEvent: {}
+[33.312475] (-) TimerEvent: {}
+[33.421759] (-) TimerEvent: {}
+[33.533620] (-) TimerEvent: {}
+[33.643108] (-) TimerEvent: {}
+[33.752854] (-) TimerEvent: {}
+[33.863553] (-) TimerEvent: {}
+[33.971947] (-) TimerEvent: {}
+[34.026736] (line_laser) StdoutLine: {'line': b'[100%] Built target line_laser_node\n'}
+[34.078675] (line_laser) CommandEnded: {'returncode': 0}
+[34.079656] (-) TimerEvent: {}
+[34.083751] (line_laser) JobProgress: {'identifier': 'line_laser', 'progress': 'install'}
+[34.113313] (line_laser) Command: {'cmd': ['/usr/bin/cmake', '--install', '/home/hsy/Mypro/create3_ws/build/line_laser'], 'cwd': '/home/hsy/Mypro/create3_ws/build/line_laser', 'env': OrderedDict([('GJS_DEBUG_TOPICS', 'JS ERROR;JS LOG'), ('LESSOPEN', '| /usr/bin/lesspipe %s'), ('USER', 'hsy'), ('SSH_AGENT_PID', '1545'), ('XDG_SESSION_TYPE', 'x11'), ('SHLVL', '1'), ('LD_LIBRARY_PATH', '/opt/ros/galactic/opt/yaml_cpp_vendor/lib:/opt/ros/galactic/opt/rviz_ogre_vendor/lib:/opt/ros/galactic/lib/x86_64-linux-gnu:/opt/ros/galactic/lib'), ('HOME', '/home/hsy'), ('OLDPWD', '/home/hsy/Mypro'), ('DESKTOP_SESSION', 'ubuntu'), ('GIO_LAUNCHED_DESKTOP_FILE', '/usr/share/applications/terminator.desktop'), ('ROS_PYTHON_VERSION', '3'), ('GNOME_SHELL_SESSION_MODE', 'ubuntu'), ('GTK_MODULES', 'gail:atk-bridge'), ('MANAGERPID', '1446'), ('DBUS_SESSION_BUS_ADDRESS', 'unix:path=/run/user/1000/bus'), ('COLORTERM', 'truecolor'), ('TERMINATOR_DBUS_NAME', 'net.tenshu.Terminator21a9d5db22c73a993ff0b42f64b396873'), ('GIO_LAUNCHED_DESKTOP_FILE_PID', '5583'), ('IM_CONFIG_PHASE', '1'), ('COLCON_PREFIX_PATH', '/home/hsy/Mypro/create3_ws/install:/home/hsy/ros2_ws/install'), ('ROS_DISTRO', 'galactic'), ('LOGNAME', 'hsy'), ('JOURNAL_STREAM', '8:49750'), ('_', '/usr/bin/colcon'), ('ROS_VERSION', '2'), ('XDG_SESSION_CLASS', 'user'), ('USERNAME', 'hsy'), ('TERM', 'xterm-256color'), ('GNOME_DESKTOP_SESSION_ID', 'this-is-deprecated'), ('ROS_LOCALHOST_ONLY', '0'), ('WINDOWPATH', '2'), ('PATH', '/opt/ros/galactic/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:/usr/games:/usr/local/games:/snap/bin'), ('SESSION_MANAGER', 'local/hsy:@/tmp/.ICE-unix/1580,unix/hsy:/tmp/.ICE-unix/1580'), ('INVOCATION_ID', '15f2841e84184282be83c598e86779c5'), ('XDG_MENU_PREFIX', 'gnome-'), ('XDG_RUNTIME_DIR', '/run/user/1000'), ('DISPLAY', ':0'), ('TERMINATOR_DBUS_PATH', '/net/tenshu/Terminator2'), ('LANG', 'en_US.UTF-8'), ('XDG_CURRENT_DESKTOP', 'ubuntu:GNOME'), ('RMW_IMPLEMENTATION', 'rmw_fastrtps_cpp'), ('XMODIFIERS', '@im=ibus'), ('XDG_SESSION_DESKTOP', 'ubuntu'), ('XAUTHORITY', '/run/user/1000/gdm/Xauthority'), ('LS_COLORS', 'rs=0:di=01;34:ln=01;36:mh=00:pi=40;33:so=01;35:do=01;35:bd=40;33;01:cd=40;33;01:or=40;31;01:mi=00:su=37;41:sg=30;43:ca=30;41:tw=30;42:ow=34;42:st=37;44:ex=01;32:*.tar=01;31:*.tgz=01;31:*.arc=01;31:*.arj=01;31:*.taz=01;31:*.lha=01;31:*.lz4=01;31:*.lzh=01;31:*.lzma=01;31:*.tlz=01;31:*.txz=01;31:*.tzo=01;31:*.t7z=01;31:*.zip=01;31:*.z=01;31:*.dz=01;31:*.gz=01;31:*.lrz=01;31:*.lz=01;31:*.lzo=01;31:*.xz=01;31:*.zst=01;31:*.tzst=01;31:*.bz2=01;31:*.bz=01;31:*.tbz=01;31:*.tbz2=01;31:*.tz=01;31:*.deb=01;31:*.rpm=01;31:*.jar=01;31:*.war=01;31:*.ear=01;31:*.sar=01;31:*.rar=01;31:*.alz=01;31:*.ace=01;31:*.zoo=01;31:*.cpio=01;31:*.7z=01;31:*.rz=01;31:*.cab=01;31:*.wim=01;31:*.swm=01;31:*.dwm=01;31:*.esd=01;31:*.jpg=01;35:*.jpeg=01;35:*.mjpg=01;35:*.mjpeg=01;35:*.gif=01;35:*.bmp=01;35:*.pbm=01;35:*.pgm=01;35:*.ppm=01;35:*.tga=01;35:*.xbm=01;35:*.xpm=01;35:*.tif=01;35:*.tiff=01;35:*.png=01;35:*.svg=01;35:*.svgz=01;35:*.mng=01;35:*.pcx=01;35:*.mov=01;35:*.mpg=01;35:*.mpeg=01;35:*.m2v=01;35:*.mkv=01;35:*.webm=01;35:*.ogm=01;35:*.mp4=01;35:*.m4v=01;35:*.mp4v=01;35:*.vob=01;35:*.qt=01;35:*.nuv=01;35:*.wmv=01;35:*.asf=01;35:*.rm=01;35:*.rmvb=01;35:*.flc=01;35:*.avi=01;35:*.fli=01;35:*.flv=01;35:*.gl=01;35:*.dl=01;35:*.xcf=01;35:*.xwd=01;35:*.yuv=01;35:*.cgm=01;35:*.emf=01;35:*.ogv=01;35:*.ogx=01;35:*.aac=00;36:*.au=00;36:*.flac=00;36:*.m4a=00;36:*.mid=00;36:*.midi=00;36:*.mka=00;36:*.mp3=00;36:*.mpc=00;36:*.ogg=00;36:*.ra=00;36:*.wav=00;36:*.oga=00;36:*.opus=00;36:*.spx=00;36:*.xspf=00;36:'), ('SSH_AUTH_SOCK', '/run/user/1000/keyring/ssh'), ('ROS_DOMAIN_ID', '25'), ('AMENT_PREFIX_PATH', '/home/hsy/Mypro/create3_ws/install/line_laser:/home/hsy/ros2_ws/install/line_laser:/opt/ros/galactic'), ('SHELL', '/bin/bash'), ('TERMINATOR_UUID', 'urn:uuid:5cfd2df7-ae6b-4259-bb8f-2d728fd8b021'), ('QT_ACCESSIBILITY', '1'), ('GDMSESSION', 'ubuntu'), ('LESSCLOSE', '/usr/bin/lesspipe %s %s'), ('GPG_AGENT_INFO', '/run/user/1000/gnupg/S.gpg-agent:0:1'), ('GJS_DEBUG_OUTPUT', 'stderr'), ('QT_IM_MODULE', 'ibus'), ('PWD', '/home/hsy/Mypro/create3_ws/build/line_laser'), ('LC_ALL', 'en_US.UTF-8'), ('XDG_CONFIG_DIRS', '/etc/xdg/xdg-ubuntu:/etc/xdg'), ('XDG_DATA_DIRS', '/usr/share/ubuntu:/usr/local/share/:/usr/share/:/var/lib/snapd/desktop'), ('PYTHONPATH', '/opt/ros/galactic/lib/python3.8/site-packages'), ('COLCON', '1'), ('VTE_VERSION', '6003'), ('CMAKE_PREFIX_PATH', '/home/hsy/Mypro/create3_ws/install/line_laser:/home/hsy/ros2_ws/install/line_laser:/opt/ros/galactic')]), 'shell': False}
+[34.133765] (line_laser) StdoutLine: {'line': b'-- Install configuration: ""\n'}
+[34.135501] (line_laser) StdoutLine: {'line': b'-- Installing: /home/hsy/Mypro/create3_ws/install/line_laser/lib/line_laser/line_laser_node\n'}
+[34.145934] (line_laser) StdoutLine: {'line': b'-- Set runtime path of "/home/hsy/Mypro/create3_ws/install/line_laser/lib/line_laser/line_laser_node" to ""\n'}
+[34.146443] (line_laser) StdoutLine: {'line': b'-- Installing: /home/hsy/Mypro/create3_ws/install/line_laser/share/ament_index/resource_index/package_run_dependencies/line_laser\n'}
+[34.146691] (line_laser) StdoutLine: {'line': b'-- Installing: /home/hsy/Mypro/create3_ws/install/line_laser/share/ament_index/resource_index/parent_prefix_path/line_laser\n'}
+[34.147676] (line_laser) StdoutLine: {'line': b'-- Installing: /home/hsy/Mypro/create3_ws/install/line_laser/share/line_laser/environment/ament_prefix_path.sh\n'}
+[34.148192] (line_laser) StdoutLine: {'line': b'-- Installing: /home/hsy/Mypro/create3_ws/install/line_laser/share/line_laser/environment/ament_prefix_path.dsv\n'}
+[34.148804] (line_laser) StdoutLine: {'line': b'-- Installing: /home/hsy/Mypro/create3_ws/install/line_laser/share/line_laser/environment/path.sh\n'}
+[34.149093] (line_laser) StdoutLine: {'line': b'-- Installing: /home/hsy/Mypro/create3_ws/install/line_laser/share/line_laser/environment/path.dsv\n'}
+[34.149515] (line_laser) StdoutLine: {'line': b'-- Installing: /home/hsy/Mypro/create3_ws/install/line_laser/share/line_laser/local_setup.bash\n'}
+[34.150185] (line_laser) StdoutLine: {'line': b'-- Installing: /home/hsy/Mypro/create3_ws/install/line_laser/share/line_laser/local_setup.sh\n'}
+[34.150450] (line_laser) StdoutLine: {'line': b'-- Installing: /home/hsy/Mypro/create3_ws/install/line_laser/share/line_laser/local_setup.zsh\n'}
+[34.150632] (line_laser) StdoutLine: {'line': b'-- Installing: /home/hsy/Mypro/create3_ws/install/line_laser/share/line_laser/local_setup.dsv\n'}
+[34.151419] (line_laser) StdoutLine: {'line': b'-- Installing: /home/hsy/Mypro/create3_ws/install/line_laser/share/line_laser/package.dsv\n'}
+[34.151785] (line_laser) StdoutLine: {'line': b'-- Installing: /home/hsy/Mypro/create3_ws/install/line_laser/share/ament_index/resource_index/packages/line_laser\n'}
+[34.152427] (line_laser) StdoutLine: {'line': b'-- Installing: /home/hsy/Mypro/create3_ws/install/line_laser/share/line_laser/cmake/line_laserConfig.cmake\n'}
+[34.153249] (line_laser) StdoutLine: {'line': b'-- Installing: /home/hsy/Mypro/create3_ws/install/line_laser/share/line_laser/cmake/line_laserConfig-version.cmake\n'}
+[34.155452] (line_laser) StdoutLine: {'line': b'-- Installing: /home/hsy/Mypro/create3_ws/install/line_laser/share/line_laser/package.xml\n'}
+[34.161562] (line_laser) CommandEnded: {'returncode': 0}
+[34.189936] (-) TimerEvent: {}
+[34.212330] (line_laser) JobEnded: {'identifier': 'line_laser', 'rc': 0}
+[34.214614] (-) EventReactorShutdown: {}
