@@ -1,0 +1,83 @@
+[0.027s] Invoking command in '/home/hsy/Mypro/create3_ws/build/line_laser': CMAKE_PREFIX_PATH=${CMAKE_PREFIX_PATH}:/opt/ros/galactic /usr/bin/cmake /home/hsy/Mypro/create3_ws/src/line_laser -DCMAKE_INSTALL_PREFIX=/home/hsy/Mypro/create3_ws/install/line_laser
+[0.223s] -- The C compiler identification is GNU 9.4.0
+[0.378s] -- The CXX compiler identification is GNU 9.4.0
+[0.392s] -- Check for working C compiler: /usr/bin/cc
+[0.615s] -- Check for working C compiler: /usr/bin/cc -- works
+[0.615s] -- Detecting C compiler ABI info
+[0.848s] -- Detecting C compiler ABI info - done
+[0.881s] -- Detecting C compile features
+[0.885s] -- Detecting C compile features - done
+[0.893s] -- Check for working CXX compiler: /usr/bin/c++
+[1.107s] -- Check for working CXX compiler: /usr/bin/c++ -- works
+[1.110s] -- Detecting CXX compiler ABI info
+[1.360s] -- Detecting CXX compiler ABI info - done
+[1.389s] -- Detecting CXX compile features
+[1.390s] -- Detecting CXX compile features - done
+[1.394s] -- Found ament_cmake: 1.1.6 (/opt/ros/galactic/share/ament_cmake/cmake)
+[1.459s] -- Found PythonInterp: /usr/bin/python3 (found suitable version "3.8.10", minimum required is "3") 
+[1.460s] -- Using PYTHON_EXECUTABLE: /usr/bin/python3
+[1.646s] -- Found rclcpp: 9.2.2 (/opt/ros/galactic/share/rclcpp/cmake)
+[1.765s] -- Using all available rosidl_typesupport_c: rosidl_typesupport_fastrtps_c;rosidl_typesupport_introspection_c
+[1.781s] -- Found rosidl_adapter: 2.2.3 (/opt/ros/galactic/share/rosidl_adapter/cmake)
+[1.958s] -- Found OpenSSL: /usr/lib/x86_64-linux-gnu/libcrypto.so (found version "1.1.1f")  
+[2.031s] -- Found FastRTPS: /opt/ros/galactic/include  
+[2.227s] -- Using all available rosidl_typesupport_cpp: rosidl_typesupport_fastrtps_cpp;rosidl_typesupport_introspection_cpp
+[2.391s] -- Found rmw_implementation_cmake: 3.3.1 (/opt/ros/galactic/share/rmw_implementation_cmake/cmake)
+[2.403s] -- Found rmw_fastrtps_cpp: 5.0.2 (/opt/ros/galactic/share/rmw_fastrtps_cpp/cmake)
+[2.715s] -- Using RMW implementation 'rmw_fastrtps_cpp' as default
+[2.716s] -- Looking for pthread.h
+[2.907s] -- Looking for pthread.h - found
+[2.908s] -- Performing Test CMAKE_HAVE_LIBC_PTHREAD
+[3.142s] -- Performing Test CMAKE_HAVE_LIBC_PTHREAD - Failed
+[3.143s] -- Looking for pthread_create in pthreads
+[3.340s] -- Looking for pthread_create in pthreads - not found
+[3.340s] -- Looking for pthread_create in pthread
+[3.537s] -- Looking for pthread_create in pthread - found
+[3.538s] -- Found Threads: TRUE  
+[4.010s] -- Found sensor_msgs: 2.2.4 (/opt/ros/galactic/share/sensor_msgs/cmake)
+[4.337s] -- Found tf2_ros: 0.17.5 (/opt/ros/galactic/share/tf2_ros/cmake)
+[5.383s] -- Found laser_geometry: 2.2.1 (/opt/ros/galactic/share/laser_geometry/cmake)
+[5.399s] -- Found tf2_sensor_msgs: 0.17.5 (/opt/ros/galactic/share/tf2_sensor_msgs/cmake)
+[5.454s] -- Found tf2_geometry_msgs: 0.17.5 (/opt/ros/galactic/share/tf2_geometry_msgs/cmake)
+[5.475s] -- Found Eigen3: TRUE (found version "3.3.7") 
+[5.580s] -- Found ament_lint_auto: 0.10.7 (/opt/ros/galactic/share/ament_lint_auto/cmake)
+[5.784s] -- Added test 'copyright' to check source files copyright and LICENSE
+[5.788s] -- Added test 'cppcheck' to perform static code analysis on C / C++ code
+[5.789s] -- Configured cppcheck include dirs: $<BUILD_INTERFACE:/home/hsy/Mypro/create3_ws/src/line_laser/include>
+[5.789s] -- Configured cppcheck exclude dirs and/or files: 
+[5.793s] -- Added test 'cpplint' to check C / C++ code against the Google style
+[5.793s] -- Configured cpplint exclude dirs and/or files: 
+[5.794s] -- Added test 'lint_cmake' to check CMake code style
+[5.796s] -- Added test 'uncrustify' to check C / C++ code style
+[5.797s] -- Configured uncrustify additional arguments: 
+[5.799s] -- Added test 'xmllint' to check XML markup files
+[5.807s] -- Configuring done
+[5.842s] -- Generating done
+[5.859s] -- Build files have been written to: /home/hsy/Mypro/create3_ws/build/line_laser
+[5.876s] Invoked command in '/home/hsy/Mypro/create3_ws/build/line_laser' returned '0': CMAKE_PREFIX_PATH=${CMAKE_PREFIX_PATH}:/opt/ros/galactic /usr/bin/cmake /home/hsy/Mypro/create3_ws/src/line_laser -DCMAKE_INSTALL_PREFIX=/home/hsy/Mypro/create3_ws/install/line_laser
+[5.884s] Invoking command in '/home/hsy/Mypro/create3_ws/build/line_laser': CMAKE_PREFIX_PATH=${CMAKE_PREFIX_PATH}:/opt/ros/galactic /usr/bin/cmake --build /home/hsy/Mypro/create3_ws/build/line_laser -- -j8 -l8
+[6.020s] [35m[1mScanning dependencies of target line_laser_node[0m
+[6.224s] [ 50%] [32mBuilding CXX object CMakeFiles/line_laser_node.dir/src/line_laser_node.cpp.o[0m
+[32.824s] [100%] [32m[1mLinking CXX executable line_laser_node[0m
+[34.021s] [100%] Built target line_laser_node
+[34.073s] Invoked command in '/home/hsy/Mypro/create3_ws/build/line_laser' returned '0': CMAKE_PREFIX_PATH=${CMAKE_PREFIX_PATH}:/opt/ros/galactic /usr/bin/cmake --build /home/hsy/Mypro/create3_ws/build/line_laser -- -j8 -l8
+[34.108s] Invoking command in '/home/hsy/Mypro/create3_ws/build/line_laser': CMAKE_PREFIX_PATH=${CMAKE_PREFIX_PATH}:/opt/ros/galactic /usr/bin/cmake --install /home/hsy/Mypro/create3_ws/build/line_laser
+[34.128s] -- Install configuration: ""
+[34.129s] -- Installing: /home/hsy/Mypro/create3_ws/install/line_laser/lib/line_laser/line_laser_node
+[34.140s] -- Set runtime path of "/home/hsy/Mypro/create3_ws/install/line_laser/lib/line_laser/line_laser_node" to ""
+[34.140s] -- Installing: /home/hsy/Mypro/create3_ws/install/line_laser/share/ament_index/resource_index/package_run_dependencies/line_laser
+[34.141s] -- Installing: /home/hsy/Mypro/create3_ws/install/line_laser/share/ament_index/resource_index/parent_prefix_path/line_laser
+[34.142s] -- Installing: /home/hsy/Mypro/create3_ws/install/line_laser/share/line_laser/environment/ament_prefix_path.sh
+[34.142s] -- Installing: /home/hsy/Mypro/create3_ws/install/line_laser/share/line_laser/environment/ament_prefix_path.dsv
+[34.143s] -- Installing: /home/hsy/Mypro/create3_ws/install/line_laser/share/line_laser/environment/path.sh
+[34.143s] -- Installing: /home/hsy/Mypro/create3_ws/install/line_laser/share/line_laser/environment/path.dsv
+[34.144s] -- Installing: /home/hsy/Mypro/create3_ws/install/line_laser/share/line_laser/local_setup.bash
+[34.144s] -- Installing: /home/hsy/Mypro/create3_ws/install/line_laser/share/line_laser/local_setup.sh
+[34.144s] -- Installing: /home/hsy/Mypro/create3_ws/install/line_laser/share/line_laser/local_setup.zsh
+[34.144s] -- Installing: /home/hsy/Mypro/create3_ws/install/line_laser/share/line_laser/local_setup.dsv
+[34.145s] -- Installing: /home/hsy/Mypro/create3_ws/install/line_laser/share/line_laser/package.dsv
+[34.146s] -- Installing: /home/hsy/Mypro/create3_ws/install/line_laser/share/ament_index/resource_index/packages/line_laser
+[34.147s] -- Installing: /home/hsy/Mypro/create3_ws/install/line_laser/share/line_laser/cmake/line_laserConfig.cmake
+[34.147s] -- Installing: /home/hsy/Mypro/create3_ws/install/line_laser/share/line_laser/cmake/line_laserConfig-version.cmake
+[34.150s] -- Installing: /home/hsy/Mypro/create3_ws/install/line_laser/share/line_laser/package.xml
+[34.156s] Invoked command in '/home/hsy/Mypro/create3_ws/build/line_laser' returned '0': CMAKE_PREFIX_PATH=${CMAKE_PREFIX_PATH}:/opt/ros/galactic /usr/bin/cmake --install /home/hsy/Mypro/create3_ws/build/line_laser
