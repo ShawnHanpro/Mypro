@@ -1,0 +1,26 @@
+[0.032s] Invoking command in '/home/hsy/Mypro/create3_ws/build/line_laser': CMAKE_PREFIX_PATH=${CMAKE_PREFIX_PATH}:/opt/ros/galactic /usr/bin/cmake --build /home/hsy/Mypro/create3_ws/build/line_laser -- -j8 -l8
+[0.126s] [35m[1mScanning dependencies of target line_laser_node[0m
+[0.236s] [ 50%] [32mBuilding CXX object CMakeFiles/line_laser_node.dir/src/line_laser_node.cpp.o[0m
+[25.330s] [100%] [32m[1mLinking CXX executable line_laser_node[0m
+[26.331s] [100%] Built target line_laser_node
+[26.371s] Invoked command in '/home/hsy/Mypro/create3_ws/build/line_laser' returned '0': CMAKE_PREFIX_PATH=${CMAKE_PREFIX_PATH}:/opt/ros/galactic /usr/bin/cmake --build /home/hsy/Mypro/create3_ws/build/line_laser -- -j8 -l8
+[26.418s] Invoking command in '/home/hsy/Mypro/create3_ws/build/line_laser': CMAKE_PREFIX_PATH=${CMAKE_PREFIX_PATH}:/opt/ros/galactic /usr/bin/cmake --install /home/hsy/Mypro/create3_ws/build/line_laser
+[26.437s] -- Install configuration: ""
+[26.441s] -- Installing: /home/hsy/Mypro/create3_ws/install/line_laser/lib/line_laser/line_laser_node
+[26.461s] -- Set runtime path of "/home/hsy/Mypro/create3_ws/install/line_laser/lib/line_laser/line_laser_node" to ""
+[26.462s] -- Up-to-date: /home/hsy/Mypro/create3_ws/install/line_laser/share/ament_index/resource_index/package_run_dependencies/line_laser
+[26.462s] -- Up-to-date: /home/hsy/Mypro/create3_ws/install/line_laser/share/ament_index/resource_index/parent_prefix_path/line_laser
+[26.464s] -- Up-to-date: /home/hsy/Mypro/create3_ws/install/line_laser/share/line_laser/environment/ament_prefix_path.sh
+[26.464s] -- Up-to-date: /home/hsy/Mypro/create3_ws/install/line_laser/share/line_laser/environment/ament_prefix_path.dsv
+[26.465s] -- Up-to-date: /home/hsy/Mypro/create3_ws/install/line_laser/share/line_laser/environment/path.sh
+[26.465s] -- Up-to-date: /home/hsy/Mypro/create3_ws/install/line_laser/share/line_laser/environment/path.dsv
+[26.465s] -- Up-to-date: /home/hsy/Mypro/create3_ws/install/line_laser/share/line_laser/local_setup.bash
+[26.465s] -- Up-to-date: /home/hsy/Mypro/create3_ws/install/line_laser/share/line_laser/local_setup.sh
+[26.468s] -- Up-to-date: /home/hsy/Mypro/create3_ws/install/line_laser/share/line_laser/local_setup.zsh
+[26.468s] -- Up-to-date: /home/hsy/Mypro/create3_ws/install/line_laser/share/line_laser/local_setup.dsv
+[26.469s] -- Installing: /home/hsy/Mypro/create3_ws/install/line_laser/share/line_laser/package.dsv
+[26.469s] -- Up-to-date: /home/hsy/Mypro/create3_ws/install/line_laser/share/ament_index/resource_index/packages/line_laser
+[26.470s] -- Up-to-date: /home/hsy/Mypro/create3_ws/install/line_laser/share/line_laser/cmake/line_laserConfig.cmake
+[26.470s] -- Up-to-date: /home/hsy/Mypro/create3_ws/install/line_laser/share/line_laser/cmake/line_laserConfig-version.cmake
+[26.473s] -- Up-to-date: /home/hsy/Mypro/create3_ws/install/line_laser/share/line_laser/package.xml
+[26.475s] Invoked command in '/home/hsy/Mypro/create3_ws/build/line_laser' returned '0': CMAKE_PREFIX_PATH=${CMAKE_PREFIX_PATH}:/opt/ros/galactic /usr/bin/cmake --install /home/hsy/Mypro/create3_ws/build/line_laser
