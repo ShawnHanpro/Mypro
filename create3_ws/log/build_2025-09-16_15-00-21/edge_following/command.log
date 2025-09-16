@@ -1,0 +1,4 @@
+Invoking command in '/home/hsy/Mypro/create3_ws/build/edge_following': CMAKE_PREFIX_PATH=/opt/ros/galactic /usr/bin/cmake --build /home/hsy/Mypro/create3_ws/build/edge_following -- -j8 -l8
+Invoked command in '/home/hsy/Mypro/create3_ws/build/edge_following' returned '0': CMAKE_PREFIX_PATH=/opt/ros/galactic /usr/bin/cmake --build /home/hsy/Mypro/create3_ws/build/edge_following -- -j8 -l8
+Invoking command in '/home/hsy/Mypro/create3_ws/build/edge_following': CMAKE_PREFIX_PATH=/opt/ros/galactic /usr/bin/cmake --install /home/hsy/Mypro/create3_ws/build/edge_following
+Invoked command in '/home/hsy/Mypro/create3_ws/build/edge_following' returned '0': CMAKE_PREFIX_PATH=/opt/ros/galactic /usr/bin/cmake --install /home/hsy/Mypro/create3_ws/build/edge_following

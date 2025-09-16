@@ -1,0 +1,8 @@
+source;share/edge_following/hook/cmake_prefix_path.ps1
+source;share/edge_following/hook/cmake_prefix_path.dsv
+source;share/edge_following/hook/cmake_prefix_path.sh
+source;share/edge_following/local_setup.bash
+source;share/edge_following/local_setup.dsv
+source;share/edge_following/local_setup.ps1
+source;share/edge_following/local_setup.sh
+source;share/edge_following/local_setup.zsh

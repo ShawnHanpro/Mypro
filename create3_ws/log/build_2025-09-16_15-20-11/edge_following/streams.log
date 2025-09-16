@@ -1,0 +1,34 @@
+[0.045s] Invoking command in '/home/hsy/Mypro/create3_ws/build/edge_following': CMAKE_PREFIX_PATH=${CMAKE_PREFIX_PATH}:/opt/ros/galactic /usr/bin/cmake --build /home/hsy/Mypro/create3_ws/build/edge_following -- -j8 -l8
+[0.170s] [35m[1mScanning dependencies of target edge_following_node[0m
+[0.261s] [ 50%] [32mBuilding CXX object CMakeFiles/edge_following_node.dir/src/edge_following_node.cpp.o[0m
+[8.031s] [01m[K/home/hsy/Mypro/create3_ws/src/edge_following/src/edge_following_node.cpp:[m[K In member function ‘[01m[Kvoid EdgeFollower::handle_rotating_left(sensor_msgs::msg::LaserScan_<std::allocator<void> >::SharedPtr)[m[K’:
+[8.032s] [01m[K/home/hsy/Mypro/create3_ws/src/edge_following/src/edge_following_node.cpp:135:76:[m[K [01;35m[Kwarning: [m[Kunused parameter ‘[01m[Kmsg[m[K’ [[01;35m[K-Wunused-parameter[m[K]
+[8.033s]   135 |     void handle_rotating_left([01;35m[Kconst sensor_msgs::msg::LaserScan::SharedPtr msg[m[K) {
+[8.033s]       |                               [01;35m[K~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^~~[m[K
+[8.033s] [01m[K/home/hsy/Mypro/create3_ws/src/edge_following/src/edge_following_node.cpp:[m[K In member function ‘[01m[Kvoid EdgeFollower::handle_wall_following(sensor_msgs::msg::LaserScan_<std::allocator<void> >::SharedPtr)[m[K’:
+[8.033s] [01m[K/home/hsy/Mypro/create3_ws/src/edge_following/src/edge_following_node.cpp:156:25:[m[K [01;35m[Kwarning: [m[Kcomparison of integer expressions of different signedness: ‘[01m[Kint[m[K’ and ‘[01m[Kstd::vector<float>::size_type[m[K’ {aka ‘[01m[Klong unsigned int[m[K’} [[01;35m[K-Wsign-compare[m[K]
+[8.033s]   156 |         if ([01;35m[Kright_index >= msg->ranges.size()[m[K) {
+[8.033s]       |             [01;35m[K~~~~~~~~~~~~^~~~~~~~~~~~~~~~~~~~~[m[K
+[27.165s] [100%] [32m[1mLinking CXX executable edge_following_node[0m
+[28.463s] [100%] Built target edge_following_node
+[28.491s] Invoked command in '/home/hsy/Mypro/create3_ws/build/edge_following' returned '0': CMAKE_PREFIX_PATH=${CMAKE_PREFIX_PATH}:/opt/ros/galactic /usr/bin/cmake --build /home/hsy/Mypro/create3_ws/build/edge_following -- -j8 -l8
+[28.527s] Invoking command in '/home/hsy/Mypro/create3_ws/build/edge_following': CMAKE_PREFIX_PATH=${CMAKE_PREFIX_PATH}:/opt/ros/galactic /usr/bin/cmake --install /home/hsy/Mypro/create3_ws/build/edge_following
+[28.546s] -- Install configuration: ""
+[28.547s] -- Installing: /home/hsy/Mypro/create3_ws/install/edge_following/lib/edge_following/edge_following_node
+[28.557s] -- Set runtime path of "/home/hsy/Mypro/create3_ws/install/edge_following/lib/edge_following/edge_following_node" to ""
+[28.557s] -- Up-to-date: /home/hsy/Mypro/create3_ws/install/edge_following/share/ament_index/resource_index/package_run_dependencies/edge_following
+[28.558s] -- Up-to-date: /home/hsy/Mypro/create3_ws/install/edge_following/share/ament_index/resource_index/parent_prefix_path/edge_following
+[28.558s] -- Up-to-date: /home/hsy/Mypro/create3_ws/install/edge_following/share/edge_following/environment/ament_prefix_path.sh
+[28.558s] -- Up-to-date: /home/hsy/Mypro/create3_ws/install/edge_following/share/edge_following/environment/ament_prefix_path.dsv
+[28.559s] -- Up-to-date: /home/hsy/Mypro/create3_ws/install/edge_following/share/edge_following/environment/path.sh
+[28.560s] -- Up-to-date: /home/hsy/Mypro/create3_ws/install/edge_following/share/edge_following/environment/path.dsv
+[28.560s] -- Up-to-date: /home/hsy/Mypro/create3_ws/install/edge_following/share/edge_following/local_setup.bash
+[28.560s] -- Up-to-date: /home/hsy/Mypro/create3_ws/install/edge_following/share/edge_following/local_setup.sh
+[28.561s] -- Up-to-date: /home/hsy/Mypro/create3_ws/install/edge_following/share/edge_following/local_setup.zsh
+[28.561s] -- Up-to-date: /home/hsy/Mypro/create3_ws/install/edge_following/share/edge_following/local_setup.dsv
+[28.562s] -- Installing: /home/hsy/Mypro/create3_ws/install/edge_following/share/edge_following/package.dsv
+[28.563s] -- Up-to-date: /home/hsy/Mypro/create3_ws/install/edge_following/share/ament_index/resource_index/packages/edge_following
+[28.564s] -- Up-to-date: /home/hsy/Mypro/create3_ws/install/edge_following/share/edge_following/cmake/edge_followingConfig.cmake
+[28.565s] -- Up-to-date: /home/hsy/Mypro/create3_ws/install/edge_following/share/edge_following/cmake/edge_followingConfig-version.cmake
+[28.565s] -- Up-to-date: /home/hsy/Mypro/create3_ws/install/edge_following/share/edge_following/package.xml
+[28.569s] Invoked command in '/home/hsy/Mypro/create3_ws/build/edge_following' returned '0': CMAKE_PREFIX_PATH=${CMAKE_PREFIX_PATH}:/opt/ros/galactic /usr/bin/cmake --install /home/hsy/Mypro/create3_ws/build/edge_following

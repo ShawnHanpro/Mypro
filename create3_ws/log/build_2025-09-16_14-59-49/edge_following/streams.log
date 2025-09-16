@@ -1,0 +1,19 @@
+[0.051s] Invoking command in '/home/hsy/Mypro/create3_ws/build/edge_following': CMAKE_PREFIX_PATH=/opt/ros/galactic /usr/bin/cmake --build /home/hsy/Mypro/create3_ws/build/edge_following -- -j8 -l8
+[0.184s] [35m[1mScanning dependencies of target edge_following_node[0m
+[0.287s] [ 50%] [32mBuilding CXX object CMakeFiles/edge_following_node.dir/src/edge_following_node.cpp.o[0m
+[8.075s] [01m[K/home/hsy/Mypro/create3_ws/src/edge_following/src/edge_following_node.cpp:[m[K In member function ‘[01m[Kvoid EdgeFollower::handle_rotating_left(sensor_msgs::msg::LaserScan_<std::allocator<void> >::SharedPtr)[m[K’:
+[8.076s] [01m[K/home/hsy/Mypro/create3_ws/src/edge_following/src/edge_following_node.cpp:132:76:[m[K [01;35m[Kwarning: [m[Kunused parameter ‘[01m[Kmsg[m[K’ [[01;35m[K-Wunused-parameter[m[K]
+[8.078s]   132 |     void handle_rotating_left([01;35m[Kconst sensor_msgs::msg::LaserScan::SharedPtr msg[m[K) {
+[8.079s]       |                               [01;35m[K~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^~~[m[K
+[8.079s] [01m[K/home/hsy/Mypro/create3_ws/src/edge_following/src/edge_following_node.cpp:[m[K In member function ‘[01m[Kvoid EdgeFollower::handle_wall_following(sensor_msgs::msg::LaserScan_<std::allocator<void> >::SharedPtr)[m[K’:
+[8.079s] [01m[K/home/hsy/Mypro/create3_ws/src/edge_following/src/edge_following_node.cpp:153:25:[m[K [01;35m[Kwarning: [m[Kcomparison of integer expressions of different signedness: ‘[01m[Kint[m[K’ and ‘[01m[Kstd::vector<float>::size_type[m[K’ {aka ‘[01m[Klong unsigned int[m[K’} [[01;35m[K-Wsign-compare[m[K]
+[8.080s]   153 |         if ([01;35m[Kright_index >= msg->ranges.size()[m[K) {
+[8.080s]       |             [01;35m[K~~~~~~~~~~~~^~~~~~~~~~~~~~~~~~~~~[m[K
+[24.184s] [100%] [32m[1mLinking CXX executable edge_following_node[0m
+[25.099s] /usr/bin/ld: CMakeFiles/edge_following_node.dir/src/edge_following_node.cpp.o: in function `tf2::gmTransformToKDL(geometry_msgs::msg::TransformStamped_<std::allocator<void> > const&)':
+[25.100s] edge_following_node.cpp:(.text._ZN3tf216gmTransformToKDLERKN13geometry_msgs3msg17TransformStamped_ISaIvEEE[_ZN3tf216gmTransformToKDLERKN13geometry_msgs3msg17TransformStamped_ISaIvEEE]+0x92): undefined reference to `KDL::Rotation::Quaternion(double, double, double, double)'
+[25.100s] collect2: error: ld returned 1 exit status
+[25.104s] make[2]: *** [CMakeFiles/edge_following_node.dir/build.make:184: edge_following_node] Error 1
+[25.104s] make[1]: *** [CMakeFiles/Makefile2:78: CMakeFiles/edge_following_node.dir/all] Error 2
+[25.105s] make: *** [Makefile:141: all] Error 2
+[25.110s] Invoked command in '/home/hsy/Mypro/create3_ws/build/edge_following' returned '2': CMAKE_PREFIX_PATH=/opt/ros/galactic /usr/bin/cmake --build /home/hsy/Mypro/create3_ws/build/edge_following -- -j8 -l8

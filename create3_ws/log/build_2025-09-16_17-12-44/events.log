@@ -1,0 +1,315 @@
+[0.000000] (-) TimerEvent: {}
+[0.003166] (-) JobUnselected: {'identifier': 'line_laser'}
+[0.003411] (edge_following) JobQueued: {'identifier': 'edge_following', 'dependencies': OrderedDict()}
+[0.003627] (edge_following) JobStarted: {'identifier': 'edge_following'}
+[0.029415] (edge_following) JobProgress: {'identifier': 'edge_following', 'progress': 'cmake'}
+[0.032864] (edge_following) JobProgress: {'identifier': 'edge_following', 'progress': 'build'}
+[0.036017] (edge_following) Command: {'cmd': ['/usr/bin/cmake', '--build', '/home/hsy/Mypro/create3_ws/build/edge_following', '--', '-j8', '-l8'], 'cwd': '/home/hsy/Mypro/create3_ws/build/edge_following', 'env': OrderedDict([('LESSOPEN', '| /usr/bin/lesspipe %s'), ('USER', 'hsy'), ('SSH_AGENT_PID', '1712'), ('XDG_SESSION_TYPE', 'x11'), ('SHLVL', '1'), ('LD_LIBRARY_PATH', '/opt/ros/galactic/opt/yaml_cpp_vendor/lib:/opt/ros/galactic/opt/rviz_ogre_vendor/lib:/opt/ros/galactic/lib/x86_64-linux-gnu:/opt/ros/galactic/lib'), ('HOME', '/home/hsy'), ('OLDPWD', '/home/hsy'), ('DESKTOP_SESSION', 'ubuntu'), ('ROS_PYTHON_VERSION', '3'), ('GNOME_SHELL_SESSION_MODE', 'ubuntu'), ('GTK_MODULES', 'gail:atk-bridge'), ('MANAGERPID', '1582'), ('DBUS_SESSION_BUS_ADDRESS', 'unix:path=/run/user/1000/bus'), ('COLORTERM', 'truecolor'), ('TERMINATOR_DBUS_NAME', 'net.tenshu.Terminator21a9d5db22c73a993ff0b42f64b396873'), ('GIO_LAUNCHED_DESKTOP_FILE_PID', '2835'), ('IM_CONFIG_PHASE', '1'), ('COLCON_PREFIX_PATH', '/home/hsy/Mypro/create3_ws/install'), ('ROS_DISTRO', 'galactic'), ('LOGNAME', 'hsy'), ('JOURNAL_STREAM', '8:57412'), ('_', '/usr/bin/colcon'), ('ROS_VERSION', '2'), ('XDG_SESSION_CLASS', 'user'), ('USERNAME', 'hsy'), ('TERM', 'xterm-256color'), ('GNOME_DESKTOP_SESSION_ID', 'this-is-deprecated'), ('ROS_LOCALHOST_ONLY', '0'), ('WINDOWPATH', '2'), ('PATH', '/opt/ros/galactic/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:/usr/games:/usr/local/games:/snap/bin'), ('SESSION_MANAGER', 'local/hsy:@/tmp/.ICE-unix/1748,unix/hsy:/tmp/.ICE-unix/1748'), ('INVOCATION_ID', '83b255bce24b4d9ea2acbf7c23f9e1e2'), ('XDG_MENU_PREFIX', 'gnome-'), ('XDG_RUNTIME_DIR', '/run/user/1000'), ('DISPLAY', ':0'), ('TERMINATOR_DBUS_PATH', '/net/tenshu/Terminator2'), ('LANG', 'en_US.UTF-8'), ('XDG_CURRENT_DESKTOP', 'ubuntu:GNOME'), ('RMW_IMPLEMENTATION', 'rmw_fastrtps_cpp'), ('XMODIFIERS', '@im=ibus'), ('XDG_SESSION_DESKTOP', 'ubuntu'), ('XAUTHORITY', '/run/user/1000/gdm/Xauthority'), ('LS_COLORS', 'rs=0:di=01;34:ln=01;36:mh=00:pi=40;33:so=01;35:do=01;35:bd=40;33;01:cd=40;33;01:or=40;31;01:mi=00:su=37;41:sg=30;43:ca=30;41:tw=30;42:ow=34;42:st=37;44:ex=01;32:*.tar=01;31:*.tgz=01;31:*.arc=01;31:*.arj=01;31:*.taz=01;31:*.lha=01;31:*.lz4=01;31:*.lzh=01;31:*.lzma=01;31:*.tlz=01;31:*.txz=01;31:*.tzo=01;31:*.t7z=01;31:*.zip=01;31:*.z=01;31:*.dz=01;31:*.gz=01;31:*.lrz=01;31:*.lz=01;31:*.lzo=01;31:*.xz=01;31:*.zst=01;31:*.tzst=01;31:*.bz2=01;31:*.bz=01;31:*.tbz=01;31:*.tbz2=01;31:*.tz=01;31:*.deb=01;31:*.rpm=01;31:*.jar=01;31:*.war=01;31:*.ear=01;31:*.sar=01;31:*.rar=01;31:*.alz=01;31:*.ace=01;31:*.zoo=01;31:*.cpio=01;31:*.7z=01;31:*.rz=01;31:*.cab=01;31:*.wim=01;31:*.swm=01;31:*.dwm=01;31:*.esd=01;31:*.jpg=01;35:*.jpeg=01;35:*.mjpg=01;35:*.mjpeg=01;35:*.gif=01;35:*.bmp=01;35:*.pbm=01;35:*.pgm=01;35:*.ppm=01;35:*.tga=01;35:*.xbm=01;35:*.xpm=01;35:*.tif=01;35:*.tiff=01;35:*.png=01;35:*.svg=01;35:*.svgz=01;35:*.mng=01;35:*.pcx=01;35:*.mov=01;35:*.mpg=01;35:*.mpeg=01;35:*.m2v=01;35:*.mkv=01;35:*.webm=01;35:*.ogm=01;35:*.mp4=01;35:*.m4v=01;35:*.mp4v=01;35:*.vob=01;35:*.qt=01;35:*.nuv=01;35:*.wmv=01;35:*.asf=01;35:*.rm=01;35:*.rmvb=01;35:*.flc=01;35:*.avi=01;35:*.fli=01;35:*.flv=01;35:*.gl=01;35:*.dl=01;35:*.xcf=01;35:*.xwd=01;35:*.yuv=01;35:*.cgm=01;35:*.emf=01;35:*.ogv=01;35:*.ogx=01;35:*.aac=00;36:*.au=00;36:*.flac=00;36:*.m4a=00;36:*.mid=00;36:*.midi=00;36:*.mka=00;36:*.mp3=00;36:*.mpc=00;36:*.ogg=00;36:*.ra=00;36:*.wav=00;36:*.oga=00;36:*.opus=00;36:*.spx=00;36:*.xspf=00;36:'), ('SSH_AUTH_SOCK', '/run/user/1000/keyring/ssh'), ('ROS_DOMAIN_ID', '25'), ('AMENT_PREFIX_PATH', '/home/hsy/Mypro/create3_ws/install/edge_following:/opt/ros/galactic'), ('SHELL', '/bin/bash'), ('TERMINATOR_UUID', 'urn:uuid:9168fa4a-6f0e-4178-b2d5-3f601e587498'), ('QT_ACCESSIBILITY', '1'), ('GDMSESSION', 'ubuntu'), ('LESSCLOSE', '/usr/bin/lesspipe %s %s'), ('GPG_AGENT_INFO', '/run/user/1000/gnupg/S.gpg-agent:0:1'), ('QT_IM_MODULE', 'ibus'), ('PWD', '/home/hsy/Mypro/create3_ws/build/edge_following'), ('LC_ALL', 'en_US.UTF-8'), ('XDG_CONFIG_DIRS', '/etc/xdg/xdg-ubuntu:/etc/xdg'), ('XDG_DATA_DIRS', '/usr/share/ubuntu:/usr/local/share/:/usr/share/:/var/lib/snapd/desktop'), ('PYTHONPATH', '/opt/ros/galactic/lib/python3.8/site-packages'), ('COLCON', '1'), ('VTE_VERSION', '6003'), ('CMAKE_PREFIX_PATH', '/home/hsy/Mypro/create3_ws/install/edge_following:/opt/ros/galactic')]), 'shell': False}
+[0.099689] (-) TimerEvent: {}
+[0.169672] (edge_following) StdoutLine: {'line': b'\x1b[35m\x1b[1mScanning dependencies of target edge_following_node\x1b[0m\n'}
+[0.200089] (-) TimerEvent: {}
+[0.250069] (edge_following) StdoutLine: {'line': b'[ 50%] \x1b[32mBuilding CXX object CMakeFiles/edge_following_node.dir/src/edge_following_node.cpp.o\x1b[0m\n'}
+[0.302541] (-) TimerEvent: {}
+[0.407754] (-) TimerEvent: {}
+[0.509434] (-) TimerEvent: {}
+[0.610336] (-) TimerEvent: {}
+[0.717891] (-) TimerEvent: {}
+[0.818742] (-) TimerEvent: {}
+[0.919871] (-) TimerEvent: {}
+[1.021033] (-) TimerEvent: {}
+[1.122155] (-) TimerEvent: {}
+[1.227835] (-) TimerEvent: {}
+[1.329332] (-) TimerEvent: {}
+[1.431367] (-) TimerEvent: {}
+[1.539372] (-) TimerEvent: {}
+[1.640482] (-) TimerEvent: {}
+[1.741892] (-) TimerEvent: {}
+[1.843413] (-) TimerEvent: {}
+[1.944675] (-) TimerEvent: {}
+[2.051358] (-) TimerEvent: {}
+[2.162901] (-) TimerEvent: {}
+[2.263569] (-) TimerEvent: {}
+[2.365513] (-) TimerEvent: {}
+[2.475845] (-) TimerEvent: {}
+[2.584765] (-) TimerEvent: {}
+[2.687955] (-) TimerEvent: {}
+[2.788886] (-) TimerEvent: {}
+[2.892761] (-) TimerEvent: {}
+[2.996013] (-) TimerEvent: {}
+[3.096644] (-) TimerEvent: {}
+[3.198687] (-) TimerEvent: {}
+[3.300934] (-) TimerEvent: {}
+[3.405747] (-) TimerEvent: {}
+[3.507364] (-) TimerEvent: {}
+[3.617104] (-) TimerEvent: {}
+[3.723315] (-) TimerEvent: {}
+[3.828913] (-) TimerEvent: {}
+[3.933456] (-) TimerEvent: {}
+[4.039836] (-) TimerEvent: {}
+[4.145503] (-) TimerEvent: {}
+[4.246138] (-) TimerEvent: {}
+[4.351158] (-) TimerEvent: {}
+[4.455647] (-) TimerEvent: {}
+[4.556514] (-) TimerEvent: {}
+[4.657911] (-) TimerEvent: {}
+[4.759648] (-) TimerEvent: {}
+[4.860558] (-) TimerEvent: {}
+[4.969051] (-) TimerEvent: {}
+[5.076311] (-) TimerEvent: {}
+[5.179525] (-) TimerEvent: {}
+[5.292389] (-) TimerEvent: {}
+[5.393900] (-) TimerEvent: {}
+[5.494798] (-) TimerEvent: {}
+[5.597021] (-) TimerEvent: {}
+[5.698195] (-) TimerEvent: {}
+[5.799963] (-) TimerEvent: {}
+[5.906655] (-) TimerEvent: {}
+[6.009656] (-) TimerEvent: {}
+[6.110978] (-) TimerEvent: {}
+[6.221875] (-) TimerEvent: {}
+[6.328598] (-) TimerEvent: {}
+[6.433385] (-) TimerEvent: {}
+[6.535505] (-) TimerEvent: {}
+[6.641259] (-) TimerEvent: {}
+[6.748571] (-) TimerEvent: {}
+[6.850685] (-) TimerEvent: {}
+[6.951690] (-) TimerEvent: {}
+[7.052577] (-) TimerEvent: {}
+[7.153559] (-) TimerEvent: {}
+[7.254398] (-) TimerEvent: {}
+[7.368235] (-) TimerEvent: {}
+[7.473757] (-) TimerEvent: {}
+[7.574680] (-) TimerEvent: {}
+[7.676139] (-) TimerEvent: {}
+[7.776824] (-) TimerEvent: {}
+[7.877914] (-) TimerEvent: {}
+[7.947627] (edge_following) StderrLine: {'line': b'\x1b[01m\x1b[K/home/hsy/Mypro/create3_ws/src/edge_following/src/edge_following_node.cpp:\x1b[m\x1b[K In member function \xe2\x80\x98\x1b[01m\x1b[Kvoid EdgeFollower::handle_rotating_left(sensor_msgs::msg::LaserScan_<std::allocator<void> >::SharedPtr)\x1b[m\x1b[K\xe2\x80\x99:\n'}
+[7.948528] (edge_following) StderrLine: {'line': b'\x1b[01m\x1b[K/home/hsy/Mypro/create3_ws/src/edge_following/src/edge_following_node.cpp:188:76:\x1b[m\x1b[K \x1b[01;35m\x1b[Kwarning: \x1b[m\x1b[Kunused parameter \xe2\x80\x98\x1b[01m\x1b[Kmsg\x1b[m\x1b[K\xe2\x80\x99 [\x1b[01;35m\x1b[K-Wunused-parameter\x1b[m\x1b[K]\n'}
+[7.948650] (edge_following) StderrLine: {'line': b'  188 |     void handle_rotating_left(\x1b[01;35m\x1b[Kconst sensor_msgs::msg::LaserScan::SharedPtr msg\x1b[m\x1b[K) {\n'}
+[7.948748] (edge_following) StderrLine: {'line': b'      |                               \x1b[01;35m\x1b[K~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^~~\x1b[m\x1b[K\n'}
+[7.949450] (edge_following) StderrLine: {'line': b'\x1b[01m\x1b[K/home/hsy/Mypro/create3_ws/src/edge_following/src/edge_following_node.cpp:\x1b[m\x1b[K In member function \xe2\x80\x98\x1b[01m\x1b[Kvoid EdgeFollower::handle_wall_following(sensor_msgs::msg::LaserScan_<std::allocator<void> >::SharedPtr)\x1b[m\x1b[K\xe2\x80\x99:\n'}
+[7.950234] (edge_following) StderrLine: {'line': b'\x1b[01m\x1b[K/home/hsy/Mypro/create3_ws/src/edge_following/src/edge_following_node.cpp:209:25:\x1b[m\x1b[K \x1b[01;35m\x1b[Kwarning: \x1b[m\x1b[Kcomparison of integer expressions of different signedness: \xe2\x80\x98\x1b[01m\x1b[Kint\x1b[m\x1b[K\xe2\x80\x99 and \xe2\x80\x98\x1b[01m\x1b[Kstd::vector<float>::size_type\x1b[m\x1b[K\xe2\x80\x99 {aka \xe2\x80\x98\x1b[01m\x1b[Klong unsigned int\x1b[m\x1b[K\xe2\x80\x99} [\x1b[01;35m\x1b[K-Wsign-compare\x1b[m\x1b[K]\n'}
+[7.950463] (edge_following) StderrLine: {'line': b'  209 |         if (\x1b[01;35m\x1b[Kright_index >= msg->ranges.size()\x1b[m\x1b[K) {\n'}
+[7.950639] (edge_following) StderrLine: {'line': b'      |             \x1b[01;35m\x1b[K~~~~~~~~~~~~^~~~~~~~~~~~~~~~~~~~~\x1b[m\x1b[K\n'}
+[7.979951] (-) TimerEvent: {}
+[8.080722] (-) TimerEvent: {}
+[8.181924] (-) TimerEvent: {}
+[8.284808] (-) TimerEvent: {}
+[8.389631] (-) TimerEvent: {}
+[8.495879] (-) TimerEvent: {}
+[8.597161] (-) TimerEvent: {}
+[8.698455] (-) TimerEvent: {}
+[8.805829] (-) TimerEvent: {}
+[8.912442] (-) TimerEvent: {}
+[9.013294] (-) TimerEvent: {}
+[9.114708] (-) TimerEvent: {}
+[9.215979] (-) TimerEvent: {}
+[9.330111] (-) TimerEvent: {}
+[9.432753] (-) TimerEvent: {}
+[9.534664] (-) TimerEvent: {}
+[9.635645] (-) TimerEvent: {}
+[9.737487] (-) TimerEvent: {}
+[9.839491] (-) TimerEvent: {}
+[9.940588] (-) TimerEvent: {}
+[10.045175] (-) TimerEvent: {}
+[10.152990] (-) TimerEvent: {}
+[10.259545] (-) TimerEvent: {}
+[10.363488] (-) TimerEvent: {}
+[10.465835] (-) TimerEvent: {}
+[10.567968] (-) TimerEvent: {}
+[10.672106] (-) TimerEvent: {}
+[10.774507] (-) TimerEvent: {}
+[10.877476] (-) TimerEvent: {}
+[10.985119] (-) TimerEvent: {}
+[11.090383] (-) TimerEvent: {}
+[11.191506] (-) TimerEvent: {}
+[11.294665] (-) TimerEvent: {}
+[11.402830] (-) TimerEvent: {}
+[11.510585] (-) TimerEvent: {}
+[11.615519] (-) TimerEvent: {}
+[11.727049] (-) TimerEvent: {}
+[11.828031] (-) TimerEvent: {}
+[11.929487] (-) TimerEvent: {}
+[12.038068] (-) TimerEvent: {}
+[12.144233] (-) TimerEvent: {}
+[12.256062] (-) TimerEvent: {}
+[12.364315] (-) TimerEvent: {}
+[12.473358] (-) TimerEvent: {}
+[12.581632] (-) TimerEvent: {}
+[12.688302] (-) TimerEvent: {}
+[12.789410] (-) TimerEvent: {}
+[12.892524] (-) TimerEvent: {}
+[12.994486] (-) TimerEvent: {}
+[13.097679] (-) TimerEvent: {}
+[13.204465] (-) TimerEvent: {}
+[13.310085] (-) TimerEvent: {}
+[13.410907] (-) TimerEvent: {}
+[13.512167] (-) TimerEvent: {}
+[13.613630] (-) TimerEvent: {}
+[13.714999] (-) TimerEvent: {}
+[13.817124] (-) TimerEvent: {}
+[13.919881] (-) TimerEvent: {}
+[14.028079] (-) TimerEvent: {}
+[14.130184] (-) TimerEvent: {}
+[14.231768] (-) TimerEvent: {}
+[14.337430] (-) TimerEvent: {}
+[14.438777] (-) TimerEvent: {}
+[14.544250] (-) TimerEvent: {}
+[14.646298] (-) TimerEvent: {}
+[14.747549] (-) TimerEvent: {}
+[14.850207] (-) TimerEvent: {}
+[14.951723] (-) TimerEvent: {}
+[15.061897] (-) TimerEvent: {}
+[15.169179] (-) TimerEvent: {}
+[15.269969] (-) TimerEvent: {}
+[15.373008] (-) TimerEvent: {}
+[15.475471] (-) TimerEvent: {}
+[15.576923] (-) TimerEvent: {}
+[15.680543] (-) TimerEvent: {}
+[15.782405] (-) TimerEvent: {}
+[15.888220] (-) TimerEvent: {}
+[15.989165] (-) TimerEvent: {}
+[16.090610] (-) TimerEvent: {}
+[16.191408] (-) TimerEvent: {}
+[16.292271] (-) TimerEvent: {}
+[16.400688] (-) TimerEvent: {}
+[16.501342] (-) TimerEvent: {}
+[16.602812] (-) TimerEvent: {}
+[16.712528] (-) TimerEvent: {}
+[16.819284] (-) TimerEvent: {}
+[16.927802] (-) TimerEvent: {}
+[17.036261] (-) TimerEvent: {}
+[17.143649] (-) TimerEvent: {}
+[17.247314] (-) TimerEvent: {}
+[17.349521] (-) TimerEvent: {}
+[17.454015] (-) TimerEvent: {}
+[17.559946] (-) TimerEvent: {}
+[17.663130] (-) TimerEvent: {}
+[17.764037] (-) TimerEvent: {}
+[17.872946] (-) TimerEvent: {}
+[17.973763] (-) TimerEvent: {}
+[18.089096] (-) TimerEvent: {}
+[18.192638] (-) TimerEvent: {}
+[18.294026] (-) TimerEvent: {}
+[18.396864] (-) TimerEvent: {}
+[18.504174] (-) TimerEvent: {}
+[18.611599] (-) TimerEvent: {}
+[18.712811] (-) TimerEvent: {}
+[18.816995] (-) TimerEvent: {}
+[18.927046] (-) TimerEvent: {}
+[19.034553] (-) TimerEvent: {}
+[19.142481] (-) TimerEvent: {}
+[19.248534] (-) TimerEvent: {}
+[19.349379] (-) TimerEvent: {}
+[19.451965] (-) TimerEvent: {}
+[19.552963] (-) TimerEvent: {}
+[19.666018] (-) TimerEvent: {}
+[19.773112] (-) TimerEvent: {}
+[19.876520] (-) TimerEvent: {}
+[19.977288] (-) TimerEvent: {}
+[20.081864] (-) TimerEvent: {}
+[20.183543] (-) TimerEvent: {}
+[20.285887] (-) TimerEvent: {}
+[20.391656] (-) TimerEvent: {}
+[20.492989] (-) TimerEvent: {}
+[20.595125] (-) TimerEvent: {}
+[20.695815] (-) TimerEvent: {}
+[20.809449] (-) TimerEvent: {}
+[20.912027] (-) TimerEvent: {}
+[21.027200] (-) TimerEvent: {}
+[21.133619] (-) TimerEvent: {}
+[21.243791] (-) TimerEvent: {}
+[21.344915] (-) TimerEvent: {}
+[21.446399] (-) TimerEvent: {}
+[21.547807] (-) TimerEvent: {}
+[21.659939] (-) TimerEvent: {}
+[21.770742] (-) TimerEvent: {}
+[21.879035] (-) TimerEvent: {}
+[21.987986] (-) TimerEvent: {}
+[22.096346] (-) TimerEvent: {}
+[22.203948] (-) TimerEvent: {}
+[22.312573] (-) TimerEvent: {}
+[22.419434] (-) TimerEvent: {}
+[22.529461] (-) TimerEvent: {}
+[22.635856] (-) TimerEvent: {}
+[22.739395] (-) TimerEvent: {}
+[22.842474] (-) TimerEvent: {}
+[22.945017] (-) TimerEvent: {}
+[23.050501] (-) TimerEvent: {}
+[23.151321] (-) TimerEvent: {}
+[23.252857] (-) TimerEvent: {}
+[23.353513] (-) TimerEvent: {}
+[23.460844] (-) TimerEvent: {}
+[23.562637] (-) TimerEvent: {}
+[23.664547] (-) TimerEvent: {}
+[23.771333] (-) TimerEvent: {}
+[23.879792] (-) TimerEvent: {}
+[23.986715] (-) TimerEvent: {}
+[24.096030] (-) TimerEvent: {}
+[24.200443] (-) TimerEvent: {}
+[24.302468] (-) TimerEvent: {}
+[24.404419] (-) TimerEvent: {}
+[24.505270] (-) TimerEvent: {}
+[24.608192] (-) TimerEvent: {}
+[24.716685] (-) TimerEvent: {}
+[24.825375] (-) TimerEvent: {}
+[24.933896] (-) TimerEvent: {}
+[25.042539] (-) TimerEvent: {}
+[25.143988] (-) TimerEvent: {}
+[25.245269] (-) TimerEvent: {}
+[25.352023] (-) TimerEvent: {}
+[25.453453] (-) TimerEvent: {}
+[25.555053] (-) TimerEvent: {}
+[25.656422] (-) TimerEvent: {}
+[25.757725] (-) TimerEvent: {}
+[25.864588] (-) TimerEvent: {}
+[25.965378] (-) TimerEvent: {}
+[26.067788] (-) TimerEvent: {}
+[26.169652] (-) TimerEvent: {}
+[26.285219] (-) TimerEvent: {}
+[26.390015] (-) TimerEvent: {}
+[26.491775] (-) TimerEvent: {}
+[26.592663] (-) TimerEvent: {}
+[26.696305] (-) TimerEvent: {}
+[26.797274] (-) TimerEvent: {}
+[26.900397] (-) TimerEvent: {}
+[26.956976] (edge_following) StdoutLine: {'line': b'[100%] \x1b[32m\x1b[1mLinking CXX executable edge_following_node\x1b[0m\n'}
+[27.000982] (-) TimerEvent: {}
+[27.106616] (-) TimerEvent: {}
+[27.217164] (-) TimerEvent: {}
+[27.317967] (-) TimerEvent: {}
+[27.420704] (-) TimerEvent: {}
+[27.529924] (-) TimerEvent: {}
+[27.630683] (-) TimerEvent: {}
+[27.731536] (-) TimerEvent: {}
+[27.832342] (-) TimerEvent: {}
+[27.938554] (-) TimerEvent: {}
+[28.040455] (-) TimerEvent: {}
+[28.147459] (-) TimerEvent: {}
+[28.249239] (-) TimerEvent: {}
+[28.262401] (edge_following) StdoutLine: {'line': b'[100%] Built target edge_following_node\n'}
+[28.296870] (edge_following) CommandEnded: {'returncode': 0}
+[28.306694] (edge_following) JobProgress: {'identifier': 'edge_following', 'progress': 'install'}
+[28.334466] (edge_following) Command: {'cmd': ['/usr/bin/cmake', '--install', '/home/hsy/Mypro/create3_ws/build/edge_following'], 'cwd': '/home/hsy/Mypro/create3_ws/build/edge_following', 'env': OrderedDict([('LESSOPEN', '| /usr/bin/lesspipe %s'), ('USER', 'hsy'), ('SSH_AGENT_PID', '1712'), ('XDG_SESSION_TYPE', 'x11'), ('SHLVL', '1'), ('LD_LIBRARY_PATH', '/opt/ros/galactic/opt/yaml_cpp_vendor/lib:/opt/ros/galactic/opt/rviz_ogre_vendor/lib:/opt/ros/galactic/lib/x86_64-linux-gnu:/opt/ros/galactic/lib'), ('HOME', '/home/hsy'), ('OLDPWD', '/home/hsy'), ('DESKTOP_SESSION', 'ubuntu'), ('ROS_PYTHON_VERSION', '3'), ('GNOME_SHELL_SESSION_MODE', 'ubuntu'), ('GTK_MODULES', 'gail:atk-bridge'), ('MANAGERPID', '1582'), ('DBUS_SESSION_BUS_ADDRESS', 'unix:path=/run/user/1000/bus'), ('COLORTERM', 'truecolor'), ('TERMINATOR_DBUS_NAME', 'net.tenshu.Terminator21a9d5db22c73a993ff0b42f64b396873'), ('GIO_LAUNCHED_DESKTOP_FILE_PID', '2835'), ('IM_CONFIG_PHASE', '1'), ('COLCON_PREFIX_PATH', '/home/hsy/Mypro/create3_ws/install'), ('ROS_DISTRO', 'galactic'), ('LOGNAME', 'hsy'), ('JOURNAL_STREAM', '8:57412'), ('_', '/usr/bin/colcon'), ('ROS_VERSION', '2'), ('XDG_SESSION_CLASS', 'user'), ('USERNAME', 'hsy'), ('TERM', 'xterm-256color'), ('GNOME_DESKTOP_SESSION_ID', 'this-is-deprecated'), ('ROS_LOCALHOST_ONLY', '0'), ('WINDOWPATH', '2'), ('PATH', '/opt/ros/galactic/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:/usr/games:/usr/local/games:/snap/bin'), ('SESSION_MANAGER', 'local/hsy:@/tmp/.ICE-unix/1748,unix/hsy:/tmp/.ICE-unix/1748'), ('INVOCATION_ID', '83b255bce24b4d9ea2acbf7c23f9e1e2'), ('XDG_MENU_PREFIX', 'gnome-'), ('XDG_RUNTIME_DIR', '/run/user/1000'), ('DISPLAY', ':0'), ('TERMINATOR_DBUS_PATH', '/net/tenshu/Terminator2'), ('LANG', 'en_US.UTF-8'), ('XDG_CURRENT_DESKTOP', 'ubuntu:GNOME'), ('RMW_IMPLEMENTATION', 'rmw_fastrtps_cpp'), ('XMODIFIERS', '@im=ibus'), ('XDG_SESSION_DESKTOP', 'ubuntu'), ('XAUTHORITY', '/run/user/1000/gdm/Xauthority'), ('LS_COLORS', 'rs=0:di=01;34:ln=01;36:mh=00:pi=40;33:so=01;35:do=01;35:bd=40;33;01:cd=40;33;01:or=40;31;01:mi=00:su=37;41:sg=30;43:ca=30;41:tw=30;42:ow=34;42:st=37;44:ex=01;32:*.tar=01;31:*.tgz=01;31:*.arc=01;31:*.arj=01;31:*.taz=01;31:*.lha=01;31:*.lz4=01;31:*.lzh=01;31:*.lzma=01;31:*.tlz=01;31:*.txz=01;31:*.tzo=01;31:*.t7z=01;31:*.zip=01;31:*.z=01;31:*.dz=01;31:*.gz=01;31:*.lrz=01;31:*.lz=01;31:*.lzo=01;31:*.xz=01;31:*.zst=01;31:*.tzst=01;31:*.bz2=01;31:*.bz=01;31:*.tbz=01;31:*.tbz2=01;31:*.tz=01;31:*.deb=01;31:*.rpm=01;31:*.jar=01;31:*.war=01;31:*.ear=01;31:*.sar=01;31:*.rar=01;31:*.alz=01;31:*.ace=01;31:*.zoo=01;31:*.cpio=01;31:*.7z=01;31:*.rz=01;31:*.cab=01;31:*.wim=01;31:*.swm=01;31:*.dwm=01;31:*.esd=01;31:*.jpg=01;35:*.jpeg=01;35:*.mjpg=01;35:*.mjpeg=01;35:*.gif=01;35:*.bmp=01;35:*.pbm=01;35:*.pgm=01;35:*.ppm=01;35:*.tga=01;35:*.xbm=01;35:*.xpm=01;35:*.tif=01;35:*.tiff=01;35:*.png=01;35:*.svg=01;35:*.svgz=01;35:*.mng=01;35:*.pcx=01;35:*.mov=01;35:*.mpg=01;35:*.mpeg=01;35:*.m2v=01;35:*.mkv=01;35:*.webm=01;35:*.ogm=01;35:*.mp4=01;35:*.m4v=01;35:*.mp4v=01;35:*.vob=01;35:*.qt=01;35:*.nuv=01;35:*.wmv=01;35:*.asf=01;35:*.rm=01;35:*.rmvb=01;35:*.flc=01;35:*.avi=01;35:*.fli=01;35:*.flv=01;35:*.gl=01;35:*.dl=01;35:*.xcf=01;35:*.xwd=01;35:*.yuv=01;35:*.cgm=01;35:*.emf=01;35:*.ogv=01;35:*.ogx=01;35:*.aac=00;36:*.au=00;36:*.flac=00;36:*.m4a=00;36:*.mid=00;36:*.midi=00;36:*.mka=00;36:*.mp3=00;36:*.mpc=00;36:*.ogg=00;36:*.ra=00;36:*.wav=00;36:*.oga=00;36:*.opus=00;36:*.spx=00;36:*.xspf=00;36:'), ('SSH_AUTH_SOCK', '/run/user/1000/keyring/ssh'), ('ROS_DOMAIN_ID', '25'), ('AMENT_PREFIX_PATH', '/home/hsy/Mypro/create3_ws/install/edge_following:/opt/ros/galactic'), ('SHELL', '/bin/bash'), ('TERMINATOR_UUID', 'urn:uuid:9168fa4a-6f0e-4178-b2d5-3f601e587498'), ('QT_ACCESSIBILITY', '1'), ('GDMSESSION', 'ubuntu'), ('LESSCLOSE', '/usr/bin/lesspipe %s %s'), ('GPG_AGENT_INFO', '/run/user/1000/gnupg/S.gpg-agent:0:1'), ('QT_IM_MODULE', 'ibus'), ('PWD', '/home/hsy/Mypro/create3_ws/build/edge_following'), ('LC_ALL', 'en_US.UTF-8'), ('XDG_CONFIG_DIRS', '/etc/xdg/xdg-ubuntu:/etc/xdg'), ('XDG_DATA_DIRS', '/usr/share/ubuntu:/usr/local/share/:/usr/share/:/var/lib/snapd/desktop'), ('PYTHONPATH', '/opt/ros/galactic/lib/python3.8/site-packages'), ('COLCON', '1'), ('VTE_VERSION', '6003'), ('CMAKE_PREFIX_PATH', '/home/hsy/Mypro/create3_ws/install/edge_following:/opt/ros/galactic')]), 'shell': False}
+[28.352566] (-) TimerEvent: {}
+[28.359800] (edge_following) StdoutLine: {'line': b'-- Install configuration: ""\n'}
+[28.361301] (edge_following) StdoutLine: {'line': b'-- Installing: /home/hsy/Mypro/create3_ws/install/edge_following/lib/edge_following/edge_following_node\n'}
+[28.372461] (edge_following) StdoutLine: {'line': b'-- Set runtime path of "/home/hsy/Mypro/create3_ws/install/edge_following/lib/edge_following/edge_following_node" to ""\n'}
+[28.373656] (edge_following) StdoutLine: {'line': b'-- Up-to-date: /home/hsy/Mypro/create3_ws/install/edge_following/share/ament_index/resource_index/package_run_dependencies/edge_following\n'}
+[28.374290] (edge_following) StdoutLine: {'line': b'-- Up-to-date: /home/hsy/Mypro/create3_ws/install/edge_following/share/ament_index/resource_index/parent_prefix_path/edge_following\n'}
+[28.374993] (edge_following) StdoutLine: {'line': b'-- Up-to-date: /home/hsy/Mypro/create3_ws/install/edge_following/share/edge_following/environment/ament_prefix_path.sh\n'}
+[28.375288] (edge_following) StdoutLine: {'line': b'-- Up-to-date: /home/hsy/Mypro/create3_ws/install/edge_following/share/edge_following/environment/ament_prefix_path.dsv\n'}
+[28.375471] (edge_following) StdoutLine: {'line': b'-- Up-to-date: /home/hsy/Mypro/create3_ws/install/edge_following/share/edge_following/environment/path.sh\n'}
+[28.375636] (edge_following) StdoutLine: {'line': b'-- Up-to-date: /home/hsy/Mypro/create3_ws/install/edge_following/share/edge_following/environment/path.dsv\n'}
+[28.375792] (edge_following) StdoutLine: {'line': b'-- Up-to-date: /home/hsy/Mypro/create3_ws/install/edge_following/share/edge_following/local_setup.bash\n'}
+[28.376365] (edge_following) StdoutLine: {'line': b'-- Up-to-date: /home/hsy/Mypro/create3_ws/install/edge_following/share/edge_following/local_setup.sh\n'}
+[28.376766] (edge_following) StdoutLine: {'line': b'-- Up-to-date: /home/hsy/Mypro/create3_ws/install/edge_following/share/edge_following/local_setup.zsh\n'}
+[28.377157] (edge_following) StdoutLine: {'line': b'-- Up-to-date: /home/hsy/Mypro/create3_ws/install/edge_following/share/edge_following/local_setup.dsv\n'}
+[28.377754] (edge_following) StdoutLine: {'line': b'-- Installing: /home/hsy/Mypro/create3_ws/install/edge_following/share/edge_following/package.dsv\n'}
+[28.377933] (edge_following) StdoutLine: {'line': b'-- Up-to-date: /home/hsy/Mypro/create3_ws/install/edge_following/share/ament_index/resource_index/packages/edge_following\n'}
+[28.378105] (edge_following) StdoutLine: {'line': b'-- Up-to-date: /home/hsy/Mypro/create3_ws/install/edge_following/share/edge_following/cmake/edge_followingConfig.cmake\n'}
+[28.378255] (edge_following) StdoutLine: {'line': b'-- Up-to-date: /home/hsy/Mypro/create3_ws/install/edge_following/share/edge_following/cmake/edge_followingConfig-version.cmake\n'}
+[28.381446] (edge_following) StdoutLine: {'line': b'-- Up-to-date: /home/hsy/Mypro/create3_ws/install/edge_following/share/edge_following/package.xml\n'}
+[28.386303] (edge_following) CommandEnded: {'returncode': 0}
+[28.442617] (edge_following) JobEnded: {'identifier': 'edge_following', 'rc': 0}
+[28.446897] (-) EventReactorShutdown: {}

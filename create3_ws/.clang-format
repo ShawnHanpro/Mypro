@@ -106,7 +106,7 @@ BreakAfterJavaFieldAnnotations: false
 # 字符串字面量在需要时换行
 BreakStringLiterals: true 
 # 每行最大字符数限制为80
-ColumnLimit:     80 
+ColumnLimit:     150 
 # 特定注释格式的正则表达式匹配
 CommentPragmas:  '^ IWYU pragma:' 
 # 命名空间内容不紧凑排列

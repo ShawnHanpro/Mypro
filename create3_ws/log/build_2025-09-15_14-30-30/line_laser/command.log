@@ -1,6 +1,0 @@
-Invoking command in '/home/hsy/Mypro/create3_ws/build/line_laser': CMAKE_PREFIX_PATH=${CMAKE_PREFIX_PATH}:/opt/ros/galactic /usr/bin/cmake /home/hsy/Mypro/create3_ws/src/line_laser -DCMAKE_INSTALL_PREFIX=/home/hsy/Mypro/create3_ws/install/line_laser
-Invoked command in '/home/hsy/Mypro/create3_ws/build/line_laser' returned '0': CMAKE_PREFIX_PATH=${CMAKE_PREFIX_PATH}:/opt/ros/galactic /usr/bin/cmake /home/hsy/Mypro/create3_ws/src/line_laser -DCMAKE_INSTALL_PREFIX=/home/hsy/Mypro/create3_ws/install/line_laser
-Invoking command in '/home/hsy/Mypro/create3_ws/build/line_laser': CMAKE_PREFIX_PATH=${CMAKE_PREFIX_PATH}:/opt/ros/galactic /usr/bin/cmake --build /home/hsy/Mypro/create3_ws/build/line_laser -- -j8 -l8
-Invoked command in '/home/hsy/Mypro/create3_ws/build/line_laser' returned '0': CMAKE_PREFIX_PATH=${CMAKE_PREFIX_PATH}:/opt/ros/galactic /usr/bin/cmake --build /home/hsy/Mypro/create3_ws/build/line_laser -- -j8 -l8
-Invoking command in '/home/hsy/Mypro/create3_ws/build/line_laser': CMAKE_PREFIX_PATH=${CMAKE_PREFIX_PATH}:/opt/ros/galactic /usr/bin/cmake --install /home/hsy/Mypro/create3_ws/build/line_laser
-Invoked command in '/home/hsy/Mypro/create3_ws/build/line_laser' returned '0': CMAKE_PREFIX_PATH=${CMAKE_PREFIX_PATH}:/opt/ros/galactic /usr/bin/cmake --install /home/hsy/Mypro/create3_ws/build/line_laser
