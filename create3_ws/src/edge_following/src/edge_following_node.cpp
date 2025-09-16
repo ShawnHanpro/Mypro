@@ -65,7 +65,7 @@ private:
                 break;
         }
 
-        // 发布圆柱体
+        // 发布最近点
         PublishCylinder(target_point_.x, target_point_.y, 0.1, 0.03, 0.03, 0.3, 0.0, 1.0, 0.0, 1.0, 0);
 #if 0
         // 机身坐标
@@ -108,15 +108,15 @@ private:
                         min_dist, target_angle_);
 
             // 激光雷达坐标系坐标点
-            Point2D laser_point(min_dist * cos(target_angle_), min_dist * sin(target_angle_));
+            laser_point_ = Point2D(min_dist * cos(target_angle_), min_dist * sin(target_angle_));
 
             // pointstamped类型存储数据
             geometry_msgs::msg::PointStamped point_in_laser;
             point_in_laser.header = msg->header;
             point_in_laser.header.stamp = rclcpp::Time(0);
             
-            point_in_laser.point.x = laser_point.x;
-            point_in_laser.point.y = laser_point.y;
+            point_in_laser.point.x = laser_point_.x;
+            point_in_laser.point.y = laser_point_.y;
             point_in_laser.point.z = 0.0;
 
             geometry_msgs::msg::PointStamped point_in_odom;
@@ -125,11 +125,11 @@ private:
                 point_in_odom = tf_buffer_->transform(point_in_laser, "odom");
                 target_point_.x = point_in_odom.point.x;
                 target_point_.y = point_in_odom.point.y;
+                current_state_ = State::DRIVING_TO_WALL;
             } catch (const tf2::TransformException &ex) {
                 RCLCPP_WARN(this->get_logger(), "无法转换坐标点：%s", ex.what());
             }
 
-            current_state_ = State::DRIVING_TO_WALL;
         }
 
     }
@@ -138,36 +138,31 @@ private:
     void handle_driving_to_wall(const sensor_msgs::msg::LaserScan::SharedPtr msg) {
         geometry_msgs::msg::TransformStamped transform;
 
+        geometry_msgs::msg::PointStamped target_in_odom;
+        target_in_odom.header.frame_id = "odom";
+        target_in_odom.header.stamp = rclcpp::Time(0);
+        target_in_odom.point.x = target_point_.x;
+        target_in_odom.point.y = target_point_.y;
+        target_in_odom.point.z = 0.0;
+
+        geometry_msgs::msg::PointStamped target_in_base;
+
         try {
-            transform = tf_buffer_->lookupTransform("odom", "base_link", tf2::TimePointZero);
-            double qx = transform.transform.rotation.x;
-            double qy = transform.transform.rotation.y;
-            double qz = transform.transform.rotation.z;
-            double qw = transform.transform.rotation.w;
+            // 转换到 base_link
+            target_in_base = tf_buffer_->transform(target_in_odom, "base_link");
 
-            // 四元数转 yaw
-            double siny = 2.0 * (qw * qz + qx * qy);
-            double cosy = 1.0 - 2.0 * (qy * qy + qz * qz);
-            double current_yaw = std::atan2(siny, cosy);
-
-            // 目标角度
-            double target_yaw = std::atan2(target_point_.y, target_point_.x);
-
-            // 固定角度范围
-            double angle_diff = target_yaw - current_yaw;
-            while (angle_diff > M_PI) angle_diff -= 2 * M_PI;
-            while (angle_diff < -M_PI) angle_diff += 2 * M_PI;
+            // 计算相对机器人前进方向的角度
+            double target_yaw = std::atan2(target_in_base.point.y, target_in_base.point.x);
 
             geometry_msgs::msg::Twist twist_msg;
             // 0度角向前
             float                     front_dist = msg->ranges[0];
 
             // 转向最近的点
-            if (std::fabs(angle_diff) > 0.05) {
-                twist_msg.angular.z = (angle_diff > 0) ? 0.3 : -0.3;
-                RCLCPP_INFO(this->get_logger(), "Rotating. Current yaw: %.2f, Target yaw: %.2f, Diff: %.2f",
-                            current_yaw, target_yaw, angle_diff);
-            } else if (front_dist > 0.3) {
+            if (std::fabs(target_yaw) > 0.05) {
+                twist_msg.angular.z = (target_yaw > 0) ? 0.3 : -0.3;
+                RCLCPP_INFO(this->get_logger(), "Rotating. Target yaw: %.2f", target_yaw);
+            } else if (front_dist > 0.55) {
                 twist_msg.linear.x = 0.1;
                 RCLCPP_INFO(this->get_logger(), "Moving forward. Distance to wall: %f", front_dist);
             } else {
@@ -286,6 +281,7 @@ private:
     std::shared_ptr<tf2_ros::TransformListener> tf_listener_;
 
     Point2D target_point_;
+    Point2D laser_point_;
 };
 
 int main(int argc, char *argv[]) {
