@@ -39,3 +39,12 @@
 
 # debug information files
 *.dwo
+
+# preclude
+create3_ws/build/
+create3_ws/install/
+create3_ws/log/
+build/
+install/
+log/
+
