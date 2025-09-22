@@ -69,14 +69,15 @@ public:
         dis_to_wall_ = -1.0f;
         has_min_dist_ = false;
         front_dist_ = -1.0f;
+        has_obstacle_ = false;
+        front_obstacle_dist_ = 0.3;
 
         RCLCPP_INFO(this->get_logger(), "Wall follower node has been started.");
     }
 
 private:
     void line_laser_callback(const sensor_msgs::msg::LaserScan::SharedPtr msg) {
-        if (msg->ranges.size() < 10) {
-            RCLCPP_WARN(this->get_logger(), "no line lidar data!");
+        if (msg->ranges.size() < 10 || current_state_ != State::WALL_FOLLOWING) {
             dis_to_wall_ = -1.0f;
             return;
         }
@@ -103,24 +104,19 @@ private:
 
         // sensor_msgs::msg::LaserScan scan = *msg;
         // int scan_size = scan.ranges.size();
-
         // std::fill(scan.ranges.begin() + 5, scan.ranges.end() - 5, std::numeric_limits<float>::quiet_NaN());
-
         // sensor_msgs::msg::PointCloud2 laser_cloud;
         // sensor_msgs::msg::PointCloud2 odom_cloud;
         // try {
         //     // laserscan -> pointcloud in laser
         //     projector_.transformLaserScanToPointCloud(scan.header.frame_id, scan, laser_cloud, *tf_buffer_);
-
         //     // in odom
         //     geometry_msgs::msg::TransformStamped transform_stamped =
         //         tf_buffer_->lookupTransform(
         //             "odom", msg->header.frame_id, msg->header.stamp,
         //             rclcpp::Duration::from_seconds(0.2));
-
         //     tf2::doTransform(laser_cloud, odom_cloud,
         //                      transform_stamped);
-
         //     // pub
         //     cloud_pub_->publish(odom_cloud);
         // } catch (const tf2::TransformException &ex) {
@@ -164,37 +160,78 @@ private:
 
     void scan_callback(const sensor_msgs::msg::LaserScan::SharedPtr msg) {
 
-        if (!has_min_dist_) {
-            int min_angle_index = -1;
-            float min_dist = std::numeric_limits<float>::infinity();
-            for (size_t i = 0; i < msg->ranges.size(); ++i) {
-                if (msg->ranges[i] < min_dist && msg->ranges[i] > 0) {
-                    min_dist = msg->ranges[i];
-                    has_min_dist_ = true;
-                    min_angle_index = i;
-                }
-            }
-
-            if (min_angle_index != -1) {
-                float target_angle = msg->angle_min + min_angle_index * msg->angle_increment;
-
-                // 激光雷达坐标系坐标点
-                Point2D laser_point = Point2D(min_dist * cos(target_angle), min_dist * sin(target_angle));
-
-                // pointstamped类型存储数据
-                point_in_laser_.header = msg->header;
-                point_in_laser_.header.stamp = rclcpp::Time(0);
-
-                point_in_laser_.point.x = laser_point.x;
-                point_in_laser_.point.y = laser_point.y;
-                point_in_laser_.point.z = 0.0;
-            }
-        }
-
+        is_obstacle_in_front(msg);
+        point_in_laser(msg);
         front_dist_ = msg->ranges[0];
 
+        // -45 to -135
+        float right_min_dist = std::numeric_limits<double>::infinity();
+        int right_min_index = -1;
+        size_t start_index = get_index_from_angle(msg, 3.93); // -135
+        size_t end_index = get_index_from_angle(msg, 5.5); // -45
+
+#if 1
+        for (size_t i = start_index; i <= end_index; ++i) {
+            if (std::isfinite(msg->ranges[i]) && msg->ranges[i] < right_min_dist && msg->ranges[i] > 0.1) {
+                right_min_dist = msg->ranges[i];
+                right_min_index = i;
+            }
+        }
+        right_min_dist = (right_min_dist == std::numeric_limits<double>::infinity()) ? -1.0 : right_min_dist;
+
+        if (right_min_index != -1) {
+            float target_angle = msg->angle_min + right_min_index * msg->angle_increment;
+
+            // 激光雷达坐标系坐标点
+            Point2D laser_point = Point2D(right_min_dist * cos(target_angle), right_min_dist * sin(target_angle));
+
+            // pointstamped类型存储数据
+            geometry_msgs::msg::PointStamped right_in_laser;
+            right_in_laser.header = msg->header;
+            right_in_laser.header.stamp = rclcpp::Time(0);
+
+            right_in_laser.point.x = laser_point.x;
+            right_in_laser.point.y = laser_point.y;
+            right_in_laser.point.z = 0.0;
+
+            geometry_msgs::msg::PointStamped right_in_odom;
+            // 转换到odom
+            try {
+                right_in_odom = tf_buffer_->transform(right_in_laser, "odom");
+            } catch (const tf2::TransformException &ex) {
+                RCLCPP_WARN(this->get_logger(), "right target：%s", ex.what());
+            }
+
+            Point2D right_min_point;
+            right_min_point.x = right_in_odom.point.x;
+            right_min_point.y = right_in_odom.point.y;
+
+            PublishCylinder(right_min_point.x, right_min_point.y, 0.1, 0.03, 0.03, 0.3, 0.0, 1.0, 0.0, 1.0, 0);
+        }
+#endif
         // 发布最近点
-        PublishCylinder(target_point_.x, target_point_.y, 0.1, 0.03, 0.03, 0.3, 0.0, 1.0, 0.0, 1.0, 0);
+        // PublishCylinder(target_point_.x, target_point_.y, 0.1, 0.03, 0.03, 0.3, 0.0, 1.0, 0.0, 1.0, 0);
+#if 0
+        sensor_msgs::msg::LaserScan scan = *msg;
+        std::fill(scan.ranges.begin() + start_index, scan.ranges.begin() + end_index, std::numeric_limits<float>::quiet_NaN());
+        sensor_msgs::msg::PointCloud2 laser_cloud;
+        sensor_msgs::msg::PointCloud2 odom_cloud;
+        try {
+            // laserscan -> pointcloud in laser
+            projector_.transformLaserScanToPointCloud(scan.header.frame_id, scan, laser_cloud, *tf_buffer_);
+            // in odom
+            geometry_msgs::msg::TransformStamped transform_stamped =
+                tf_buffer_->lookupTransform(
+                    "odom", msg->header.frame_id, msg->header.stamp,
+                    rclcpp::Duration::from_seconds(0.2));
+            tf2::doTransform(laser_cloud, odom_cloud,
+                             transform_stamped);
+            // pub
+            cloud_pub_->publish(odom_cloud);
+        } catch (const tf2::TransformException &ex) {
+            RCLCPP_WARN(this->get_logger(), "point clouds trans failed:%s", ex.what());
+        }
+#endif
 #if 0
         // 机身坐标
         geometry_msgs::msg::PointStamped base_point;
@@ -215,6 +252,7 @@ private:
     }
 
     void control_loop() {
+#if 0
         switch (current_state_) {
             case State::SEARCHING:
                 handle_searching();
@@ -232,6 +270,7 @@ private:
         }
         // rclcpp::Time now = this->get_clock()->now();
         // RCLCPP_INFO(this->get_logger(), "ROS time: %ld.%09ld", now.seconds(), now.nanoseconds());
+#endif
     }
 
     // 状态1: 寻找最近的点
@@ -420,6 +459,63 @@ private:
         publisher_->publish(twist_msg);
     }
 
+    size_t get_index_from_angle(const sensor_msgs::msg::LaserScan::SharedPtr scan, double angle_rad) {
+        // 将角度转换为激光雷达数据数组中的索引
+        int index = static_cast<int>((scan->angle_min + angle_rad) / scan->angle_increment);
+        return std::max(0, std::min(static_cast<int>(scan->ranges.size() - 1), index));
+    }
+
+    void is_obstacle_in_front(const sensor_msgs::msg::LaserScan::SharedPtr scan) {
+        if (!scan) {
+            has_obstacle_ = false;
+            return;
+        } 
+        // 检查前方一个狭窄的扇区（例如-15到+15度）
+        size_t start_index = get_index_from_angle(scan, 6.02); // -15 degrees
+        size_t end_index = get_index_from_angle(scan, 0.26);   // +15 degrees
+
+        std::vector<float> head(scan->ranges.begin(), scan->ranges.begin() + end_index);
+        std::vector<float> tail(scan->ranges.end() - start_index, scan->ranges.end());
+        head.insert(head.end(), tail.begin(), tail.end());
+
+        for (float val : head) {
+            if (!std::isnan(val) && val < front_obstacle_dist_) {
+                has_obstacle_ = true;
+            } else {
+                has_obstacle_ = false;
+            }
+        }
+    }
+
+    void point_in_laser(const sensor_msgs::msg::LaserScan::SharedPtr scan) {
+        if (!has_min_dist_) {
+            int front_min_index = -1;
+            float front_min_dist = std::numeric_limits<float>::infinity();
+            for (size_t i = 0; i < scan->ranges.size(); ++i) {
+                if (scan->ranges[i] < front_min_dist && scan->ranges[i] > 0) {
+                    front_min_dist = scan->ranges[i];
+                    has_min_dist_ = true;
+                    front_min_index = i;
+                }
+            }
+
+            if (front_min_index != -1) {
+                float target_angle = scan->angle_min + front_min_index * scan->angle_increment;
+
+                // 激光雷达坐标系坐标点
+                Point2D laser_point = Point2D(front_min_dist * cos(target_angle), front_min_dist * sin(target_angle));
+
+                // pointstamped类型存储数据
+                point_in_laser_.header = scan->header;
+                point_in_laser_.header.stamp = rclcpp::Time(0);
+
+                point_in_laser_.point.x = laser_point.x;
+                point_in_laser_.point.y = laser_point.y;
+                point_in_laser_.point.z = 0.0;
+            }
+        }
+    }
+
     rclcpp::Publisher<geometry_msgs::msg::Twist>::SharedPtr                         publisher_;
     rclcpp::Subscription<sensor_msgs::msg::LaserScan>::SharedPtr                    subscription_;
     rclcpp::Subscription<sensor_msgs::msg::LaserScan>::SharedPtr                    line_laser_sub_;
@@ -446,6 +542,8 @@ private:
     float dis_to_wall_;
     float front_dist_;
     bool has_min_dist_;
+    bool has_obstacle_;
+    float front_obstacle_dist_;
 };
 
 int main(int argc, char *argv[]) {
