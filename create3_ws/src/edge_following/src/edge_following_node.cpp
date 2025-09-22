@@ -22,6 +22,7 @@
 
 using std::placeholders::_1;
 using std::placeholders::_2;
+using namespace std::chrono_literals;
 
 // 定义状态机的不同状态
 enum class State { SEARCHING, DRIVING_TO_WALL, ROTATING_LEFT, WALL_FOLLOWING };
@@ -64,15 +65,41 @@ public:
 
         marker_pub_ = this->create_publisher<visualization_msgs::msg::Marker>("visualization_marker", 10);
 
+        timer_ = this->create_wall_timer(50ms, std::bind(&EdgeFollower::control_loop, this));
+        dis_to_wall_ = -1.0f;
+        has_min_dist_ = false;
+        front_dist_ = -1.0f;
+
         RCLCPP_INFO(this->get_logger(), "Wall follower node has been started.");
     }
 
 private:
     void line_laser_callback(const sensor_msgs::msg::LaserScan::SharedPtr msg) {
-        {
-            std::lock_guard<std::mutex> lock(line_laser_mutex_);
-            line_laser_ = *msg;
+        if (msg->ranges.size() < 10) {
+            RCLCPP_WARN(this->get_logger(), "no line lidar data!");
+            dis_to_wall_ = -1.0f;
+            return;
         }
+        // 使用线激光的中心读数作为墙距
+        std::vector<float> head(msg->ranges.begin(), msg->ranges.begin() + 5);
+        std::vector<float> tail(msg->ranges.end() - 5, msg->ranges.end());
+        head.insert(head.end(), tail.begin(), tail.end());
+
+        float sum = 0.0f;
+        int count = 0;
+        for (float val : head) {
+            if (!std::isnan(val)) {
+                sum += val;
+                ++count;
+            }
+        }
+
+        if (count == 0) {
+            RCLCPP_WARN(this->get_logger(), "have no valid data!");
+            return;
+        }
+
+        dis_to_wall_ = sum / count;
 
         // sensor_msgs::msg::LaserScan scan = *msg;
         // int scan_size = scan.ranges.size();
@@ -136,22 +163,35 @@ private:
     }
 
     void scan_callback(const sensor_msgs::msg::LaserScan::SharedPtr msg) {
-        switch (current_state_) {
-            case State::SEARCHING:
-                handle_searching(msg);
-                break;
-            case State::DRIVING_TO_WALL:
-                handle_driving_to_wall(msg);
-                break;
-            case State::ROTATING_LEFT:
-                handle_rotating_left(msg);
-                break;
-            case State::WALL_FOLLOWING: {
-                std::lock_guard<std::mutex> lock (line_laser_mutex_);
-                handle_wall_following(line_laser_);
-                break;
+
+        if (!has_min_dist_) {
+            int min_angle_index = -1;
+            float min_dist = std::numeric_limits<float>::infinity();
+            for (size_t i = 0; i < msg->ranges.size(); ++i) {
+                if (msg->ranges[i] < min_dist && msg->ranges[i] > 0) {
+                    min_dist = msg->ranges[i];
+                    has_min_dist_ = true;
+                    min_angle_index = i;
+                }
+            }
+
+            if (min_angle_index != -1) {
+                float target_angle = msg->angle_min + min_angle_index * msg->angle_increment;
+
+                // 激光雷达坐标系坐标点
+                Point2D laser_point = Point2D(min_dist * cos(target_angle), min_dist * sin(target_angle));
+
+                // pointstamped类型存储数据
+                point_in_laser_.header = msg->header;
+                point_in_laser_.header.stamp = rclcpp::Time(0);
+
+                point_in_laser_.point.x = laser_point.x;
+                point_in_laser_.point.y = laser_point.y;
+                point_in_laser_.point.z = 0.0;
             }
         }
+
+        front_dist_ = msg->ranges[0];
 
         // 发布最近点
         PublishCylinder(target_point_.x, target_point_.y, 0.1, 0.03, 0.03, 0.3, 0.0, 1.0, 0.0, 1.0, 0);
@@ -174,54 +214,44 @@ private:
 #endif
     }
 
-    // 状态1: 寻找最近的点
-    void handle_searching(const sensor_msgs::msg::LaserScan::SharedPtr msg) {
-        float min_dist = std::numeric_limits<float>::infinity();
-        int   min_index = -1;
-
-        if (min_index == -1) {
-            for (size_t i = 0; i < msg->ranges.size(); ++i) {
-                if (msg->ranges[i] < min_dist && msg->ranges[i] > 0) {
-                    min_dist = msg->ranges[i];
-                    min_index = i;
-                }
+    void control_loop() {
+        switch (current_state_) {
+            case State::SEARCHING:
+                handle_searching();
+                break;
+            case State::DRIVING_TO_WALL:
+                handle_driving_to_wall();
+                break;
+            case State::ROTATING_LEFT:
+                handle_rotating_left();
+                break;
+            case State::WALL_FOLLOWING: {
+                handle_wall_following();
+                break;
             }
         }
+        // rclcpp::Time now = this->get_clock()->now();
+        // RCLCPP_INFO(this->get_logger(), "ROS time: %ld.%09ld", now.seconds(), now.nanoseconds());
+    }
 
-        if (min_index != -1) {
-            target_angle_ = msg->angle_min + min_index * msg->angle_increment;
-            // RCLCPP_INFO(this->get_logger(),
-            //             "Found nearest point at %f meters, angle %f radians. "
-            //             "Turning towards it.",
-            //             min_dist, target_angle_);
-
-            // 激光雷达坐标系坐标点
-            laser_point_ = Point2D(min_dist * cos(target_angle_), min_dist * sin(target_angle_));
-
-            // pointstamped类型存储数据
-            geometry_msgs::msg::PointStamped point_in_laser;
-            point_in_laser.header = msg->header;
-            point_in_laser.header.stamp = rclcpp::Time(0);
-
-            point_in_laser.point.x = laser_point_.x;
-            point_in_laser.point.y = laser_point_.y;
-            point_in_laser.point.z = 0.0;
-
+    // 状态1: 寻找最近的点
+    void handle_searching() {
+        if (has_min_dist_) {
             geometry_msgs::msg::PointStamped point_in_odom;
             // 转换到odom
             try {
-                point_in_odom = tf_buffer_->transform(point_in_laser, "odom");
+                point_in_odom = tf_buffer_->transform(point_in_laser_, "odom");
                 target_point_.x = point_in_odom.point.x;
                 target_point_.y = point_in_odom.point.y;
                 current_state_ = State::DRIVING_TO_WALL;
             } catch (const tf2::TransformException &ex) {
-                RCLCPP_WARN(this->get_logger(), "无法转换坐标点：%s", ex.what());
+                RCLCPP_WARN(this->get_logger(), "无法从激光坐标转换到里程计坐标：%s", ex.what());
             }
         }
     }
 
     // 状态2: 转向并移动到墙前
-    void handle_driving_to_wall(const sensor_msgs::msg::LaserScan::SharedPtr msg) {
+    void handle_driving_to_wall() {
         geometry_msgs::msg::TransformStamped transform;
 
         geometry_msgs::msg::PointStamped target_in_odom;
@@ -241,16 +271,14 @@ private:
             double target_yaw = std::atan2(target_in_base.point.y, target_in_base.point.x);
 
             geometry_msgs::msg::Twist twist_msg;
-            // 0度角向前
-            float front_dist = msg->ranges[0];
 
             // 转向最近的点
-            if (std::fabs(target_yaw) > 0.05) {
+            if (std::fabs(target_yaw) > 0.04) {
                 twist_msg.angular.z = (target_yaw > 0) ? 0.3 : -0.3;
                 RCLCPP_INFO(this->get_logger(), "Rotating. Target yaw: %.2f", target_yaw);
-            } else if (front_dist > 0.4) {
+            } else if (front_dist_ > 0.4) {
                 twist_msg.linear.x = 0.1;
-                RCLCPP_INFO(this->get_logger(), "Moving forward. Distance to wall: %f", front_dist);
+                RCLCPP_INFO(this->get_logger(), "Moving forward. Distance to wall: %f", front_dist_);
             } else {
                 twist_msg.linear.x = 0;
                 twist_msg.angular.z = 0;
@@ -268,12 +296,12 @@ private:
             }
 
         } catch (const tf2::TransformException &ex) {
-            RCLCPP_WARN(this->get_logger(), "tf err:%s", ex.what());
+            RCLCPP_WARN(this->get_logger(), "tran base_link tf err:%s", ex.what());
         }
     }
 
     // 状态3: 左转90度
-    void handle_rotating_left(const sensor_msgs::msg::LaserScan::SharedPtr msg) {
+    void handle_rotating_left() {
         geometry_msgs::msg::Twist twist_msg;
         // 假设角速度为0.5 rad/s，旋转90度(PI/2)大约需要3.14秒
         double rotation_duration = (M_PI / 2) / 0.5;
@@ -290,42 +318,23 @@ private:
     }
 
     // 状态4: 沿边算法
-    void handle_wall_following(const sensor_msgs::msg::LaserScan& msg) {
-        if (msg.ranges.size() < 5) {
-            return;
-        }
-        
-        // 使用线激光的中心读数作为墙距
-        std::vector<float> head(msg.ranges.begin(), msg.ranges.begin() + 5);
-        std::vector<float> tail(msg.ranges.end() - 5, msg.ranges.end());
-        head.insert(head.end(), tail.begin(), tail.end());
-
-        float sum = 0.0f;
-        int count = 0;
-        for (float val : head) {
-            if (!std::isnan(val)) {
-                sum += val;
-                ++count;
-            }
-        }
-
-        float dist_to_wall = sum / count;
-
+    void handle_wall_following() {
         geometry_msgs::msg::Twist twist_msg;
         twist_msg.linear.x = 0.1;
 
         // 如果墙壁丢失（例如外角），则右转寻找
-        if (dist_to_wall > 0.06 || std::isinf(dist_to_wall) || std::isnan(dist_to_wall)) {
+        if (dis_to_wall_ > 0.09 || std::isinf(dis_to_wall_) || std::isnan(dis_to_wall_)) {
             RCLCPP_WARN(this->get_logger(), "墙壁丢失，正在右转寻找。");
-            twist_msg.angular.z = -0.2; // 右转
+            twist_msg.angular.z = -0.6; // 右转
+            twist_msg.linear.x = 0.1;
         } else {
             // P控制器维持距离
-            float error = 0.05 - dist_to_wall;
+            float error = 0.05 - dis_to_wall_;
             twist_msg.angular.z = 1.2 * error;
-            RCLCPP_WARN(this->get_logger(), "距离过近，调整远离。");
+            RCLCPP_WARN(this->get_logger(), "调整距离");
         }
         
-        RCLCPP_INFO(this->get_logger(), "循边中... 墙距: %.2f, 角速度: %.2f", dist_to_wall, twist_msg.angular.z);
+        RCLCPP_INFO(this->get_logger(), "循边中... 墙距: %.2f, 角速度: %.2f", dis_to_wall_, twist_msg.angular.z);
 
         // 处理碰撞
         if (hazard_type_ == 1) {
@@ -333,18 +342,6 @@ private:
         } else {
             publisher_->publish(twist_msg);
         }
-    }
-
-    int find_min_dist_index(const sensor_msgs::msg::LaserScan::SharedPtr msg) {
-        float min_dist = std::numeric_limits<float>::infinity();
-        int   min_index = -1;
-        for (size_t i = 0; i < msg->ranges.size(); ++i) {
-            if (msg->ranges[i] < min_dist) {
-                min_dist = msg->ranges[i];
-                min_index = i;
-            }
-        }
-        return min_index;
     }
 
     void PublishCylinder(float x, float y, float z,  // 圆柱体中心坐标
@@ -393,20 +390,20 @@ private:
 
         // 根据碰撞位置调整旋转时间
         if (hazard_frame_id_ == "bump_left") {
-            rotation_duration = 5.0;
+            rotation_duration = 4.5;
         } else if (hazard_frame_id_ == "bump_front_left") {
-            rotation_duration = 4.0;
+            rotation_duration = 3.5;
         } else if (hazard_frame_id_ == "bump_front_center") {
-            rotation_duration = 3.0;
+            rotation_duration = 2.5;
         } else if (hazard_frame_id_ == "bump_front_right") {
-            rotation_duration = 2.0;
+            rotation_duration = 1.5;
         } else if (hazard_frame_id_ == "bump_right") {
-            rotation_duration = 1.0;
+            rotation_duration = 0.5;
         }
         
         if (time_in_align < rotation_duration) {
             twist_msg.linear.x = 0.0;
-            twist_msg.angular.z = 0.3; // 左转
+            twist_msg.angular.z = 0.6; // 左转
         } else {
             RCLCPP_INFO(this->get_logger(), "对准完成。切换到 WALL_FOLLOWING 状态。");
             // stop_robot();
@@ -428,24 +425,27 @@ private:
     rclcpp::Subscription<sensor_msgs::msg::LaserScan>::SharedPtr                    line_laser_sub_;
     rclcpp::Publisher<visualization_msgs::msg::Marker>::SharedPtr                   marker_pub_;
     State                                                                           current_state_ = State::SEARCHING;
-    float                                                                           target_angle_ = 0.0;
     rclcpp::Time                                                                    rotation_start_time_;
     rclcpp::Time align_start_time_;
     rclcpp::Subscription<irobot_create_msgs::msg::HazardDetectionVector>::SharedPtr hazard_sub_;
     rclcpp::Publisher<sensor_msgs::msg::PointCloud2>::SharedPtr cloud_pub_;
     laser_geometry::LaserProjection                              projector_;
 
+    rclcpp::TimerBase::SharedPtr timer_;
+    geometry_msgs::msg::PointStamped point_in_laser_;
+
     std::unique_ptr<tf2_ros::Buffer>            tf_buffer_;
     std::shared_ptr<tf2_ros::TransformListener> tf_listener_;
 
     Point2D target_point_;
-    Point2D laser_point_;
 
     std::string hazard_frame_id_;
     uint8_t hazard_type_;
 
-    std::mutex line_laser_mutex_;
     sensor_msgs::msg::LaserScan line_laser_;
+    float dis_to_wall_;
+    float front_dist_;
+    bool has_min_dist_;
 };
 
 int main(int argc, char *argv[]) {
