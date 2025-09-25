@@ -6,7 +6,6 @@ Panels:
       Expanded:
         - /Global Options1
         - /Status1
-        - /TF1
         - /TF1/Frames1
         - /Marker1
       Splitter Ratio: 0.5
@@ -73,14 +72,14 @@ Visualization Manager:
       Selectable: true
       Size (Pixels): 3
       Size (m): 0.009999999776482582
-      Style: Flat Squares
+      Style: Points
       Topic:
         Depth: 5
         Durability Policy: Volatile
         Filter size: 10
         History Policy: Keep Last
         Reliability Policy: Reliable
-        Value: /accumulated_cloud
+        Value: /point_clouds
       Use Fixed Frame: true
       Use rainbow: true
       Value: false
@@ -283,7 +282,7 @@ Visualization Manager:
       Enabled: true
       Name: Marker
       Namespaces:
-        my_cylinders: true
+        {}
       Topic:
         Depth: 5
         Durability Policy: Volatile
@@ -338,25 +337,25 @@ Visualization Manager:
   Views:
     Current:
       Class: rviz_default_plugins/Orbit
-      Distance: 3.27487850189209
+      Distance: 1.9968379735946655
       Enable Stereo Rendering:
         Stereo Eye Separation: 0.05999999865889549
         Stereo Focal Distance: 1
         Swap Stereo Eyes: false
         Value: false
       Focal Point:
-        X: -1.3998063802719116
-        Y: 0.42491692304611206
-        Z: 0.07880693674087524
+        X: 0.12292566895484924
+        Y: -0.15689009428024292
+        Z: 0.06581505388021469
       Focal Shape Fixed Size: true
       Focal Shape Size: 0.05000000074505806
       Invert Z Axis: false
       Name: Current View
       Near Clip Distance: 0.009999999776482582
-      Pitch: 1.4297962188720703
+      Pitch: 0.7047968506813049
       Target Frame: <Fixed Frame>
       Value: Orbit (rviz)
-      Yaw: 4.6354570388793945
+      Yaw: 3.3004541397094727
     Saved: ~
 Window Geometry:
   Displays:

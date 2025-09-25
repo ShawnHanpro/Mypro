@@ -1,24 +1,25 @@
+#include <tf2_geometry_msgs/tf2_geometry_msgs.h>
+
 #include <cmath>
 #include <functional>
 #include <iostream>
-#include <vector>
-#include <string>
 #include <mutex>
+#include <string>
+#include <vector>
 
 #include "geometry_msgs/msg/point_stamped.hpp"
 #include "geometry_msgs/msg/twist.hpp"
 #include "irobot_create_msgs/msg/hazard_detection.hpp"
 #include "irobot_create_msgs/msg/hazard_detection_vector.hpp"
+#include "laser_geometry/laser_geometry.hpp"
 #include "rclcpp/rclcpp.hpp"
 #include "sensor_msgs/msg/laser_scan.hpp"
-#include "tf2_ros/buffer.h"
-#include "tf2_ros/transform_listener.h"
-#include <tf2_geometry_msgs/tf2_geometry_msgs.h>
-#include "tf2_sensor_msgs/tf2_sensor_msgs.h"
-#include "visualization_msgs/msg/marker.hpp"
 #include "sensor_msgs/msg/point_cloud2.hpp"
 #include "sensor_msgs/point_cloud2_iterator.hpp"
-#include "laser_geometry/laser_geometry.hpp"
+#include "tf2_ros/buffer.h"
+#include "tf2_ros/transform_listener.h"
+#include "tf2_sensor_msgs/tf2_sensor_msgs.h"
+#include "visualization_msgs/msg/marker.hpp"
 
 using std::placeholders::_1;
 using std::placeholders::_2;
@@ -35,9 +36,9 @@ public:
     Point2D() : x(0), y(0) {}
     Point2D(float x_, float y_) : x(x_), y(y_) {}
 
-    Point2D operator+(const Point2D &other) const { return Point2D(x + other.x, y + other.y); }
+    Point2D operator+(const Point2D& other) const { return Point2D(x + other.x, y + other.y); }
 
-    Point2D &operator+=(const Point2D &other) {
+    Point2D& operator+=(const Point2D& other) {
         x += other.x;
         y += other.y;
         return *this;
@@ -51,8 +52,8 @@ public:
 
         subscription_ = this->create_subscription<sensor_msgs::msg::LaserScan>("/scan", 10, std::bind(&EdgeFollower::scan_callback, this, _1));
 
-        line_laser_sub_ = this->create_subscription<sensor_msgs::msg::LaserScan>(
-            "/line_scan", 10, std::bind(&EdgeFollower::line_laser_callback, this, _1));
+        line_laser_sub_ =
+            this->create_subscription<sensor_msgs::msg::LaserScan>("/line_scan", 10, std::bind(&EdgeFollower::line_laser_callback, this, _1));
 
         hazard_sub_ = this->create_subscription<irobot_create_msgs::msg::HazardDetectionVector>("/hazard_detection", rclcpp::SensorDataQoS(),
                                                                                                 std::bind(&EdgeFollower::hazard_callback, this, _1));
@@ -66,28 +67,39 @@ public:
         marker_pub_ = this->create_publisher<visualization_msgs::msg::Marker>("visualization_marker", 10);
 
         timer_ = this->create_wall_timer(50ms, std::bind(&EdgeFollower::control_loop, this));
-        dis_to_wall_ = -1.0f;
+        line_right_dis_ = -1.0f;
+        scan_right_dis_ = -1.0f;
         has_min_dist_ = false;
         front_dist_ = -1.0f;
-        has_obstacle_ = false;
+        scan_right_front_dis_ = -1.0f;
+        scan_right_back_dis_ = -1.0f;
+        scan_front_dis_ = -1.0f;
+
         front_obstacle_dist_ = 0.3;
+        follow_distance_ = 0.2;
 
         RCLCPP_INFO(this->get_logger(), "Wall follower node has been started.");
     }
 
 private:
     void line_laser_callback(const sensor_msgs::msg::LaserScan::SharedPtr msg) {
+        // 多线程访问需要加锁
+        line_laser_ = msg;
+
         if (msg->ranges.size() < 10 || current_state_ != State::WALL_FOLLOWING) {
-            dis_to_wall_ = -1.0f;
+            line_right_dis_ = -1.0f;
             return;
         }
         // 使用线激光的中心读数作为墙距
-        std::vector<float> head(msg->ranges.begin(), msg->ranges.begin() + 5);
-        std::vector<float> tail(msg->ranges.end() - 5, msg->ranges.end());
+        size_t minus_5_deg = get_index_from_angle(msg, 359.913); // -5
+        size_t positive_5_deg = get_index_from_angle(msg, 0.087);   // 5
+
+        std::vector<float> head(msg->ranges.begin(), msg->ranges.begin() + positive_5_deg);
+        std::vector<float> tail(msg->ranges.begin(), msg->ranges.begin() + minus_5_deg);
         head.insert(head.end(), tail.begin(), tail.end());
 
         float sum = 0.0f;
-        int count = 0;
+        int   count = 0;
         for (float val : head) {
             if (!std::isnan(val)) {
                 sum += val;
@@ -96,11 +108,12 @@ private:
         }
 
         if (count == 0) {
-            RCLCPP_WARN(this->get_logger(), "have no valid data!");
+            // RCLCPP_WARN(this->get_logger(), "have no valid data!");
+            line_right_dis_ = -1.0f;
             return;
         }
 
-        dis_to_wall_ = sum / count;
+        line_right_dis_ = sum / count;
 
         // sensor_msgs::msg::LaserScan scan = *msg;
         // int scan_size = scan.ranges.size();
@@ -130,7 +143,7 @@ private:
             return;
         }
 
-        for (const auto &detection : msg->detections) {
+        for (const auto& detection : msg->detections) {
             if (detection.type == 0) {
                 continue;
             }
@@ -159,26 +172,156 @@ private:
     }
 
     void scan_callback(const sensor_msgs::msg::LaserScan::SharedPtr msg) {
+        if (msg->ranges.size() < 10) {
+            std::cout << "no data" << std::endl;
+            return;
+        }
+        // 多线程访问需要加锁
+        {
+            std::lock_guard<std::mutex> lock(scan_lock_);
+            scan_laser_ = msg;
+        }
 
-        is_obstacle_in_front(msg);
-        point_in_laser(msg);
         front_dist_ = msg->ranges[0];
 
+        if (msg->ranges.size() < 10 || current_state_ != State::WALL_FOLLOWING) {
+            scan_right_dis_ = -1.0f;
+            return;
+        }
+
+        // scan右侧沿墙距离
+        size_t minus_135_deg = get_index_from_angle(msg, 3.93);      // -135
+        size_t minus_90_deg = get_index_from_angle(msg, 4.71);       // -90
+        size_t minus_80_deg = get_index_from_angle(msg, 4.887);      // -80
+        size_t minus_45_deg = get_index_from_angle(msg, 5.5);        // -45
+        size_t minus_22_5_deg = get_index_from_angle(msg, 5.89);     // -22.5
+        size_t positive_22_5_deg = get_index_from_angle(msg, 0.39);  // 22.5
+        size_t positive_360_deg = get_index_from_angle(msg, 6.28);   // 360
+
+        // 范围内平均距离
+        scan_right_dis_ = avg_distance_cal(msg, minus_90_deg, minus_80_deg);
+        scan_right_front_dis_ = avg_distance_cal(msg, minus_90_deg, minus_45_deg);
+        scan_right_back_dis_ = avg_distance_cal(msg, minus_135_deg, minus_90_deg);
+        float front_dis_0_left = avg_distance_cal(msg, 0, positive_22_5_deg);
+        float front_dis_0_right = avg_distance_cal(msg, minus_22_5_deg, positive_360_deg);
+        scan_front_dis_ = (front_dis_0_left + front_dis_0_right) / 2;
+
+        float min_dist = std::numeric_limits<float>::infinity();
+        int min_index = -1;
+        int start_index = (int)((4.17 - msg->angle_min) / msg->angle_increment);
+        int end_index   = (int)((5.5 - msg->angle_min) / msg->angle_increment);
+        for(int i = start_index; i <= end_index; ++i) {
+            if(msg->ranges[i] < min_dist) {
+                min_dist =msg->ranges[i];
+                min_index = i;
+            }
+        }
+        float angle = msg->angle_min + min_index * msg->angle_increment;
+        float x_point = min_dist * cos(angle);  // 前方为X轴
+        float y_point = min_dist * sin(angle);  // 右侧为负Y
+        float norm = std::sqrt(y_point*y_point + x_point*x_point);
+        float vx = -y_point / norm; // 垂直连线方向
+        float vy = x_point / norm;
+        target_yaw_ = atan2(vy, vx); // 运动方向
+
+// 凹轮廓线检测
+#if 0
+        sensor_msgs::msg::LaserScan scan = *msg;
+        std::fill(scan.ranges.begin(), scan.ranges.end(), std::numeric_limits<float>::quiet_NaN());
+
+        // 然后保留 -135° 到 -45° 的范围
+        std::copy(msg->ranges.begin() + minus_135_deg, msg->ranges.begin() + minus_45_deg,
+                scan.ranges.begin() + minus_135_deg);
+        // 轮廓线检测
+        sensor_msgs::msg::PointCloud2 laser_cloud;
+        sensor_msgs::msg::PointCloud2 odom_cloud;
+        geometry_msgs::msg::TransformStamped transform_stamped;
+        try {
+            // laserscan -> pointcloud in laser
+            projector_.transformLaserScanToPointCloud(scan.header.frame_id, scan, laser_cloud, *tf_buffer_);
+            // in odom
+            transform_stamped =
+                tf_buffer_->lookupTransform("odom", scan.header.frame_id, scan.header.stamp, rclcpp::Duration::from_seconds(0.2));
+            tf2::doTransform(laser_cloud, odom_cloud, transform_stamped);
+        } catch (const tf2::TransformException& ex) {
+            RCLCPP_WARN(this->get_logger(), "point clouds trans failed:%s", ex.what());
+        }
+
+        tf2::Transform tf;
+        tf2::fromMsg(transform_stamped.transform, tf);
+        std::vector<Point2D>                         points;
+
+        float angle = scan.angle_min;
+        for (auto r : scan.ranges) {
+            if (r < scan.range_min || r > scan.range_max) {
+                angle += scan.angle_increment;
+                continue;
+            }
+
+            tf2::Vector3 p_laser(r * cos(angle), r * sin(angle), 0.0);
+            tf2::Vector3 p_odom = tf * p_laser;  // 转到odom
+            points.push_back({(float)p_odom.x(), (float)p_odom.y()});
+            angle += scan.angle_increment;
+        }
+
+        if (points.empty()) {
+            std::cout << "empty" << std::endl;
+        }
+
+        // 计算凸包作为房间轮廓
+        auto hull = concaveHull(points);
+
+        // 发布到 RViz
+        visualization_msgs::msg::Marker line_strip;
+        line_strip.header.frame_id = "odom";
+        line_strip.header.stamp = this->now();
+        line_strip.ns = "room_contour";
+        line_strip.id = 0;
+        line_strip.type = visualization_msgs::msg::Marker::LINE_STRIP;
+        line_strip.action = visualization_msgs::msg::Marker::ADD;
+        line_strip.scale.x = 0.02;  // 线宽
+        line_strip.color.r = 0.0;
+        line_strip.color.g = 1.0;
+        line_strip.color.b = 0.0;
+        line_strip.color.a = 1.0;
+
+        for (auto& p : hull) {
+            if (std::isnan(p.x) || std::isnan(p.y)) continue;
+            if (std::isinf(p.x) || std::isinf(p.y)) continue;
+            geometry_msgs::msg::Point pt;
+            pt.x = p.x;
+            pt.y = p.y;
+            pt.z = 0.0;
+            line_strip.points.push_back(pt);
+        }
+        // 闭合轮廓
+        // if (!hull.empty()) {
+        //     geometry_msgs::msg::Point pt;
+        //     pt.x = hull[0].x;
+        //     pt.y = hull[0].y;
+        //     pt.z = 0.0;
+        //     line_strip.points.push_back(pt);
+        // }
+
+        marker_pub_->publish(line_strip);
+#endif
+
+#if 0
         // -45 to -135
         float right_min_dist = std::numeric_limits<double>::infinity();
         int right_min_index = -1;
         size_t start_index = get_index_from_angle(msg, 3.93); // -135
         size_t end_index = get_index_from_angle(msg, 5.5); // -45
 
-#if 1
         for (size_t i = start_index; i <= end_index; ++i) {
             if (std::isfinite(msg->ranges[i]) && msg->ranges[i] < right_min_dist && msg->ranges[i] > 0.1) {
                 right_min_dist = msg->ranges[i];
                 right_min_index = i;
             }
         }
-        right_min_dist = (right_min_dist == std::numeric_limits<double>::infinity()) ? -1.0 : right_min_dist;
 
+        scan_right_dis_ = (right_min_dist == std::numeric_limits<double>::infinity()) ? -1.0 : right_min_dist;
+        std::cout << "scan_right_dis_: " << scan_right_dis_ << std::endl;
         if (right_min_index != -1) {
             float target_angle = msg->angle_min + right_min_index * msg->angle_increment;
 
@@ -211,6 +354,7 @@ private:
 #endif
         // 发布最近点
         // PublishCylinder(target_point_.x, target_point_.y, 0.1, 0.03, 0.03, 0.3, 0.0, 1.0, 0.0, 1.0, 0);
+// pointclouds
 #if 0
         sensor_msgs::msg::LaserScan scan = *msg;
         std::fill(scan.ranges.begin() + start_index, scan.ranges.begin() + end_index, std::numeric_limits<float>::quiet_NaN());
@@ -232,6 +376,7 @@ private:
             RCLCPP_WARN(this->get_logger(), "point clouds trans failed:%s", ex.what());
         }
 #endif
+// 显示机身位置
 #if 0
         // 机身坐标
         geometry_msgs::msg::PointStamped base_point;
@@ -251,8 +396,78 @@ private:
 #endif
     }
 
+    // 计算凸包 (Graham scan / Andrew 算法)
+    std::vector<Point2D> TconvexHull(std::vector<Point2D>& pts) {
+        if (pts.size() < 3) return pts;
+        std::sort(pts.begin(), pts.end(), [](const Point2D& a, const Point2D& b) { return a.x == b.x ? a.y < b.y : a.x < b.x; });
+        std::vector<Point2D> hull;
+        auto cross = [](const Point2D& O, const Point2D& A, const Point2D& B) { return (A.x - O.x) * (B.y - O.y) - (A.y - O.y) * (B.x - O.x); };
+        // 下凸壳
+        for (auto& p : pts) {
+            while (hull.size() >= 2 && cross(hull[hull.size() - 2], hull.back(), p) <= 0) {
+                hull.pop_back();
+            }
+            hull.push_back(p);
+        }
+        // 上凸壳
+        size_t t = hull.size() + 1;
+        for (int i = pts.size() - 1; i >= 0; i--) {
+            auto& p = pts[i];
+            while (hull.size() >= t && cross(hull[hull.size() - 2], hull.back(), p) <= 0) {
+                hull.pop_back();
+            }
+            hull.push_back(p);
+        }
+        hull.pop_back();
+        return hull;
+    }
+
+    // 计算两点距离
+    float dist2(const Point2D& a, const Point2D& b) {
+        return (a.x - b.x)*(a.x - b.x) + (a.y - b.y)*(a.y - b.y);
+    }
+
+    // 极角排序
+    std::vector<Point2D> concaveHull(std::vector<Point2D>& pts, float k = 10) {
+        if (pts.size() < 3) return pts;
+
+        // 1. 找到最下方点作为起点
+        auto start_it = std::min_element(pts.begin(), pts.end(),
+                                        [](const Point2D& a, const Point2D& b) { return a.y < b.y; });
+        Point2D start = *start_it;
+
+        std::vector<Point2D> hull;
+        hull.push_back(start);
+        Point2D current = start;
+        Point2D previous = {start.x - 1.0f, start.y};  // 用左边点初始化前一条边方向
+
+        pts.erase(start_it);
+
+        while (!pts.empty()) {
+            // 2. 找 k 个最近点
+            std::sort(pts.begin(), pts.end(),
+                    [this, &current](const Point2D& a, const Point2D& b) { return dist2(a, current) < dist2(b, current); });
+            size_t n = std::min((size_t)k, pts.size());
+
+            // 3. 选择最合适的点（保持逆时针/顺时针方向）
+            bool found = false;
+            for (size_t i = 0; i < n; i++) {
+                Point2D candidate = pts[i];
+                // 可以加简单交叉判断避免自交，这里简化
+                hull.push_back(candidate);
+                current = candidate;
+                pts.erase(pts.begin() + i);
+                found = true;
+                break;
+            }
+            if (!found) break;
+        }
+
+        return hull;
+    }
+
     void control_loop() {
-#if 0
+#if 1
         switch (current_state_) {
             case State::SEARCHING:
                 handle_searching();
@@ -275,22 +490,79 @@ private:
 
     // 状态1: 寻找最近的点
     void handle_searching() {
-        if (has_min_dist_) {
-            geometry_msgs::msg::PointStamped point_in_odom;
-            // 转换到odom
-            try {
-                point_in_odom = tf_buffer_->transform(point_in_laser_, "odom");
-                target_point_.x = point_in_odom.point.x;
-                target_point_.y = point_in_odom.point.y;
-                current_state_ = State::DRIVING_TO_WALL;
-            } catch (const tf2::TransformException &ex) {
-                RCLCPP_WARN(this->get_logger(), "无法从激光坐标转换到里程计坐标：%s", ex.what());
+        std::cout << "search" << std::endl;
+        std::lock_guard<std::mutex> lock(scan_lock_);
+        if (!scan_laser_) {
+            std::cout << "scan_laser_ is nullptr" << std::endl;
+            return;
+        }
+        if (scan_laser_->ranges.size() < 10) {
+            std::cout << "no data" << std::endl;
+            return;
+        }
+
+        // scan最近点
+        if (!has_min_dist_) {
+            int   min_index = -1;
+            float min_dist = std::numeric_limits<float>::infinity();
+            if (!search_right_) {
+                for (size_t i = 0; i < scan_laser_->ranges.size(); ++i) {
+                    if (scan_laser_->ranges[i] < min_dist && scan_laser_->ranges[i] > 0) {
+                        min_dist = scan_laser_->ranges[i];
+                        min_index = i;
+                    }
+                }
+            } else {
+                sensor_msgs::msg::LaserScan scan = *scan_laser_;
+                size_t                      minus_135_deg = get_index_from_angle(scan_laser_, 3.93);  // -135
+                size_t                      minus_45_deg = get_index_from_angle(scan_laser_, 5.5);    // -45
+                std::vector<float>          search_range(scan.ranges.begin() + minus_135_deg, scan.ranges.begin() + minus_45_deg);
+                for (size_t i = 0; i < search_range.size(); ++i) {
+                    if (search_range[i] < min_dist && search_range[i] > 0) {
+                        min_dist = search_range[i];
+                        min_index = i + minus_135_deg;
+                    }
+                }
+            }
+
+            if (min_index != -1) {
+                float target_angle = scan_laser_->angle_min + min_index * scan_laser_->angle_increment;
+
+                // 激光雷达坐标系坐标点
+                Point2D                          laser_point = Point2D(min_dist * cos(target_angle), min_dist * sin(target_angle));
+                geometry_msgs::msg::PointStamped point_in_laser;
+                // pointstamped类型存储数据
+                point_in_laser.header = scan_laser_->header;
+                point_in_laser.header.stamp = rclcpp::Time(0);
+
+                point_in_laser.point.x = laser_point.x;
+                point_in_laser.point.y = laser_point.y;
+                point_in_laser.point.z = 0.0;
+
+                geometry_msgs::msg::PointStamped point_in_odom;
+                // 转换到odom
+                try {
+                    point_in_odom = tf_buffer_->transform(point_in_laser, "odom");
+                    target_point_.x = point_in_odom.point.x;
+                    target_point_.y = point_in_odom.point.y;
+                } catch (const tf2::TransformException& ex) {
+                    RCLCPP_WARN(this->get_logger(), "无法从激光坐标转换到里程计坐标：%s", ex.what());
+                }
+
+                if (!search_right_) {
+                    current_state_ = State::DRIVING_TO_WALL;
+                } else {
+                    current_state_ = State::WALL_FOLLOWING;
+                    search_right_ = false;
+                }
+                has_min_dist_ = true;
             }
         }
     }
 
     // 状态2: 转向并移动到墙前
     void handle_driving_to_wall() {
+        std::cout << "driving" << std::endl;
         geometry_msgs::msg::TransformStamped transform;
 
         geometry_msgs::msg::PointStamped target_in_odom;
@@ -312,11 +584,12 @@ private:
             geometry_msgs::msg::Twist twist_msg;
 
             // 转向最近的点
-            if (std::fabs(target_yaw) > 0.04) {
+            if (std::fabs(target_yaw) > 0.04 && !turn_step_final_) {
                 twist_msg.angular.z = (target_yaw > 0) ? 0.3 : -0.3;
                 RCLCPP_INFO(this->get_logger(), "Rotating. Target yaw: %.2f", target_yaw);
-            } else if (front_dist_ > 0.4) {
+            } else if (front_dist_ > 0.25) {
                 twist_msg.linear.x = 0.1;
+                turn_step_final_ = true;
                 RCLCPP_INFO(this->get_logger(), "Moving forward. Distance to wall: %f", front_dist_);
             } else {
                 twist_msg.linear.x = 0;
@@ -334,13 +607,14 @@ private:
                 publisher_->publish(twist_msg);
             }
 
-        } catch (const tf2::TransformException &ex) {
+        } catch (const tf2::TransformException& ex) {
             RCLCPP_WARN(this->get_logger(), "tran base_link tf err:%s", ex.what());
         }
     }
 
     // 状态3: 左转90度
     void handle_rotating_left() {
+        std::cout << "turn" << std::endl;
         geometry_msgs::msg::Twist twist_msg;
         // 假设角速度为0.5 rad/s，旋转90度(PI/2)大约需要3.14秒
         double rotation_duration = (M_PI / 2) / 0.5;
@@ -358,28 +632,52 @@ private:
 
     // 状态4: 沿边算法
     void handle_wall_following() {
-        geometry_msgs::msg::Twist twist_msg;
-        twist_msg.linear.x = 0.1;
+        std::cout << "following" << std::endl;
+        geometry_msgs::msg::Twist cmd;
 
-        // 如果墙壁丢失（例如外角），则右转寻找
-        if (dis_to_wall_ > 0.09 || std::isinf(dis_to_wall_) || std::isnan(dis_to_wall_)) {
-            RCLCPP_WARN(this->get_logger(), "墙壁丢失，正在右转寻找。");
-            twist_msg.angular.z = -0.6; // 右转
-            twist_msg.linear.x = 0.1;
+#if 1
+        static float s_prev_error = 0.0f;
+        static float s_integral = 0.0f;
+        float error = 0.0f;
+        float derivative = 0.0;
+        float control = 0.0;
+
+        if (line_right_dis_ > 0.01 && line_right_dis_ < 0.05) {
+            error = 0.03 - line_right_dis_;
+            s_integral += error * 0.1;  // 0.1s 控制周期
+            derivative = (error - s_prev_error) / 0.1;
+            control = 12.0 * error + 0.0 * s_integral + 0.5 * derivative;
         } else {
-            // P控制器维持距离
-            float error = 0.05 - dis_to_wall_;
-            twist_msg.angular.z = 1.2 * error;
-            RCLCPP_WARN(this->get_logger(), "调整距离");
+            error = follow_distance_ - scan_right_dis_;
+            s_integral += error * 0.1;  // 0.1s 控制周期
+            derivative = (error - s_prev_error) / 0.1;
+            control = 12.0 * error + 0.0 * s_integral + 0.5 * derivative;
         }
-        
-        RCLCPP_INFO(this->get_logger(), "循边中... 墙距: %.2f, 角速度: %.2f", dis_to_wall_, twist_msg.angular.z);
+        s_prev_error = error;
+
+        cmd.linear.x = 0.07;      // 固定前进速度
+        cmd.angular.z = control;  // PID控制角速度
+#endif
+
+        if (after_bump_) {
+            search_right_ = true;
+            after_bump_ = false;
+            has_min_dist_ = false;
+            current_state_ = State::SEARCHING;
+        } else {
+            if (scan_right_dis_ > 0.5) {
+                cmd.linear.x = 0.0;
+                cmd.angular.z = -0.5;
+            }
+        }
+
+        RCLCPP_INFO(this->get_logger(), "循边中... 墙距: scan:%.2f line:%.2f, 角速度: %.2f", scan_right_dis_, line_right_dis_, cmd.angular.z);
 
         // 处理碰撞
         if (hazard_type_ == 1) {
             handle_bump();
         } else {
-            publisher_->publish(twist_msg);
+            publisher_->publish(cmd);
         }
     }
 
@@ -423,26 +721,26 @@ private:
 
     void handle_bump() {
         geometry_msgs::msg::Twist twist_msg;
-        double time_in_align = (this->get_clock()->now() - align_start_time_).seconds();
-        
-        double rotation_duration = 2.0; // 默认旋转时间（约90度）
+        double                    time_in_align = (this->get_clock()->now() - align_start_time_).seconds();
+
+        double rotation_duration = 3.0;  // 默认旋转时间（约90度）
 
         // 根据碰撞位置调整旋转时间
         if (hazard_frame_id_ == "bump_left") {
-            rotation_duration = 4.5;
+            rotation_duration = 5.0;
         } else if (hazard_frame_id_ == "bump_front_left") {
-            rotation_duration = 3.5;
+            rotation_duration = 4.0;
         } else if (hazard_frame_id_ == "bump_front_center") {
-            rotation_duration = 2.5;
+            rotation_duration = 3.0;
         } else if (hazard_frame_id_ == "bump_front_right") {
-            rotation_duration = 1.5;
+            rotation_duration = 2.0;
         } else if (hazard_frame_id_ == "bump_right") {
-            rotation_duration = 0.5;
+            rotation_duration = 1.0;
         }
-        
+
         if (time_in_align < rotation_duration) {
             twist_msg.linear.x = 0.0;
-            twist_msg.angular.z = 0.6; // 左转
+            twist_msg.angular.z = 0.6;  // 左转
         } else {
             RCLCPP_INFO(this->get_logger(), "对准完成。切换到 WALL_FOLLOWING 状态。");
             // stop_robot();
@@ -450,6 +748,7 @@ private:
             current_state_ = State::WALL_FOLLOWING;
         }
         publisher_->publish(twist_msg);
+        after_bump_ = true;
     }
 
     void stop_robot() {
@@ -465,14 +764,13 @@ private:
         return std::max(0, std::min(static_cast<int>(scan->ranges.size() - 1), index));
     }
 
-    void is_obstacle_in_front(const sensor_msgs::msg::LaserScan::SharedPtr scan) {
+    bool is_obstacle_in_front(const sensor_msgs::msg::LaserScan::SharedPtr scan) {
         if (!scan) {
-            has_obstacle_ = false;
-            return;
-        } 
+            return false;
+        }
         // 检查前方一个狭窄的扇区（例如-15到+15度）
-        size_t start_index = get_index_from_angle(scan, 6.02); // -15 degrees
-        size_t end_index = get_index_from_angle(scan, 0.26);   // +15 degrees
+        size_t start_index = get_index_from_angle(scan, 6.02);  // -15 degrees
+        size_t end_index = get_index_from_angle(scan, 0.26);    // +15 degrees
 
         std::vector<float> head(scan->ranges.begin(), scan->ranges.begin() + end_index);
         std::vector<float> tail(scan->ranges.end() - start_index, scan->ranges.end());
@@ -480,40 +778,29 @@ private:
 
         for (float val : head) {
             if (!std::isnan(val) && val < front_obstacle_dist_) {
-                has_obstacle_ = true;
-            } else {
-                has_obstacle_ = false;
+                return true;
             }
         }
+
+        return false;
     }
 
-    void point_in_laser(const sensor_msgs::msg::LaserScan::SharedPtr scan) {
-        if (!has_min_dist_) {
-            int front_min_index = -1;
-            float front_min_dist = std::numeric_limits<float>::infinity();
-            for (size_t i = 0; i < scan->ranges.size(); ++i) {
-                if (scan->ranges[i] < front_min_dist && scan->ranges[i] > 0) {
-                    front_min_dist = scan->ranges[i];
-                    has_min_dist_ = true;
-                    front_min_index = i;
-                }
-            }
+    float avg_distance_cal(const sensor_msgs::msg::LaserScan::SharedPtr scan, size_t start, size_t end) {
+        float dis = -1.0f;
 
-            if (front_min_index != -1) {
-                float target_angle = scan->angle_min + front_min_index * scan->angle_increment;
-
-                // 激光雷达坐标系坐标点
-                Point2D laser_point = Point2D(front_min_dist * cos(target_angle), front_min_dist * sin(target_angle));
-
-                // pointstamped类型存储数据
-                point_in_laser_.header = scan->header;
-                point_in_laser_.header.stamp = rclcpp::Time(0);
-
-                point_in_laser_.point.x = laser_point.x;
-                point_in_laser_.point.y = laser_point.y;
-                point_in_laser_.point.z = 0.0;
+        std::vector<float> values(scan->ranges.begin() + start, scan->ranges.begin() + end);
+        float              sum = 0.0f;
+        int                count = 0;
+        for (float val : values) {
+            if (!std::isnan(val)) {
+                sum += val;
+                ++count;
             }
         }
+        if (count == 0) return -1;
+        dis = sum / count;
+
+        return dis;
     }
 
     rclcpp::Publisher<geometry_msgs::msg::Twist>::SharedPtr                         publisher_;
@@ -522,13 +809,12 @@ private:
     rclcpp::Publisher<visualization_msgs::msg::Marker>::SharedPtr                   marker_pub_;
     State                                                                           current_state_ = State::SEARCHING;
     rclcpp::Time                                                                    rotation_start_time_;
-    rclcpp::Time align_start_time_;
+    rclcpp::Time                                                                    align_start_time_;
     rclcpp::Subscription<irobot_create_msgs::msg::HazardDetectionVector>::SharedPtr hazard_sub_;
-    rclcpp::Publisher<sensor_msgs::msg::PointCloud2>::SharedPtr cloud_pub_;
-    laser_geometry::LaserProjection                              projector_;
+    rclcpp::Publisher<sensor_msgs::msg::PointCloud2>::SharedPtr                     cloud_pub_;
+    laser_geometry::LaserProjection                                                 projector_;
 
     rclcpp::TimerBase::SharedPtr timer_;
-    geometry_msgs::msg::PointStamped point_in_laser_;
 
     std::unique_ptr<tf2_ros::Buffer>            tf_buffer_;
     std::shared_ptr<tf2_ros::TransformListener> tf_listener_;
@@ -536,17 +822,32 @@ private:
     Point2D target_point_;
 
     std::string hazard_frame_id_;
-    uint8_t hazard_type_;
+    uint8_t     hazard_type_;
 
-    sensor_msgs::msg::LaserScan line_laser_;
-    float dis_to_wall_;
-    float front_dist_;
-    bool has_min_dist_;
-    bool has_obstacle_;
+    sensor_msgs::msg::LaserScan::SharedPtr line_laser_;
+    sensor_msgs::msg::LaserScan::SharedPtr scan_laser_;
+    std::mutex                             line_lock_;
+    std::mutex                             scan_lock_;
+    float                                  line_right_dis_;
+    float                                  scan_right_dis_;
+    float                                  front_dist_;
+    float                                  scan_right_front_dis_;
+    float                                  scan_right_back_dis_;
+    float                                  scan_front_dis_;
+
+    bool  has_min_dist_;
     float front_obstacle_dist_;
+    float follow_distance_;
+
+    bool after_bump_ = false;
+    bool search_right_ = false;
+
+    bool turn_step_final_ = false;
+
+    float target_yaw_ = -1.0f;
 };
 
-int main(int argc, char *argv[]) {
+int main(int argc, char* argv[]) {
     rclcpp::init(argc, argv);
     rclcpp::spin(std::make_shared<EdgeFollower>());
     rclcpp::shutdown();
