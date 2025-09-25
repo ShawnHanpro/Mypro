@@ -184,7 +184,7 @@ private:
 
         front_dist_ = msg->ranges[0];
 
-        if (msg->ranges.size() < 10 || current_state_ != State::WALL_FOLLOWING) {
+        if (msg->ranges.size() < 10) {
             scan_right_dis_ = -1.0f;
             return;
         }
@@ -206,23 +206,12 @@ private:
         float front_dis_0_right = avg_distance_cal(msg, minus_22_5_deg, positive_360_deg);
         scan_front_dis_ = (front_dis_0_left + front_dis_0_right) / 2;
 
-        float min_dist = std::numeric_limits<float>::infinity();
-        int min_index = -1;
-        int start_index = (int)((4.17 - msg->angle_min) / msg->angle_increment);
-        int end_index   = (int)((5.5 - msg->angle_min) / msg->angle_increment);
-        for(int i = start_index; i <= end_index; ++i) {
-            if(msg->ranges[i] < min_dist) {
-                min_dist =msg->ranges[i];
-                min_index = i;
-            }
-        }
-        float angle = msg->angle_min + min_index * msg->angle_increment;
-        float x_point = min_dist * cos(angle);  // 前方为X轴
-        float y_point = min_dist * sin(angle);  // 右侧为负Y
-        float norm = std::sqrt(y_point*y_point + x_point*x_point);
-        float vx = -y_point / norm; // 垂直连线方向
-        float vy = x_point / norm;
-        target_yaw_ = atan2(vy, vx); // 运动方向
+        // 范围内最小距离
+        scan_right_min_dis_ = min_distance_cal(msg, minus_135_deg, minus_45_deg);
+
+
+        // 发布最近点
+        // PublishCylinder(target_point_.x, target_point_.y, 0.1, 0.03, 0.03, 0.3, 0.0, 1.0, 0.0, 1.0, 0);
 
 // 凹轮廓线检测
 #if 0
@@ -352,8 +341,6 @@ private:
             PublishCylinder(right_min_point.x, right_min_point.y, 0.1, 0.03, 0.03, 0.3, 0.0, 1.0, 0.0, 1.0, 0);
         }
 #endif
-        // 发布最近点
-        // PublishCylinder(target_point_.x, target_point_.y, 0.1, 0.03, 0.03, 0.3, 0.0, 1.0, 0.0, 1.0, 0);
 // pointclouds
 #if 0
         sensor_msgs::msg::LaserScan scan = *msg;
@@ -439,7 +426,7 @@ private:
         std::vector<Point2D> hull;
         hull.push_back(start);
         Point2D current = start;
-        Point2D previous = {start.x - 1.0f, start.y};  // 用左边点初始化前一条边方向
+        // Point2D previous = {start.x - 1.0f, start.y};  // 用左边点初始化前一条边方向
 
         pts.erase(start_it);
 
@@ -587,7 +574,7 @@ private:
             if (std::fabs(target_yaw) > 0.04 && !turn_step_final_) {
                 twist_msg.angular.z = (target_yaw > 0) ? 0.3 : -0.3;
                 RCLCPP_INFO(this->get_logger(), "Rotating. Target yaw: %.2f", target_yaw);
-            } else if (front_dist_ > 0.25) {
+            } else if (front_dist_ > 0.22) {
                 twist_msg.linear.x = 0.1;
                 turn_step_final_ = true;
                 RCLCPP_INFO(this->get_logger(), "Moving forward. Distance to wall: %f", front_dist_);
@@ -633,52 +620,88 @@ private:
     // 状态4: 沿边算法
     void handle_wall_following() {
         std::cout << "following" << std::endl;
-        geometry_msgs::msg::Twist cmd;
 
-#if 1
-        static float s_prev_error = 0.0f;
-        static float s_integral = 0.0f;
-        float error = 0.0f;
-        float derivative = 0.0;
-        float control = 0.0;
-
-        if (line_right_dis_ > 0.01 && line_right_dis_ < 0.05) {
-            error = 0.03 - line_right_dis_;
-            s_integral += error * 0.1;  // 0.1s 控制周期
-            derivative = (error - s_prev_error) / 0.1;
-            control = 12.0 * error + 0.0 * s_integral + 0.5 * derivative;
-        } else {
-            error = follow_distance_ - scan_right_dis_;
-            s_integral += error * 0.1;  // 0.1s 控制周期
-            derivative = (error - s_prev_error) / 0.1;
-            control = 12.0 * error + 0.0 * s_integral + 0.5 * derivative;
+        if (!scan_laser_) {
+            std::cout << "scan_laser_ is nullptr" << std::endl;
+            return;
         }
-        s_prev_error = error;
+        if (scan_laser_->ranges.size() < 10) {
+            std::cout << "no data" << std::endl;
+            return;
+        }
 
-        cmd.linear.x = 0.07;      // 固定前进速度
-        cmd.angular.z = control;  // PID控制角速度
-#endif
+        float wall_distance_ = 0.23f;
+        float kp_distance_ = 5.0f;
+        float kp_angle_ = 2.0f;
+        float linear_velocity_ = 0.05f;
 
-        if (after_bump_) {
-            search_right_ = true;
-            after_bump_ = false;
-            has_min_dist_ = false;
-            current_state_ = State::SEARCHING;
-        } else {
-            if (scan_right_dis_ > 0.5) {
-                cmd.linear.x = 0.0;
-                cmd.angular.z = -0.5;
+        float center_angle_rad = 270.0 * M_PI / 180.0;
+        float scan_range_rad = 60.0 * M_PI / 180.0;
+
+        size_t start_index = find_index_for_angle(scan_laser_, center_angle_rad - scan_range_rad / 2.0);
+        size_t end_index = find_index_for_angle(scan_laser_, center_angle_rad + scan_range_rad / 2.0);
+
+        // 寻找此范围内的最近点
+        float min_dist = std::numeric_limits<float>::max();
+        size_t min_index = 0;
+        for (size_t i = start_index; i <= end_index; ++i) {
+            // 确保索引在有效范围内
+            if (i >= scan_laser_->ranges.size()) continue;
+            
+            if (std::isfinite(scan_laser_->ranges[i]) && scan_laser_->ranges[i] < min_dist && scan_laser_->ranges[i] > 0) {
+                min_dist = scan_laser_->ranges[i];
+                min_index = i;
             }
         }
 
-        RCLCPP_INFO(this->get_logger(), "循边中... 墙距: scan:%.2f line:%.2f, 角速度: %.2f", scan_right_dis_, line_right_dis_, cmd.angular.z);
+        auto twist_msg = std::make_unique<geometry_msgs::msg::Twist>();
+
+        if (min_dist == std::numeric_limits<float>::max()) {
+            // 如果右侧没有检测到任何东西，让机器人旋转寻找墙壁
+            twist_msg->linear.x = 0.0;
+            twist_msg->angular.z = -0.3;
+        } else {
+            // 距离误差: (目标距离 - 当前距离)
+            double distance_error = wall_distance_ - min_dist;
+
+            // 通过看最近的点偏离了-90度多远来计算角度误差。
+            double closest_point_angle = scan_laser_->angle_min + scan_laser_->angle_increment * min_index;
+            double angle_error = center_angle_rad - closest_point_angle;
+
+            // PID控制器 (这里只用了P - 比例控制)
+            // 如果机器人离墙太近 (distance_error > 0), 需要向左转 (angular.z > 0)
+            // 如果机器人离墙太远 (distance_error < 0), 需要向右转 (angular.z < 0)
+            // 如果机器人车头朝向墙 (angle_error > 0), 需要向右转 (angular.z < 0)
+            // 如果机器人车头背离墙 (angle_error < 0), 需要向左转 (angular.z > 0)
+            // 注意：kp_angle的符号需要调整以匹配这个逻辑
+            double angular_z = kp_distance_ * distance_error - kp_angle_ * angle_error;
+            
+            twist_msg->linear.x = linear_velocity_;
+            twist_msg->angular.z = angular_z;
+            
+            RCLCPP_INFO(this->get_logger(), "Dist: %.2f, DistErr: %.2f, AngleErr: %.2f, AngularZ: %.2f",
+                min_dist, distance_error, angle_error, angular_z);
+        }
 
         // 处理碰撞
         if (hazard_type_ == 1) {
             handle_bump();
-        } else {
-            publisher_->publish(cmd);
+            return;
+        } else if (scan_front_dis_ < 0.23) {
+            rotation_start_time_ = this->get_clock()->now();
+            current_state_ = State::ROTATING_LEFT;
+            return;
         }
+
+        publisher_->publish(std::move(twist_msg));
+    }
+
+    size_t find_index_for_angle(const sensor_msgs::msg::LaserScan::SharedPtr msg, double angle_rad) {
+        int index = static_cast<int>((angle_rad - msg->angle_min) / msg->angle_increment);
+        // 确保索引不会超出范围
+        if (index < 0) return 0;
+        if (static_cast<size_t>(index) >= msg->ranges.size()) return msg->ranges.size() - 1;
+        return static_cast<size_t>(index);
     }
 
     void PublishCylinder(float x, float y, float z,  // 圆柱体中心坐标
@@ -729,9 +752,9 @@ private:
         if (hazard_frame_id_ == "bump_left") {
             rotation_duration = 5.0;
         } else if (hazard_frame_id_ == "bump_front_left") {
-            rotation_duration = 4.0;
-        } else if (hazard_frame_id_ == "bump_front_center") {
             rotation_duration = 3.0;
+        } else if (hazard_frame_id_ == "bump_front_center") {
+            rotation_duration = 2.5;
         } else if (hazard_frame_id_ == "bump_front_right") {
             rotation_duration = 2.0;
         } else if (hazard_frame_id_ == "bump_right") {
@@ -803,6 +826,19 @@ private:
         return dis;
     }
 
+    float min_distance_cal(const sensor_msgs::msg::LaserScan::SharedPtr scan, size_t start, size_t end) {
+        float dis = std::numeric_limits<float>::infinity();
+
+        std::vector<float> values(scan->ranges.begin() + start, scan->ranges.begin() + end);
+        for (float val : values) {
+            if (!std::isnan(val) && val < dis) {
+                dis = val;
+            }
+        }
+
+        return dis;
+    }
+
     rclcpp::Publisher<geometry_msgs::msg::Twist>::SharedPtr                         publisher_;
     rclcpp::Subscription<sensor_msgs::msg::LaserScan>::SharedPtr                    subscription_;
     rclcpp::Subscription<sensor_msgs::msg::LaserScan>::SharedPtr                    line_laser_sub_;
@@ -835,6 +871,8 @@ private:
     float                                  scan_right_back_dis_;
     float                                  scan_front_dis_;
 
+    float                                  scan_right_min_dis_ = -0.1f;
+
     bool  has_min_dist_;
     float front_obstacle_dist_;
     float follow_distance_;
@@ -845,6 +883,7 @@ private:
     bool turn_step_final_ = false;
 
     float target_yaw_ = -1.0f;
+
 };
 
 int main(int argc, char* argv[]) {
