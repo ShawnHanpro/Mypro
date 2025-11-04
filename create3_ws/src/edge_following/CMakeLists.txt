@@ -46,6 +46,18 @@ ament_target_dependencies(
 install(TARGETS edge_following_node
   DESTINATION lib/${PROJECT_NAME})
 
+# launch
+install(
+  DIRECTORY launch
+  DESTINATION share/${PROJECT_NAME}/
+)
+
+# yaml
+install(
+  DIRECTORY yaml
+  DESTINATION share/${PROJECT_NAME}/
+)
+
 # 为接口文件生成源码
 rosidl_generate_interfaces( ${PROJECT_NAME}
   "msg/HazardDetection.msg"

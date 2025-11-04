@@ -1,0 +1,5 @@
+edge_following:
+  ros__parameters:
+    wall_distance: 0.20
+    state_loop: true
+

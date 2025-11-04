@@ -1,0 +1,7 @@
+spot_laser_collection:
+  ros__parameters:
+    enable_point_interpolation_compensation: true
+    save_point_laser_points: false
+    publish_cloud: false
+    publish_scan: true
+

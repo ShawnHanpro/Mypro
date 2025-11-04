@@ -28,6 +28,26 @@ using namespace std::chrono_literals;
 // 定义状态机的不同状态
 enum class State { SEARCHING, DRIVING_TO_WALL, ROTATING_LEFT, WALL_FOLLOWING };
 
+struct Color {
+    static constexpr const char* RED     = "\033[0;31m";
+    static constexpr const char* GREEN   = "\033[0;32m";
+    static constexpr const char* YELLOW  = "\033[0;33m";
+    static constexpr const char* BLUE    = "\033[0;34m";
+    static constexpr const char* MAGENTA = "\033[0;35m";
+    static constexpr const char* CYAN    = "\033[0;36m";
+    static constexpr const char* WHITE   = "\033[0;37m";
+
+    static constexpr const char* RED_BOLD     = "\033[1;31m";
+    static constexpr const char* GREEN_BOLD   = "\033[1;32m";
+    static constexpr const char* YELLOW_BOLD  = "\033[1;33m";
+    static constexpr const char* BLUE_BOLD    = "\033[1;34m";
+    static constexpr const char* MAGENTA_BOLD = "\033[1;35m";
+    static constexpr const char* CYAN_BOLD    = "\033[1;36m";
+    static constexpr const char* WHITE_BOLD   = "\033[1;37m";
+
+    static constexpr const char* RESET   = "\033[0m";
+};
+
 class Point2D {
 public:
     float x;
@@ -67,32 +87,32 @@ public:
 class EdgeFollower : public rclcpp::Node {
 public:
     EdgeFollower() : Node("edge_follower_node") {
-        cmd_publisher_ = this->create_publisher<geometry_msgs::msg::Twist>("/cmd_vel", 10);
+        // 加载参数
+        this->declare_parameter<float>("wall_distance", 0.25);
+        this->get_parameter("wall_distance", wall_distance_);
+        this->declare_parameter<bool>("state_loop", true);
+        this->get_parameter("state_loop", state_loop_);
+
+        RCLCPP_INFO(this->get_logger(), "wall_distance = %s%.5f%s", Color::GREEN_BOLD, wall_distance_, Color::RESET);
+        if (state_loop_) RCLCPP_INFO(this->get_logger(), "publish_scan = %strue%s", Color::GREEN_BOLD, Color::RESET);
+        else RCLCPP_INFO(this->get_logger(), "publish_scan = %sfalse%s", Color::RED_BOLD, Color::RESET);
 
         scan_laser_sub_ = this->create_subscription<sensor_msgs::msg::LaserScan>("/scan", 10, std::bind(&EdgeFollower::scan_callback, this, _1));
-
         line_laser_sub_ =
             this->create_subscription<sensor_msgs::msg::LaserScan>("/line_scan", 10, std::bind(&EdgeFollower::line_laser_callback, this, _1));
-
         hazard_sub_ = this->create_subscription<irobot_create_msgs::msg::HazardDetectionVector>("/hazard_detection", rclcpp::SensorDataQoS(),
                                                                                                 std::bind(&EdgeFollower::hazard_callback, this, _1));
 
-        // point cloud pub
+        cmd_publisher_ = this->create_publisher<geometry_msgs::msg::Twist>("/cmd_vel", 10);
         cloud_pub_ = this->create_publisher<sensor_msgs::msg::PointCloud2>("point_clouds", 10);
         corner_cloud_pub_ = this->create_publisher<sensor_msgs::msg::PointCloud2>("corner_point_clouds", 10);
+        marker_pub_ = this->create_publisher<visualization_msgs::msg::Marker>("visualization_marker", 10);
 
         tf_buffer_ = std::make_unique<tf2_ros::Buffer>(this->get_clock());
         tf_listener_ = std::make_shared<tf2_ros::TransformListener>(*tf_buffer_);
 
-        marker_pub_ = this->create_publisher<visualization_msgs::msg::Marker>("visualization_marker", 10);
+        if (state_loop_) timer_ = this->create_wall_timer(50ms, std::bind(&EdgeFollower::control_loop, this));
 
-        timer_ = this->create_wall_timer(50ms, std::bind(&EdgeFollower::control_loop, this));
-        line_right_dis_ = -1.0f;
-        scan_right_dis_ = -1.0f;
-        has_min_dist_ = false;
-        front_dist_ = -1.0f;
-        scan_right_front_dis_ = -1.0f;
-        scan_right_back_dis_ = -1.0f;
         scan_front_dis_ = -1.0f;
 
         RCLCPP_INFO(this->get_logger(), "Wall follower node has been started.");
@@ -104,16 +124,16 @@ private:
         line_laser_ = msg;
 
         if (msg->ranges.size() < 10) {
-            line_right_dis_ = -1.0f;
+            RCLCPP_WARN(this->get_logger(), "have no data!");
             return;
         }
-        
+
         // sensor_msgs::msg::PointCloud2 out = find_boundary_point();
         // pub_point_cloud(out);
 
         // 使用线激光的中心读数作为墙距
-        size_t minus_5_deg = get_index_from_angle(msg, 359.913); // -5
-        size_t positive_5_deg = get_index_from_angle(msg, 0.087);   // 5
+        size_t minus_5_deg = get_index_from_angle(msg, 359.913);   // -5
+        size_t positive_5_deg = get_index_from_angle(msg, 0.087);  // 5
 
         std::vector<float> head(msg->ranges.begin(), msg->ranges.begin() + positive_5_deg);
         std::vector<float> tail(msg->ranges.begin(), msg->ranges.begin() + minus_5_deg);
@@ -129,12 +149,9 @@ private:
         }
 
         if (count == 0) {
-            // RCLCPP_WARN(this->get_logger(), "have no valid data!");
-            line_right_dis_ = -1.0f;
+            RCLCPP_WARN(this->get_logger(), "have no valid data!");
             return;
         }
-
-        line_right_dis_ = sum / count;
 
 #if 0
         sensor_msgs::msg::LaserScan scan = *msg;
@@ -213,115 +230,20 @@ private:
         front_dist_ = msg->ranges[0];
 
         if (msg->ranges.size() < 10) {
-            scan_right_dis_ = -1.0f;
             return;
         }
 
-        // scan右侧沿墙距离
-        size_t minus_135_deg = get_index_from_angle(msg, 3.93);      // -135
-        size_t minus_90_deg = get_index_from_angle(msg, 4.71);       // -90
-        size_t minus_80_deg = get_index_from_angle(msg, 4.887);      // -80
-        size_t minus_45_deg = get_index_from_angle(msg, 5.5);        // -45
-        size_t minus_22_5_deg = get_index_from_angle(msg, 5.89);     // -22.5
-        size_t positive_22_5_deg = get_index_from_angle(msg, 0.39);  // 22.5
-        size_t positive_360_deg = get_index_from_angle(msg, 6.28);   // 360
+        size_t minus_5_deg = get_index_from_angle(msg, 355 * M_PI / 180);  // -5
+        size_t positive_5_deg = get_index_from_angle(msg, 5 * M_PI / 180);  // 5
+        size_t p_360_deg = get_index_from_angle(msg, 360 * M_PI / 180);   // 360
 
         // 范围内平均距离
-        scan_right_dis_ = avg_distance_cal(msg, minus_90_deg, minus_80_deg);
-        scan_right_front_dis_ = avg_distance_cal(msg, minus_90_deg, minus_45_deg);
-        scan_right_back_dis_ = avg_distance_cal(msg, minus_135_deg, minus_90_deg);
-        float front_dis_0_left = avg_distance_cal(msg, 0, positive_22_5_deg);
-        float front_dis_0_right = avg_distance_cal(msg, minus_22_5_deg, positive_360_deg);
+        float front_dis_0_left = avg_distance_cal(msg, 0, positive_5_deg);
+        float front_dis_0_right = avg_distance_cal(msg, minus_5_deg, p_360_deg);
         scan_front_dis_ = (front_dis_0_left + front_dis_0_right) / 2;
-
-        // 范围内最小距离
-        scan_right_min_dis_ = min_distance_cal(msg, minus_135_deg, minus_45_deg);
-
 
         // 发布最近点
         // PublishCylinder(target_point_.x, target_point_.y, 0.1, 0.03, 0.03, 0.3, 0.0, 1.0, 0.0, 1.0, 0);
-
-// 凹轮廓线检测
-#if 0
-        sensor_msgs::msg::LaserScan scan = *msg;
-        std::fill(scan.ranges.begin(), scan.ranges.end(), std::numeric_limits<float>::quiet_NaN());
-
-        // 然后保留 -135° 到 -45° 的范围
-        std::copy(msg->ranges.begin() + minus_135_deg, msg->ranges.begin() + minus_45_deg,
-                scan.ranges.begin() + minus_135_deg);
-        // 轮廓线检测
-        sensor_msgs::msg::PointCloud2 laser_cloud;
-        sensor_msgs::msg::PointCloud2 odom_cloud;
-        geometry_msgs::msg::TransformStamped transform_stamped;
-        try {
-            // laserscan -> pointcloud in laser
-            projector_.transformLaserScanToPointCloud(scan.header.frame_id, scan, laser_cloud, *tf_buffer_);
-            // in odom
-            transform_stamped =
-                tf_buffer_->lookupTransform("odom", scan.header.frame_id, scan.header.stamp, rclcpp::Duration::from_seconds(0.2));
-            tf2::doTransform(laser_cloud, odom_cloud, transform_stamped);
-        } catch (const tf2::TransformException& ex) {
-            RCLCPP_WARN(this->get_logger(), "point clouds trans failed:%s", ex.what());
-        }
-
-        tf2::Transform tf;
-        tf2::fromMsg(transform_stamped.transform, tf);
-        std::vector<Point2D>                         points;
-
-        float angle = scan.angle_min;
-        for (auto r : scan.ranges) {
-            if (r < scan.range_min || r > scan.range_max) {
-                angle += scan.angle_increment;
-                continue;
-            }
-
-            tf2::Vector3 p_laser(r * cos(angle), r * sin(angle), 0.0);
-            tf2::Vector3 p_odom = tf * p_laser;  // 转到odom
-            points.push_back({(float)p_odom.x(), (float)p_odom.y()});
-            angle += scan.angle_increment;
-        }
-
-        if (points.empty()) {
-            std::cout << "empty" << std::endl;
-        }
-
-        // 计算凸包作为房间轮廓
-        auto hull = concaveHull(points);
-
-        // 发布到 RViz
-        visualization_msgs::msg::Marker line_strip;
-        line_strip.header.frame_id = "odom";
-        line_strip.header.stamp = this->now();
-        line_strip.ns = "room_contour";
-        line_strip.id = 0;
-        line_strip.type = visualization_msgs::msg::Marker::LINE_STRIP;
-        line_strip.action = visualization_msgs::msg::Marker::ADD;
-        line_strip.scale.x = 0.02;  // 线宽
-        line_strip.color.r = 0.0;
-        line_strip.color.g = 1.0;
-        line_strip.color.b = 0.0;
-        line_strip.color.a = 1.0;
-
-        for (auto& p : hull) {
-            if (std::isnan(p.x) || std::isnan(p.y)) continue;
-            if (std::isinf(p.x) || std::isinf(p.y)) continue;
-            geometry_msgs::msg::Point pt;
-            pt.x = p.x;
-            pt.y = p.y;
-            pt.z = 0.0;
-            line_strip.points.push_back(pt);
-        }
-        // 闭合轮廓
-        // if (!hull.empty()) {
-        //     geometry_msgs::msg::Point pt;
-        //     pt.x = hull[0].x;
-        //     pt.y = hull[0].y;
-        //     pt.z = 0.0;
-        //     line_strip.points.push_back(pt);
-        // }
-
-        marker_pub_->publish(line_strip);
-#endif
 
 #if 0
         // -45 to -135
@@ -337,8 +259,6 @@ private:
             }
         }
 
-        scan_right_dis_ = (right_min_dist == std::numeric_limits<double>::infinity()) ? -1.0 : right_min_dist;
-        std::cout << "scan_right_dis_: " << scan_right_dis_ << std::endl;
         if (right_min_index != -1) {
             float target_angle = msg->angle_min + right_min_index * msg->angle_increment;
 
@@ -411,44 +331,15 @@ private:
 #endif
     }
 
-    // 计算凸包 (Graham scan / Andrew 算法)
-    std::vector<Point2D> TconvexHull(std::vector<Point2D>& pts) {
-        if (pts.size() < 3) return pts;
-        std::sort(pts.begin(), pts.end(), [](const Point2D& a, const Point2D& b) { return a.x == b.x ? a.y < b.y : a.x < b.x; });
-        std::vector<Point2D> hull;
-        auto cross = [](const Point2D& O, const Point2D& A, const Point2D& B) { return (A.x - O.x) * (B.y - O.y) - (A.y - O.y) * (B.x - O.x); };
-        // 下凸壳
-        for (auto& p : pts) {
-            while (hull.size() >= 2 && cross(hull[hull.size() - 2], hull.back(), p) <= 0) {
-                hull.pop_back();
-            }
-            hull.push_back(p);
-        }
-        // 上凸壳
-        size_t t = hull.size() + 1;
-        for (int i = pts.size() - 1; i >= 0; i--) {
-            auto& p = pts[i];
-            while (hull.size() >= t && cross(hull[hull.size() - 2], hull.back(), p) <= 0) {
-                hull.pop_back();
-            }
-            hull.push_back(p);
-        }
-        hull.pop_back();
-        return hull;
-    }
-
     // 计算两点距离
-    float dist2(const Point2D& a, const Point2D& b) {
-        return (a.x - b.x)*(a.x - b.x) + (a.y - b.y)*(a.y - b.y);
-    }
+    float dist2(const Point2D& a, const Point2D& b) { return (a.x - b.x) * (a.x - b.x) + (a.y - b.y) * (a.y - b.y); }
 
     // 极角排序
     std::vector<Point2D> concaveHull(std::vector<Point2D>& pts, float k = 10) {
         if (pts.size() < 3) return pts;
 
         // 1. 找到最下方点作为起点
-        auto start_it = std::min_element(pts.begin(), pts.end(),
-                                        [](const Point2D& a, const Point2D& b) { return a.y < b.y; });
+        auto    start_it = std::min_element(pts.begin(), pts.end(), [](const Point2D& a, const Point2D& b) { return a.y < b.y; });
         Point2D start = *start_it;
 
         std::vector<Point2D> hull;
@@ -460,8 +351,7 @@ private:
 
         while (!pts.empty()) {
             // 2. 找 k 个最近点
-            std::sort(pts.begin(), pts.end(),
-                    [this, &current](const Point2D& a, const Point2D& b) { return dist2(a, current) < dist2(b, current); });
+            std::sort(pts.begin(), pts.end(), [this, &current](const Point2D& a, const Point2D& b) { return dist2(a, current) < dist2(b, current); });
             size_t n = std::min((size_t)k, pts.size());
 
             // 3. 选择最合适的点（保持逆时针/顺时针方向）
@@ -482,7 +372,6 @@ private:
     }
 
     void control_loop() {
-#if 1
         switch (current_state_) {
             case State::SEARCHING:
                 handle_searching();
@@ -498,9 +387,6 @@ private:
                 break;
             }
         }
-        // rclcpp::Time now = this->get_clock()->now();
-        // RCLCPP_INFO(this->get_logger(), "ROS time: %ld.%09ld", now.seconds(), now.nanoseconds());
-#endif
     }
 
     // 状态1: 寻找最近的点
@@ -658,24 +544,22 @@ private:
             return;
         }
 
-        float wall_distance_ = 0.23f;
-        float kp_distance_ = 6.0f;
-        float kp_angle_ = 1.0f;
-        float linear_velocity_ = 0.05f;
+        float kp_distance = 6.0f;
+        float kp_angle = 1.0f;
 
-        float center_angle_rad = 270.0 * M_PI / 180.0;
+        float right_angle_rad = 270.0 * M_PI / 180.0;
         float scan_range_rad = 60.0 * M_PI / 180.0;
 
-        size_t start_index = find_index_for_angle(scan_laser_, center_angle_rad - scan_range_rad / 2.0);
-        size_t end_index = find_index_for_angle(scan_laser_, center_angle_rad + scan_range_rad / 2.0);
+        size_t start_index = find_index_for_angle(scan_laser_, right_angle_rad - scan_range_rad / 2.0);
+        size_t end_index = find_index_for_angle(scan_laser_, right_angle_rad + scan_range_rad / 2.0);
 
         // 寻找此范围内的最近点
-        float min_dist = std::numeric_limits<float>::max();
+        float  min_dist = std::numeric_limits<float>::max();
         size_t min_index = 0;
         for (size_t i = start_index; i <= end_index; ++i) {
             // 确保索引在有效范围内
             if (i >= scan_laser_->ranges.size()) continue;
-            
+
             if (std::isfinite(scan_laser_->ranges[i]) && scan_laser_->ranges[i] < min_dist && scan_laser_->ranges[i] > 0) {
                 min_dist = scan_laser_->ranges[i];
                 min_index = i;
@@ -690,25 +574,20 @@ private:
             twist_msg->angular.z = -0.3;
         } else {
             // 距离误差: (目标距离 - 当前距离)
-            double distance_error = wall_distance_ - min_dist;
+            float distance_error = wall_distance_ - min_dist;
 
             // 通过看最近的点偏离了-90度多远来计算角度误差。
-            double closest_point_angle = scan_laser_->angle_min + scan_laser_->angle_increment * min_index;
-            double angle_error = center_angle_rad - closest_point_angle;
+            float closest_point_angle = scan_laser_->angle_min + scan_laser_->angle_increment * min_index;
+            float angle_error = right_angle_rad - closest_point_angle;
 
-            // PID控制器 (这里只用了P - 比例控制)
-            // 如果机器人离墙太近 (distance_error > 0), 需要向左转 (angular.z > 0)
-            // 如果机器人离墙太远 (distance_error < 0), 需要向右转 (angular.z < 0)
-            // 如果机器人车头朝向墙 (angle_error > 0), 需要向右转 (angular.z < 0)
-            // 如果机器人车头背离墙 (angle_error < 0), 需要向左转 (angular.z > 0)
-            // 注意：kp_angle的符号需要调整以匹配这个逻辑
-            double angular_z = kp_distance_ * distance_error - kp_angle_ * angle_error;
-            
-            twist_msg->linear.x = linear_velocity_;
+            // 通过控制距墙距离和机器人朝向来判断旋转方向
+            float angular_z = kp_distance * distance_error - kp_angle * angle_error;
+
+            twist_msg->linear.x = 0.05f;
             twist_msg->angular.z = angular_z;
-            
-            RCLCPP_INFO(this->get_logger(), "Dist: %.2f, DistErr: %.2f, AngleErr: %.2f, AngularZ: %.2f",
-                min_dist, distance_error, angle_error, angular_z);
+
+            RCLCPP_INFO(this->get_logger(), "Dist: %.2f, DistErr: %.2f, AngleErr: %.2f, AngularZ: %.2f", min_dist, distance_error, angle_error,
+                        angular_z);
         }
 
         // 处理碰撞
@@ -723,18 +602,16 @@ private:
 
         cmd_publisher_->publish(std::move(twist_msg));
         // pub_point_cloud();
-        sensor_msgs::msg::PointCloud2 out = find_boundary_point();
-        pub_point_cloud(out);
+        // sensor_msgs::msg::PointCloud2 out = find_boundary_point();
+        // pub_point_cloud(out);
     }
 
     sensor_msgs::msg::PointCloud2 find_boundary_point() {
-
         std::vector<Point3D> points_in_odom;
         try {
             // 获取 line_laser 坐标系相对于 odom 的变换
             geometry_msgs::msg::TransformStamped transformStamped =
-                tf_buffer_->lookupTransform("odom", line_laser_->header.frame_id, 
-                                           tf2::TimePointZero);
+                tf_buffer_->lookupTransform("odom", line_laser_->header.frame_id, tf2::TimePointZero);
 
             // 遍历 LaserScan 数据
             double angle = line_laser_->angle_min;
@@ -760,15 +637,14 @@ private:
                 p.z = point_in_odom.point.z;
                 points_in_odom.push_back(p);
             }
-        } catch (tf2::TransformException &ex) {
-            RCLCPP_WARN(this->get_logger(), "Could not transform %s to odom: %s", 
-                        line_laser_->header.frame_id.c_str(), ex.what());
+        } catch (tf2::TransformException& ex) {
+            RCLCPP_WARN(this->get_logger(), "Could not transform %s to odom: %s", line_laser_->header.frame_id.c_str(), ex.what());
         }
 
         std::unordered_map<uint64_t, std::vector<Point3D>> grid;
-        float bin_size = 0.01f;
-        float wall_height_thresh = 0.02f;
-        float ground_z_thresh = 0.03f;
+        float                                              bin_size = 0.01f;
+        float                                              wall_height_thresh = 0.02f;
+        float                                              ground_z_thresh = 0.03f;
         grid.reserve(points_in_odom.size() / 4 + 10);
         std::vector<Point3D> boundary_points_out;
 
@@ -776,7 +652,7 @@ private:
 
         // gird
         for (size_t i = 0; i < points_in_odom.size(); ++i) {
-            const auto &pt = points_in_odom[i];
+            const auto& pt = points_in_odom[i];
             // save max p
             if (std::fabs(pt.y) > std::fabs(max_p.y)) {
                 max_p = pt;
@@ -785,13 +661,13 @@ private:
             int64_t bx64 = static_cast<int64_t>(std::floor(pt.x / bin_size));
             int64_t by64 = static_cast<int64_t>(std::floor(pt.y / bin_size));
             // clamp to int32 range to be safe
-            if (bx64 < std::numeric_limits<int32_t>::min() || bx64 > std::numeric_limits<int32_t>::max()
-            || by64 < std::numeric_limits<int32_t>::min() || by64 > std::numeric_limits<int32_t>::max()) {
+            if (bx64 < std::numeric_limits<int32_t>::min() || bx64 > std::numeric_limits<int32_t>::max() ||
+                by64 < std::numeric_limits<int32_t>::min() || by64 > std::numeric_limits<int32_t>::max()) {
                 RCLCPP_WARN(this->get_logger(), "over limits!");
                 continue;
             }
-            int32_t bx = static_cast<int32_t>(bx64);
-            int32_t by = static_cast<int32_t>(by64);
+            int32_t  bx = static_cast<int32_t>(bx64);
+            int32_t  by = static_cast<int32_t>(by64);
             uint64_t key = pack_cell_key(bx, by);
             grid[key].push_back(pt);
         }
@@ -821,28 +697,28 @@ private:
 
         // v2.0
 #if 1
-        for (auto &kv : grid) {
-            auto &pts = kv.second;
+        for (auto& kv : grid) {
+            auto& pts = kv.second;
             if (pts.size() < min_points_per_cell) continue;
 
             float z_min = std::numeric_limits<float>::infinity();
             float z_max = -std::numeric_limits<float>::infinity();
 
-            for (const auto &p : pts) {
+            for (const auto& p : pts) {
                 z_min = std::min(z_min, static_cast<float>(p.z));
                 z_max = std::max(z_max, static_cast<float>(p.z));
             }
 
             // 如果竖直高度差不足，则不认为有墙
             std::cout << "z_max - z_min: " << z_max - z_min << std::endl;
-            if ( (z_max - z_min) < wall_height_thresh ) continue;
+            if ((z_max - z_min) < wall_height_thresh) continue;
             // 在认为存在墙的 cell 中，找最接近地面的“墙点”
-            bool found = false;
-            Point3D best_p{}; // 若未找到，保持无意义但不被 push
-            float best_z = std::numeric_limits<float>::infinity();
+            bool    found = false;
+            Point3D best_p{};  // 若未找到，保持无意义但不被 push
+            float   best_z = std::numeric_limits<float>::infinity();
 
-            for (const auto &p : pts) {
-                std::cout << "p.z:" <<  p.z << std::endl;
+            for (const auto& p : pts) {
+                std::cout << "p.z:" << p.z << std::endl;
                 // 只考虑高于 ground_z_thresh 的点（认为墙体高于地面）
                 if (p.z > ground_z_thresh) {
                     // 想要“最低的墙点”，就取 z 最小的那个（但仍大于 ground_z_thresh）
@@ -862,7 +738,7 @@ private:
         std::cout << "best p size: " << boundary_points_out.size() << std::endl;
 
         Point3D min_p{};
-        float min_z = std::numeric_limits<int32_t>::max();
+        float   min_z = std::numeric_limits<int32_t>::max();
         for (auto p : boundary_points_out) {
             if (p.z < min_z) {
                 min_z = p.z;
@@ -888,10 +764,9 @@ private:
                 }
                 std::cout << "fix!" << std::endl;
             }
-
         }
-        
-        for(auto p : points_in_odom) {
+
+        for (auto p : points_in_odom) {
             boundary_points_out.push_back(p);
         }
 
@@ -923,11 +798,10 @@ private:
 
     static inline uint64_t pack_cell_key(int32_t bx, int32_t by) {
         // 把两个 32-bit 有符号整数打包到一个 uint64_t（保留 bitwise 表示）
-        return (static_cast<uint64_t>(static_cast<uint32_t>(bx)) << 32) |
-            static_cast<uint64_t>(static_cast<uint32_t>(by));
+        return (static_cast<uint64_t>(static_cast<uint32_t>(bx)) << 32) | static_cast<uint64_t>(static_cast<uint32_t>(by));
     }
 
-    void pub_point_cloud(sensor_msgs::msg::PointCloud2 &line_pointcloud_in_odom) {
+    void pub_point_cloud(sensor_msgs::msg::PointCloud2& line_pointcloud_in_odom) {
         try {
             // 1. 将当前帧的 LaserScan 转换为 PointCloud2 (在 laser 坐标系下)
             // sensor_msgs::msg::PointCloud2 pointcloud_in_laser;
@@ -957,10 +831,8 @@ private:
                 is_initialized_ = true;
             } else {
                 // 检查点云结构是否一致
-                if (accumulated_cloud_.fields !=
-                        line_pointcloud_in_odom.fields ||
-                    accumulated_cloud_.point_step !=
-                        line_pointcloud_in_odom.point_step) {
+                if (accumulated_cloud_.fields != line_pointcloud_in_odom.fields ||
+                    accumulated_cloud_.point_step != line_pointcloud_in_odom.point_step) {
                     RCLCPP_ERROR(this->get_logger(),
                                  "Point cloud fields or point_step do not "
                                  "match. Cannot merge.");
@@ -970,21 +842,17 @@ private:
                 // 获取旧数据的大小
                 size_t old_data_size = accumulated_cloud_.data.size();
                 // 获取新数据的大小
-                size_t new_data_size =
-                    line_pointcloud_in_odom.data.size();
+                size_t new_data_size = line_pointcloud_in_odom.data.size();
 
                 // 调整累积点云数据区的大小以容纳新数据
                 accumulated_cloud_.data.resize(old_data_size + new_data_size);
 
                 // 将新数据拷贝到累积点云数据的末尾
-                std::copy(line_pointcloud_in_odom.data.begin(),
-                          line_pointcloud_in_odom.data.end(),
-                          accumulated_cloud_.data.begin() + old_data_size);
+                std::copy(line_pointcloud_in_odom.data.begin(), line_pointcloud_in_odom.data.end(), accumulated_cloud_.data.begin() + old_data_size);
 
                 // 更新元数据
                 accumulated_cloud_.width += line_pointcloud_in_odom.width;
-                accumulated_cloud_.row_step =
-                    accumulated_cloud_.width * accumulated_cloud_.point_step;
+                accumulated_cloud_.row_step = accumulated_cloud_.width * accumulated_cloud_.point_step;
             }
 
             // 更新时间戳并发布
@@ -992,8 +860,7 @@ private:
             cloud_pub_->publish(accumulated_cloud_);
 
         } catch (const tf2::TransformException& ex) {
-            RCLCPP_WARN(this->get_logger(), "Could not transform %s to %s: %s",
-                        line_laser_->header.frame_id.c_str(), target_frame_.c_str(),
+            RCLCPP_WARN(this->get_logger(), "Could not transform %s to %s: %s", line_laser_->header.frame_id.c_str(), target_frame_.c_str(),
                         ex.what());
         }
     }
@@ -1119,17 +986,18 @@ private:
         return dis;
     }
 
-    rclcpp::Publisher<geometry_msgs::msg::Twist>::SharedPtr                         cmd_publisher_;
     rclcpp::Subscription<sensor_msgs::msg::LaserScan>::SharedPtr                    scan_laser_sub_;
     rclcpp::Subscription<sensor_msgs::msg::LaserScan>::SharedPtr                    line_laser_sub_;
-    rclcpp::Publisher<visualization_msgs::msg::Marker>::SharedPtr                   marker_pub_;
-    State                                                                           current_state_ = State::SEARCHING;
-    rclcpp::Time                                                                    rotation_start_time_;
-    rclcpp::Time                                                                    align_start_time_;
     rclcpp::Subscription<irobot_create_msgs::msg::HazardDetectionVector>::SharedPtr hazard_sub_;
+    rclcpp::Publisher<visualization_msgs::msg::Marker>::SharedPtr                   marker_pub_;
+    rclcpp::Publisher<geometry_msgs::msg::Twist>::SharedPtr                         cmd_publisher_;
     rclcpp::Publisher<sensor_msgs::msg::PointCloud2>::SharedPtr                     cloud_pub_;
     rclcpp::Publisher<sensor_msgs::msg::PointCloud2>::SharedPtr                     corner_cloud_pub_;
+    rclcpp::Time                                                                    rotation_start_time_;
+    rclcpp::Time                                                                    align_start_time_;
     laser_geometry::LaserProjection                                                 projector_;
+    sensor_msgs::msg::PointCloud2 accumulated_cloud_;
+    State                                                                           current_state_ = State::SEARCHING;
 
     rclcpp::TimerBase::SharedPtr timer_;
 
@@ -1141,28 +1009,23 @@ private:
     std::string hazard_frame_id_;
     uint8_t     hazard_type_;
 
-    sensor_msgs::msg::PointCloud2 accumulated_cloud_;
-
     sensor_msgs::msg::LaserScan::SharedPtr line_laser_;
     sensor_msgs::msg::LaserScan::SharedPtr scan_laser_;
     std::mutex                             line_lock_;
     std::mutex                             scan_lock_;
-    float                                  line_right_dis_;
-    float                                  scan_right_dis_;
-    float                                  front_dist_;
-    float                                  scan_right_front_dis_;
-    float                                  scan_right_back_dis_;
+    float                                  front_dist_ = -1.0f;
     float                                  scan_front_dis_;
 
-    float                                  scan_right_min_dis_ = -0.1f;
-
-    bool  has_min_dist_;
+    bool has_min_dist_ = false;
     bool search_right_ = false;
     bool turn_step_final_ = false;
 
-    float is_initialized_ = false;
+    float       is_initialized_ = false;
     std::string target_frame_ = "odom";
 
+    // yaml param
+    float wall_distance_;
+    bool state_loop_;
 };
 
 int main(int argc, char* argv[]) {

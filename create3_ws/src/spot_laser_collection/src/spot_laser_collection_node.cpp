@@ -2,10 +2,14 @@
 #include <iostream>
 #include <vector>
 #include <mutex>
+#include <fstream>
+#include <iomanip>
+#include <chrono>
+#include <string>
 
+#include "rclcpp/rclcpp.hpp"
 #include "irobot_create_msgs/msg/wheel_vels.hpp"
 #include "nav_msgs/msg/odometry.hpp"
-#include "rclcpp/rclcpp.hpp"
 #include "sensor_msgs/msg/laser_scan.hpp"
 #include "sensor_msgs/msg/point_cloud2.hpp"
 #include "sensor_msgs/msg/range.hpp"
@@ -25,6 +29,25 @@ class VirtualLaser : public rclcpp::Node {
     struct Pose2D;
 public:
     VirtualLaser() : Node("virtual_laser") {
+
+        // 声明参数并加载默认值
+        this->declare_parameter<bool>("enable_point_interpolation_compensation", false);
+        this->get_parameter("enable_point_interpolation_compensation", enable_point_interpolation_compensation_);
+        this->declare_parameter<bool>("save_point_laser_points", false);
+        this->get_parameter("save_point_laser_points", save_point_laser_points_);
+        this->declare_parameter<bool>("publish_cloud", true);
+        this->get_parameter("publish_cloud", publish_cloud_);
+        this->declare_parameter<bool>("publish_scan", true);
+        this->get_parameter("publish_scan", publish_scan_);
+        if (enable_point_interpolation_compensation_) RCLCPP_INFO(this->get_logger(), "enable_point_interpolation_compensation = \033[1;32m[true]\033[0m");
+        else RCLCPP_INFO(this->get_logger(), "enable_point_interpolation_compensation = \033[1;31m[false]\033[0m");
+        if (save_point_laser_points_) RCLCPP_INFO(this->get_logger(), "save_point_laser_points = \033[1;32m[true]\033[0m");
+        else RCLCPP_INFO(this->get_logger(), "save_point_laser_points = \033[1;31m[false]\033[0m");
+        if (publish_cloud_) RCLCPP_INFO(this->get_logger(), "publish_cloud = \033[1;32m[true]\033[0m");
+        else RCLCPP_INFO(this->get_logger(), "publish_cloud = \033[1;31m[false]\033[0m");
+        if (publish_scan_) RCLCPP_INFO(this->get_logger(), "publish_scan = \033[1;32m[true]\033[0m");
+        else RCLCPP_INFO(this->get_logger(), "publish_scan = \033[1;31m[false]\033[0m");
+
         imu_group_ = this->create_callback_group(rclcpp::CallbackGroupType::MutuallyExclusive);
         point_laser_group_ = this->create_callback_group(rclcpp::CallbackGroupType::MutuallyExclusive);
 
@@ -71,10 +94,11 @@ private:
         }
 
         scan_range_ = msg->ranges[idx];
+
+#if 0
         float range = msg->ranges[idx];
         float angle = msg->angle_min + idx * msg->angle_increment;
 
-#if 0
         // Laser 坐标系下的第一个点坐标（假设激光在平面上，z=0）
         geometry_msgs::msg::PointStamped point_in_laser;
         point_in_laser.header.frame_id = msg->header.frame_id;
@@ -174,14 +198,16 @@ private:
         float point_in_laser_y = msg->range * std::sin(theta);
 
         // laser->base安装位置偏移计算
-        float delta_range = scan_range_ - msg->range;
-        float laser_dyaw = 0.0;
+        // float delta_range = scan_range_ - msg->range;
+        float delta_range = 0.15;
+        float laser_dyaw = 0.01745329;
         float laser_dx = delta_range;
         float laser_dy = 0.0;
         float cl = std::cos(laser_dyaw);
         float sl = std::sin(laser_dyaw);
         float x_base = laser_dx + (cl * point_in_laser_x - sl * point_in_laser_y);
         float y_base = laser_dy + (sl * point_in_laser_x + cl * point_in_laser_y);
+        Pose2D temp_point(x_base, y_base);
 
         // base->odom
         float co = std::cos(yaw);
@@ -208,23 +234,27 @@ private:
         // 需要根据tf获取的两个角度之间进行差值处理
         float delta_yaw = std::fabs(yaw - last_yaw);
         static std::vector<Pose2D> temp_points;
-        if (delta_yaw == 0 && std::fabs(angular_z) > 0.01) {
-            temp_points.push_back(point);
+
+        if (enable_point_interpolation_compensation_) {
+            if (delta_yaw == 0 && std::fabs(angular_z) > 0.01) {
+                temp_points.push_back(temp_point);
+            }
         }
-    
-        RCLCPP_INFO(this->get_logger(), "range yaw: %f", yaw);
-        RCLCPP_INFO(this->get_logger(), "delta_yaw: %f", delta_yaw);
-        RCLCPP_INFO(this->get_logger(), "temp_points: %ld", temp_points.size());
-        RCLCPP_INFO(this->get_logger(), "angular_z: %f", angular_z);
+        // RCLCPP_INFO(this->get_logger(), "range yaw: %f", yaw);
+        // RCLCPP_INFO(this->get_logger(), "delta_yaw: %f", delta_yaw);
+        // RCLCPP_INFO(this->get_logger(), "temp_points: %ld", temp_points.size());
+        // RCLCPP_INFO(this->get_logger(), "angular_z: %f", angular_z);
 
         if (delta_yaw >= angle_step_rad_) {
             if (!temp_points.empty()) {
                 float step_angel = delta_yaw / temp_points.size();
                 for (size_t i = 0; i < temp_points.size(); ++i) {
+
+                    // base->odom
                     float co_temp = std::cos(last_yaw + step_angel * (i+1));
                     float so_temp = std::sin(last_yaw + step_angel * (i+1));
-                    float x_odom_temp = x0 + (co_temp * x_base - so_temp * y_base);
-                    float y_odom_temp = y0 + (so_temp * x_base + co_temp * y_base);
+                    float x_odom_temp = x0 + (co_temp * temp_points[i].x - so_temp * temp_points[i].y);
+                    float y_odom_temp = y0 + (so_temp * temp_points[i].x + co_temp * temp_points[i].y);
                     points_.push_back({x_odom_temp, y_odom_temp});
                 }
 
@@ -245,7 +275,10 @@ private:
         if (!collecting_) return;
 
         if (std::fabs(yaw_continue_) >= 2 * M_PI) {
-            PublishCloud(msg);
+            if(publish_cloud_) PublishCloud(msg);
+            if(publish_scan_) PublishScan(msg);
+            if(save_point_laser_points_) SavePointsToTxt(points_, "/home/shan2/Mypro/create3_ws/src/spot_laser_collection/data/point_laser.txt");
+            RCLCPP_INFO(this->get_logger(), "point size: \033[1;32m%ld\033[0m", points_.size());
             points_.clear();
             collecting_ = false;
             yaw_continue_ = 0.0;
@@ -353,6 +386,78 @@ private:
         cloud_pub_->publish(cloud);
     }
 
+    void PublishScan(const sensor_msgs::msg::Range::SharedPtr msg) {
+        if (points_.empty()) {
+            RCLCPP_WARN(this->get_logger(), "points_ a empty, skipping LaserScan publish.");
+            return;
+        }
+
+        geometry_msgs::msg::TransformStamped tf_odom_to_combined;
+        try {
+            tf_odom_to_combined = tf_buffer_->lookupTransform(
+                "combined_scan",  // target frame
+                "odom",           // source frame
+                msg->header.stamp, 
+                rclcpp::Duration::from_seconds(0.2));
+        } catch (tf2::TransformException &ex) {
+            RCLCPP_WARN(this->get_logger(), "TF lookup failed: %s", ex.what());
+            return;
+        }
+        tf2::Transform tf;
+        tf2::fromMsg(tf_odom_to_combined.transform, tf);
+        std::vector<Pose2D> transformed_points;
+        transformed_points.reserve(points_.size());
+
+        for (const auto &p : points_) {
+            tf2::Vector3 v(p.x, p.y, 0.0);
+            tf2::Vector3 v_t = tf * v;  // 应用 odom->combined_scan 变换
+
+            Pose2D p_out;
+            p_out.x = v_t.x();
+            p_out.y = v_t.y();
+            transformed_points.push_back(p_out);
+        }
+
+
+
+        sensor_msgs::msg::LaserScan scan;
+        scan.header.stamp = msg->header.stamp; // 使用传入消息的时间戳
+        scan.header.frame_id = "combined_scan"; 
+        
+        scan.angle_min = -M_PI;
+        scan.angle_max = M_PI;
+        // scan.angle_increment = 2*M_PI / (float)num_readings;
+        scan.angle_increment = M_PI / 360.0; // 0.5deg
+        scan.time_increment = 0.0;
+        scan.scan_time = 0.0;
+        scan.range_min = 0.03;
+        scan.range_max = 10.0;
+        // scan.ranges.resize(num_readings, std::numeric_limits<float>::infinity());
+        int num_readings = (scan.angle_max - scan.angle_min) / scan.angle_increment;
+        scan.ranges.assign(num_readings, std::numeric_limits<float>::infinity());
+
+        // for (const auto &p : points_) {
+        for (const auto &p : transformed_points) {
+            float range = std::sqrt(p.x * p.x + p.y * p.y);
+            float angle = std::atan2(p.y, p.x);
+
+            if (range < scan.range_min || range > scan.range_max  || 
+                angle < scan.angle_min || angle > scan.angle_max) {
+                continue;
+            }
+
+            int index = static_cast<int>((angle - scan.angle_min) / scan.angle_increment);
+
+            if (index >= 0 && index < num_readings) {
+                if (range < scan.ranges[index]) {
+                    scan.ranges[index] = range;
+                }
+            }
+        }
+
+        scan_pub_->publish(scan);
+    }
+
     float GetYawFromOdom(const nav_msgs::msg::Odometry::SharedPtr msg) {
         auto  q = msg->pose.pose.orientation;
         float siny = 2.0 * (q.w * q.z + q.x * q.y);
@@ -360,8 +465,34 @@ private:
         return std::atan2(siny, cosy);
     }
 
+    void SavePointsToTxt(const std::vector<Pose2D>& points, const std::string& file_path) {
+        if (points.empty()) {
+            std::cerr << "[WARN] SavePointsToTxt: empty points vector, skip saving.\n";
+            return;
+        }
+        auto now = std::chrono::system_clock::now();
+        auto now_ms = std::chrono::duration_cast<std::chrono::milliseconds>(now.time_since_epoch()).count();
+
+        std::ofstream ofs(file_path, std::ios::app);
+        if (!ofs.is_open()) {
+            std::cerr << "Failed to open file: " << file_path << std::endl;
+            return;
+        }
+
+        ofs << "---" << "\n";
+        ofs << "timestamp: " << now_ms << "\n";
+        // 设置浮点型精度
+        ofs << std::fixed << std::setprecision(6);
+
+        for (const auto& p : points) {
+            ofs << p.x << " " << p.y << "\n";
+        }
+
+        ofs.close();
+    }
+
     rclcpp::Subscription<sensor_msgs::msg::Range>::SharedPtr            point_laser_sub_;
-    rclcpp::Subscription<sensor_msgs::msg::LaserScan>::SharedPtr            scan_laser_sub_;
+    rclcpp::Subscription<sensor_msgs::msg::LaserScan>::SharedPtr        scan_laser_sub_;
     rclcpp::Subscription<nav_msgs::msg::Odometry>::SharedPtr            odom_sub_;
     rclcpp::Subscription<irobot_create_msgs::msg::WheelVels>::SharedPtr wheel_vels_sub_;
     rclcpp::Subscription<sensor_msgs::msg::Imu>::SharedPtr              imu_sub_;
@@ -372,9 +503,13 @@ private:
     rclcpp::CallbackGroup::SharedPtr imu_group_;
     rclcpp::CallbackGroup::SharedPtr point_laser_group_;
 
+    geometry_msgs::msg::TransformStamped initial_odom_transform_;
+
+    std::unique_ptr<tf2_ros::Buffer>               tf_buffer_;
+    std::shared_ptr<tf2_ros::TransformListener>    tf_listener_;
+    std::shared_ptr<tf2_ros::TransformBroadcaster> tf_broadcaster_;
+
     bool         collecting_ = false;
-    bool         first_odom_ = true;
-    float        last_yaw_ = 0.0f;
     float        yaw_continue_ = 0.0f;
     rclcpp::Time last_time_ = this->now();
     float        x_ = 0.0f;
@@ -392,12 +527,6 @@ private:
     std::mutex yaw_mutex_;
     std::mutex odom_mutex_;
 
-    geometry_msgs::msg::TransformStamped initial_odom_transform_;
-
-    struct RangeData {
-        float yaw;
-        float range;
-    };
     struct Pose2D {
         Pose2D():x(0), y(0) {}
         Pose2D(float x_, float y_):x(x_), y(y_) {}
@@ -405,11 +534,11 @@ private:
         float y;
     };
     std::vector<Pose2D> points_;
-    std::vector<sensor_msgs::msg::Range::SharedPtr> collected_ranges_;
 
-    std::unique_ptr<tf2_ros::Buffer>               tf_buffer_;
-    std::shared_ptr<tf2_ros::TransformListener>    tf_listener_;
-    std::shared_ptr<tf2_ros::TransformBroadcaster> tf_broadcaster_;
+    bool enable_point_interpolation_compensation_;
+    bool save_point_laser_points_;
+    bool publish_cloud_;
+    bool publish_scan_;
 };
 
 int main(int argc, char **argv) {
