@@ -1,0 +1,34 @@
+# EKF 配置文件: yaml/ekf.yaml
+ekf_filter_node:
+  ros__parameters:
+    # 输出话题
+    odom_topic: /odom_ekf
+
+    frequency: 50.0                 # EKF 计算频率
+    sensor_timeout: 0.1           # 超时时间，秒
+    two_d_mode: true              # Create3 只在平面运动
+    publish_tf: true              # 发布 odom -> base_link 的 TF
+    map_frame: odom
+    odom_frame: odom_ekf
+    base_link_frame: base_link_filtered
+    world_frame: odom_ekf
+
+    # 输入 odometry (轮速)
+    odom0: /wheel_odom               # 你的原始轮速里程计 topic
+    odom0_config: [true, true, false,   # x, y, z
+                  false, false, false,  # roll, pitch, yaw
+                  true, false, false, # vx, vy, vz
+                  false, false, true, # vroll, vpitch, vyaw
+                  false, false, false] # ax, ay, az
+    odom0_differential: false
+    odom0_relative: false
+
+    # 输入 IMU
+    imu0: /imu                      # IMU topic
+    imu0_config: [false, false, false,  # x, y, z
+                  false, false, true,   # roll, pitch, yaw
+                  false, false, false,  # vx, vy, vz
+                  false, false, true,   # vroll, vpitch, vyaw
+                  false, false, false]  # ax, ay, az
+    imu0_differential: false
+    imu0_remove_gravitational_acceleration: true

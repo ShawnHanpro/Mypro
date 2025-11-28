@@ -1,5 +1,21 @@
 edge_following:
   ros__parameters:
-    wall_distance: 0.20
-    state_loop: true
+    wheel_base: 235.0 # mm
+    window_size: 5
+    sigma: 1.0
+    wall_distance: 0.19
+    following_wall_linear: 0.05
+    pub_nearby_point: true
+    # 黑色区域插值补偿
+    interpolate_gap_points: true
 
+    state_loop: true
+    line_laser_process: true
+    save_3Dpoints_to_txt: false
+
+    # 沿墙方案 不可同时使用
+    right_angle_difference_method: true # better
+    linear_fitting_method: false
+
+    # 线激光滤波方案 不可同时使用
+    use_moving_average_filter: true

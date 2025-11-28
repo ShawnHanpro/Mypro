@@ -17,6 +17,7 @@ find_package(tf2_geometry_msgs REQUIRED)
 find_package(tf2_sensor_msgs REQUIRED)
 find_package(irobot_create_msgs REQUIRED)
 find_package(laser_geometry REQUIRED)
+find_package(nav_msgs REQUIRED)
 
 # msg
 find_package(rosidl_default_generators REQUIRED)
@@ -41,9 +42,31 @@ ament_target_dependencies(
   "tf2_sensor_msgs"
   "irobot_create_msgs"
   "laser_geometry"
+  "nav_msgs"
 )
-
 install(TARGETS edge_following_node
+  DESTINATION lib/${PROJECT_NAME})
+
+add_executable(dwa src/DWA.cpp)
+target_include_directories(dwa PUBLIC
+  $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>
+  $<INSTALL_INTERFACE:include>)
+target_compile_features(dwa PUBLIC c_std_99 cxx_std_17)  # Require C99 and C++17
+ament_target_dependencies(
+  dwa
+  "rclcpp"
+  "sensor_msgs"
+  "geometry_msgs"
+  "visualization_msgs"
+  "tf2"
+  "tf2_ros"
+  "tf2_geometry_msgs"
+  "tf2_sensor_msgs"
+  "irobot_create_msgs"
+  "laser_geometry"
+  "nav_msgs"
+)
+install(TARGETS dwa
   DESTINATION lib/${PROJECT_NAME})
 
 # launch
