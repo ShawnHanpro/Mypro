@@ -8,8 +8,8 @@
 #include <string>
 #include <vector>
 
-#define ODOM
-// #define LASER
+#define GROUND
+// #define GAP
 
 struct Frame {
     std::string              timestamp;
@@ -122,7 +122,7 @@ void FindTheGround0(const std::vector<Point3D>& points, std::vector<Point3D>& gr
 }
 
 // 输出Ax + By + C = 0
-Eigen::MatrixXf iepfFunction(const std::vector<Point3D>& points, Eigen::MatrixXf& np_end_points, float dis_threshold = 0.02) {
+Eigen::MatrixXf IepfFunction(const std::vector<Point3D>& points, Eigen::MatrixXf& np_end_points, float dis_threshold = 0.02) {
 
     bool has_new_break = false;
     int insert_pos = -1;
@@ -141,7 +141,7 @@ Eigen::MatrixXf iepfFunction(const std::vector<Point3D>& points, Eigen::MatrixXf
         // 遍历端点之间的点
         int start_index = static_cast<int>(np_end_points(2, i));
         int end_insdex = static_cast<int>(np_end_points(2, i + 1));
-        std::cout << "np end points: " << np_end_points.cols() << std::endl;
+        // std::cout << "np end points: " << np_end_points.cols() << std::endl;
         for (int j = start_index + 1; j < end_insdex; ++j) {
             // 跳过首尾点
             // if (j == 0 || j == np_end_points(2, i)) continue;
@@ -190,7 +190,7 @@ Eigen::MatrixXf iepfFunction(const std::vector<Point3D>& points, Eigen::MatrixXf
 
     np_end_points = new_np_end_points;
 
-    np_end_points = iepfFunction(points, np_end_points, dis_threshold);
+    np_end_points = IepfFunction(points, np_end_points, dis_threshold);
 
     return np_end_points;
 }
@@ -288,11 +288,11 @@ std::pair<int, std::vector<Point3D>> FindGap(const std::vector<Point3D>& points)
 }
 
 int main() {
-#ifdef ODOM
+#ifdef GROUND
     // std::string   filename = "/home/shan2/Mypro/create3_ws/src/edge_following/data/line_points_in_odom.txt";
     std::string   filename = "/home/shan2/Mypro/create3_ws/src/edge_following/data/line_points_in_laser.txt";
 #endif
-#ifdef LASER
+#ifdef GAP
     std::string   filename = "/home/shan2/Mypro/create3_ws/src/edge_following/data/line_points_in_laser.txt";
 #endif 
     std::ifstream ifs(filename);
@@ -317,10 +317,10 @@ int main() {
             std::istringstream iss(line);
             float              x, y, z;
             if (!(iss >> x >> y >> z)) continue;
-#ifdef ODOM
+#ifdef GROUND
             current_frame.xyz_points.emplace_back(x, y, z);
 #endif
-#ifdef LASER
+#ifdef GAP
             current_frame.xyz_points.emplace_back(x, y, z);
 #endif
         }
@@ -345,62 +345,49 @@ int main() {
         cv::Mat img(height, width, CV_8UC3, cv::Scalar(0, 0, 0));
 
 // laser in odom find ground
-#ifdef ODOM
+#ifdef GROUND
         std::vector<Point3D> points_in_odom;
         // 绘制原始点（绿色）
         for (auto& p : frame.xyz_points) {
-            // points_in_odom.emplace_back(Point3D(0, p.y, p.z));
-            points_in_odom.emplace_back(Point3D(p.x, p.y, 0));
-            // int img_x = (int)(p.y * scale + offset_x);
-            // int img_y = (int)(height - (p.z * scale + offset_y));
-            int img_x = (int)(p.x * scale + offset_x);
-            int img_y = (int)(height - (p.y * scale + offset_y));
-            if (img_x >= 0 && img_x < width && img_y >= 0 && img_y < height) cv::circle(img, cv::Point(img_x, img_y), 3, cv::Scalar(0, 255, 0), -1);
+            points_in_odom.emplace_back(Point3D(p.x, p.y, p.z));
+            // int img_x = (int)(p.x * scale + offset_x);
+            // int img_y = (int)(height - (p.y * scale + offset_y));
+            // if (img_x >= 0 && img_x < width && img_y >= 0 && img_y < height) cv::circle(img, cv::Point(img_x, img_y), 3, cv::Scalar(0, 255, 0), -1);
         }
 
         // 找地面
-        // FindTheGround0(points_in_odom, ground_points);
         Eigen::MatrixXf np_end_points(3, 2);
         // 首端点
-        // np_end_points(0, 0) = points_in_odom.front().y; // y
-        // np_end_points(1, 0) = points_in_odom.front().z; // z
         np_end_points(0, 0) = points_in_odom.front().x; // y
         np_end_points(1, 0) = points_in_odom.front().y; // z
         np_end_points(2, 0) = 0; // index
         // 末端点
-        // np_end_points(0, 1) = points_in_odom.back().y;
-        // np_end_points(1, 1) = points_in_odom.back().z;
         np_end_points(0, 1) = points_in_odom.back().x;
         np_end_points(1, 1) = points_in_odom.back().y;
         np_end_points(2, 1) = points_in_odom.size() - 1;
         
-        Eigen::MatrixXf lines = iepfFunction(points_in_odom, np_end_points);
+        Eigen::MatrixXf lines = IepfFunction(points_in_odom, np_end_points);
         std::cout << "-----" << std::endl;
-        std::cout << "lines num: " << lines.cols() << std::endl;
+        std::cout << "line size: " << lines.cols() << std::endl;
         int ground_point_index = -1;
         bool has_ground_points = false;
         float min_k = std::numeric_limits<float>::max();
         for (int i = 0; i < lines.cols() - 1; ++i) {
             float k = (lines(1, i + 1) - lines(1, i)) / (lines(0, i + 1) - lines(0, i));
+            
+            cv::Point p1((int)(lines(0, i) * scale + offset_x), (int)(height - (-lines(1, i) * scale + offset_y)));
+            cv::Point p2((int)(lines(0, i+1) * scale + offset_x), (int)(height - (-lines(1, i+1) * scale + offset_y)));
+            // 绘制检测到的直线（红色）
+            cv::line(img, p1, p2, cv::Scalar(0, 0, 255), 2);
 
             std::cout << "k: " << k << std::endl;
-            std::cout << "2: " << lines(2, i) << std::endl;
-            
-            cv::Point p1((int)(lines(0, i) * scale + offset_x), (int)(height - (lines(1, i) * scale + offset_y)));
-            cv::Point p2((int)(lines(0, i+1) * scale + offset_x), (int)(height - (lines(1, i+1) * scale + offset_y)));
-            // 黄色
-            cv::line(img, p1, p2, cv::Scalar(0, 255, 255), 2);
-
             if (std::fabs(k) > 1) continue;
-            if (k < min_k) {
+            if (std::fabs(k) < std::fabs(min_k)) {
                 min_k = k;
                 ground_point_index = i;
                 has_ground_points = true;
             }
         }
-
-        std::cout << "g1: " << lines(2, ground_point_index) << std::endl;
-        std::cout << "g2: " << lines(2, ground_point_index + 1) << std::endl;
 
         std::vector<Point3D> ground_points;
         if (has_ground_points) {
@@ -409,37 +396,33 @@ int main() {
                       ground_points.begin());
         }
 
-        std::cout << "ground_points: " << ground_points.size() << std::endl;
+        // std::cout << "ground_points: " << ground_points.size() << std::endl;
 
-        // 非地面（蓝色）
+        // 非地面点
         std::vector<Point3D> diff = symmetricDifference(points_in_odom, ground_points);
 
-        // 绘制地面（红色）
+        // 绘制地面（绿色）
         for (auto& p : ground_points) {
-            // int img_x = (int)(p.y * scale + offset_x);
-            // int img_y = (int)(height - (p.z * scale + offset_y));
             int img_x = (int)(p.x * scale + offset_x);
-            int img_y = (int)(height - (p.y * scale + offset_y));
-            cv::circle(img, cv::Point(img_x, img_y), 2, cv::Scalar(0, 0, 255), -1);
+            int img_y = (int)(height - (-p.y * scale + offset_y));
+            cv::circle(img, cv::Point(img_x, img_y), 2, cv::Scalar(0, 255, 0), -1);
         }
 
-        // 绘制其他点（蓝色）
+        // 绘制其他点（黄色）
         for (auto& p : diff) {
-            // int img_x = (int)(p.y * scale + offset_x);
-            // int img_y = (int)(height - (p.z * scale + offset_y));
             int img_x = (int)(p.x * scale + offset_x);
-            int img_y = (int)(height - (p.y * scale + offset_y));
-            cv::circle(img, cv::Point(img_x, img_y), 2, cv::Scalar(255, 0, 0), -1);
+            int img_y = (int)(height - (-p.y * scale + offset_y));
+            cv::circle(img, cv::Point(img_x, img_y), 2, cv::Scalar(0, 255, 255), -1);
         }
 
 #endif
 
 // laser in laser find gap
-#ifdef LASER
+#ifdef GAP
         std::vector<Point3D> points_in_laser;
         // 绘制原始点（绿色）
         for (auto& p : frame.xyz_points) {
-            points_in_laser.emplace_back(Point3D(p.x, p.y, 0));
+            points_in_laser.emplace_back(Point3D(p.x, p.y, p.z));
             // int img_x = (int)(p.y * scale + offset_x);
             // int img_y = (int)(height - (p.z * scale + offset_y));
             int img_x = (int)(p.x * scale + offset_x);

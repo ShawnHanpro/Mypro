@@ -1,0 +1,18 @@
+plane_show_in_order false
+plane_show_one_in_order true
+cloud_show_one_in_order false
+
+show_planes false
+show_cloud false
+show_all_cloud_in_white true
+show_xyplane false
+
+detect_the_ground true
+
+z_pass false
+z_plane_dis 0.5
+
+z_plane_opacity 0.2
+
+KDTree_ece false
+ece_dis 0.10

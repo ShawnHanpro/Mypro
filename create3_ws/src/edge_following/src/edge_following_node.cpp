@@ -1,12 +1,12 @@
 #include <cmath>
-#include <functional>
 #include <iostream>
-#include <mutex>
+#include <fstream>
 #include <string>
 #include <vector>
+#include <mutex>
+#include <functional>
 #include <Eigen/Dense>
 #include <algorithm>
-#include <fstream>
 
 #include "geometry_msgs/msg/point_stamped.hpp"
 #include "geometry_msgs/msg/twist.hpp"
@@ -23,12 +23,18 @@
 #include "tf2_ros/transform_listener.h"
 #include "tf2_sensor_msgs/tf2_sensor_msgs.h"
 #include "tf2_ros/transform_broadcaster.h"
-#include <tf2_geometry_msgs/tf2_geometry_msgs.h>
+#include "tf2_geometry_msgs/tf2_geometry_msgs.h"
 #include "visualization_msgs/msg/marker.hpp"
 #include "nav_msgs/msg/odometry.hpp"
+#include <geometry_msgs/msg/pose_stamped.hpp>
 
-using std::placeholders::_1;
-using std::placeholders::_2;
+#include <pcl_conversions/pcl_conversions.h>
+#include <pcl/point_types.h>
+#include <pcl/filters/extract_indices.h>
+#include <pcl/segmentation/sac_segmentation.h>
+
+// using std::placeholders::_1;
+// using std::placeholders::_2;
 using namespace std::chrono_literals;
 
 // 定义状态机的不同状态
@@ -90,6 +96,14 @@ public:
     }
 };
 
+class Pose2D {
+public:
+    Pose2D() : x(0.0f), y(0.0f), yaw(0.0f) {}
+    Pose2D(double x_, double y_, double yaw_) : x(x_), y(y_), yaw(yaw_) {}
+
+    double x, y, yaw;
+};
+
 struct Frame {
     std::string              timestamp;
     std::vector<Point3D> xyz_points;
@@ -124,6 +138,110 @@ public:
 
     void AddWallPoint(const Point3D& p) {
         wall_points.push_back(p);
+    }
+};
+
+class LaserToOdomTransformer {
+private:
+    // 静态变换矩阵 T_base_laser (4x4)
+    // 从 laser 坐标系到 base_link 坐标系的变换
+    Eigen::Matrix4d T_base_laser; 
+
+    /**
+     * @brief 根据 Roll, Pitch, Yaw 角度计算 3x3 旋转矩阵 (ZYX顺序)
+     * @param roll 绕 X 轴旋转角
+     * @param pitch 绕 Y 轴旋转角
+     * @param yaw 绕 Z 轴旋转角
+     * @return 3x3 旋转矩阵
+     */
+    Eigen::Matrix3d getRotationMatrix(double roll, double pitch, double yaw) {
+        // R = Rz(yaw) * Ry(pitch) * Rx(roll)
+        
+        // 1. Rx (Roll 绕 X 轴)
+        Eigen::Matrix3d Rx;
+        Rx << 1, 0, 0,
+              0, cos(roll), -sin(roll),
+              0, sin(roll), cos(roll);
+
+        // 2. Ry (Pitch 绕 Y 轴)
+        Eigen::Matrix3d Ry;
+        Ry << cos(pitch), 0, sin(pitch),
+              0, 1, 0,
+              -sin(pitch), 0, cos(pitch);
+
+        // 3. Rz (Yaw 绕 Z 轴)
+        Eigen::Matrix3d Rz;
+        Rz << cos(yaw), -sin(yaw), 0,
+              sin(yaw), cos(yaw), 0,
+              0, 0, 1;
+
+        // 组合旋转 (Eigen 的矩阵乘法)
+        return Rz * Ry * Rx;
+    }
+
+    /**
+     * @brief 构建 4x4 齐次变换矩阵
+     * @param x, y, z 平移分量
+     * @param R 3x3 旋转矩阵
+     * @return 4x4 齐次变换矩阵
+     */
+    Eigen::Matrix4d getTransformMatrix(double x, double y, double z, const Eigen::Matrix3d& R) {
+        Eigen::Matrix4d T = Eigen::Matrix4d::Identity();
+        T.block<3, 3>(0, 0) = R;        // 设置旋转部分
+        T(0, 3) = x;                    // 设置 X 平移
+        T(1, 3) = y;                    // 设置 Y 平移
+        T(2, 3) = z;                    // 设置 Z 平移
+        return T;
+    }
+
+public:
+    LaserToOdomTransformer() {
+        // 静态参数 (x, y, z, yaw, pitch, roll)
+        const double trans_x = 0.0;
+        const double trans_y = -0.14;
+        const double trans_z = 0.10;
+        const double rot_yaw = -1.5707963;
+        const double rot_pitch = 0.0;
+        const double rot_roll = -1.5707963;
+
+        // 1. 获取静态旋转矩阵
+        Eigen::Matrix3d R_base_laser = getRotationMatrix(rot_roll, rot_pitch, rot_yaw);
+
+        // 2. 构建静态齐次变换矩阵
+        T_base_laser = getTransformMatrix(trans_x, trans_y, trans_z, R_base_laser);
+
+        // 打印静态矩阵 (可选)
+        // cout << "T_base_laser Matrix:\n" << T_base_laser << endl;
+    }
+
+    /**
+     * @brief 将激光坐标系下的点转换到 Odom 坐标系
+     * @param point_laser 激光坐标系下的点 (Vector3d)
+     * @param odom_x 机器人 Odom x 坐标
+     * @param odom_y 机器人 Odom y 坐标
+     * @param odom_yaw 机器人 Odom 偏航角
+     * @return Odom 坐标系下的点 (Vector3d)
+     */
+    Eigen::Vector3d transformPoint(const Eigen::Vector3d& point_laser, 
+                            double odom_x, double odom_y, double odom_yaw) {
+        
+        // 1. 构建动态变换矩阵 T_odom_base (Base_link -> Odom)
+        // 假设 base_link 到 odom 只有 Z 轴旋转 (2D里程计)
+        Eigen::Matrix3d R_odom_base = getRotationMatrix(0.0, 0.0, odom_yaw);
+        Eigen::Matrix4d T_odom_base = getTransformMatrix(odom_x, odom_y, 0.0, R_odom_base);
+
+        // 2. 级联变换矩阵: T_odom_laser = T_odom_base * T_base_laser
+        Eigen::Matrix4d T_odom_laser = T_odom_base * T_base_laser;
+
+        // 3. 将激光点转换为齐次坐标 (Vector4d)
+        Eigen::Vector4d p_laser_h;
+        p_laser_h << point_laser, 1.0; // 自动填充 x, y, z, 1.0
+
+        // 4. 执行变换
+        Eigen::Vector4d p_odom_h = T_odom_laser * p_laser_h;
+
+        // 5. 返回非齐次坐标 (Vector3d)
+        return p_odom_h.head<3>();
     }
 };
 
@@ -180,11 +298,12 @@ public:
         if (line_laser_process_) RCLCPP_INFO(this->get_logger(), "line_laser_process = %strue%s", Color::GREEN_BOLD, Color::RESET);
         else RCLCPP_INFO(this->get_logger(), "line_laser_process = %sfalse%s", Color::RED_BOLD, Color::RESET);
 
-        scan_laser_sub_ = this->create_subscription<sensor_msgs::msg::LaserScan>("/scan", 10, std::bind(&EdgeFollower::scan_callback, this, _1));
+        scan_laser_sub_ = this->create_subscription<sensor_msgs::msg::LaserScan>("/scan", 10, std::bind(&EdgeFollower::scan_callback, this, std::placeholders::_1));
         line_laser_sub_ =
-            this->create_subscription<sensor_msgs::msg::LaserScan>("/line_scan", 10, std::bind(&EdgeFollower::line_laser_callback, this, _1));
+            this->create_subscription<sensor_msgs::msg::LaserScan>("/line_scan", 10, std::bind(&EdgeFollower::line_laser_callback, this, std::placeholders::_1));
         hazard_sub_ = this->create_subscription<irobot_create_msgs::msg::HazardDetectionVector>("/hazard_detection", rclcpp::SensorDataQoS(),
-                                                                                                std::bind(&EdgeFollower::hazard_callback, this, _1));
+                                                                                                std::bind(&EdgeFollower::hazard_callback, this, std::placeholders::_1));
+        odom_sub_ = this->create_subscription<nav_msgs::msg::Odometry>("/odom", rclcpp::SensorDataQoS(), std::bind(&EdgeFollower::OdomCallback, this, std::placeholders::_1));
         // wheel_sub_ = this->create_subscription<irobot_create_msgs::msg::WheelVels>("/wheel_vels", rclcpp::SensorDataQoS(),
         //                                                                            std::bind(&EdgeFollower::wheel_vels_callback, this, _1));
         // imu_sub_ = this->create_subscription<sensor_msgs::msg::Imu>("/imu", rclcpp::SensorDataQoS(),
@@ -203,8 +322,22 @@ public:
         tf_buffer_ = std::make_unique<tf2_ros::Buffer>(this->get_clock());
         tf_listener_ = std::make_shared<tf2_ros::TransformListener>(*tf_buffer_);
 
+        // 发布机器人方向
+        pose_pub_ = this->create_publisher<geometry_msgs::msg::PoseStamped>("/robot_pose", 10);
+        pose_pub_timer_ = this->create_wall_timer(50ms, std::bind(&EdgeFollower::publishPose, this));
+
         if (state_loop_) control_loop_timer_ = this->create_wall_timer(50ms, std::bind(&EdgeFollower::control_loop, this));
         if (line_laser_process_) line_laser_process_timer_ = this->create_wall_timer(50ms, std::bind(&EdgeFollower::line_laser_process, this));
+        
+        // test plane points detect
+        // run loop
+        // if (line_laser_process_) line_laser_process_timer_ = this->create_wall_timer(50ms, std::bind(&EdgeFollower::TestPointCloud2, this));
+        // run once
+        // if (line_laser_process_)
+        //     line_laser_process_timer_ = this->create_wall_timer(50ms, [this]() {
+        //         this->TestPointCloud2();              // 执行一次
+        //         line_laser_process_timer_->cancel();  // 取消定时器，不再运行
+        //     });
 
         odom_last_time_ = this->get_clock()->now();
 
@@ -282,41 +415,42 @@ private:
         // save 3D points to txt
         if (save_3Dpoints_to_txt_) {
             std::vector<Point3D> points_in_laser = ResetPointsOrder(line_laser_);
-
             SaveLaserPoints3DToTxt(points_in_laser, "/home/shan2/Mypro/create3_ws/src/edge_following/data/line_points_in_laser.txt");
-    
+
+            // 初始化转换器，它会计算并存储 T_base_laser 静态矩阵
+            LaserToOdomTransformer transformer;
+
             std::vector<Point3D> points_in_odom;
-            try {
-                // 获取 line_laser 坐标系相对于 odom 的变换
-                geometry_msgs::msg::TransformStamped transformStamped =
-                    tf_buffer_->lookupTransform("odom", line_laser_.header.frame_id, tf2::TimePointZero);
+            for (auto p : points_in_laser) {
+                Eigen::Vector3d laser_point(p.x, p.y, p.z);
     
-                // 遍历 points_in_laser 数据
-                for (size_t i = 0; i < points_in_laser.size(); ++i) {
-    
-                    // point in laser
-                    geometry_msgs::msg::PointStamped point_in_laser;
-                    point_in_laser.header = line_laser_.header;
-                    point_in_laser.point.x = points_in_laser[i].x;
-                    point_in_laser.point.y = points_in_laser[i].y;
-                    point_in_laser.point.z = points_in_laser[i].z;
-                    // 转换到 odom 坐标系
-                    geometry_msgs::msg::PointStamped point_in_odom;
-                    tf2::doTransform(point_in_laser, point_in_odom, transformStamped);
-    
-                    // 保存到 Point3D
-                    Point3D p;
-                    p.x = point_in_odom.point.x;
-                    p.y = point_in_odom.point.y;
-                    p.z = point_in_odom.point.z;
-                    points_in_odom.push_back(p);
-                }
-            } catch (tf2::TransformException& ex) {
-                RCLCPP_WARN(this->get_logger(), "Could not transform %s to odom: %s", line_laser_.header.frame_id.c_str(), ex.what());
+                Eigen::Vector3d odom_point = transformer.transformPoint(
+                    laser_point, 
+                    robot_pose_.x, 
+                    robot_pose_.y,
+                    robot_pose_.yaw
+                );
+
+                points_in_odom.push_back(Point3D(odom_point.x(), odom_point.y(), odom_point.z()));
             }
     
-            SaveOdomPoints3DToTxt(points_in_odom, "/home/shan2/Mypro/create3_ws/src/edge_following/data/line_points_in_odom.txt");
+            SaveLaserPoints3DToTxt(points_in_odom, "/home/shan2/Mypro/create3_ws/src/edge_following/data/line_points_in_odom.txt");
         }
+    }
+
+    void publishPose() {
+        geometry_msgs::msg::PoseStamped msg;
+        msg.header.stamp = this->now();
+        msg.header.frame_id = "odom";
+
+        msg.pose.position.x = robot_pose_.x;
+        msg.pose.position.y = robot_pose_.y;
+
+        tf2::Quaternion q;
+        q.setRPY(0, 0, robot_pose_.yaw);
+        msg.pose.orientation = tf2::toMsg(q);
+
+        pose_pub_->publish(msg);
     }
 
     void hazard_callback(const irobot_create_msgs::msg::HazardDetectionVector::SharedPtr msg) {
@@ -376,7 +510,7 @@ private:
         scan_front_dis_ = (front_dis_0_left + front_dis_0_right) / 2;
 
         // 发布最近点
-        if (pub_nearby_point_) PublishCylinder(target_point_.x, target_point_.y, 0.1, 0.03, 0.03, 0.3, 0.0, 1.0, 0.0, 1.0, 0);
+        // if (pub_nearby_point_) PublishCylinder(target_point_.x, target_point_.y, 0.1, 0.03, 0.03, 0.3, 0.0, 1.0, 0.0, 1.0, 0);
 
 // test pub points
 #if 0
@@ -474,7 +608,7 @@ private:
         }
 #endif
 // 显示机身位置
-#if 0
+#if 1
         // 机身坐标
         geometry_msgs::msg::PointStamped base_point;
         base_point.header.frame_id = "base_link";
@@ -486,7 +620,7 @@ private:
         geometry_msgs::msg::PointStamped base_in_odom;
         try {
             base_in_odom = tf_buffer_->transform(base_point, "odom");
-            PublishCylinder(base_in_odom.point.x, base_in_odom.point.y, 0.1, 0.4, 0.4, 0.1, 1.0, 0.0, 0.0, 1.0, 1);
+            PublishCylinder(base_in_odom.point.x, base_in_odom.point.y, 0.025, 0.33, 0.33, 0.05, 0.0, 1.0, 0.0, 0.5, 1);
         } catch (const tf2::TransformException &ex) {
             RCLCPP_WARN(this->get_logger(), "无法转换base_link坐标点:%s", ex.what());
         }
@@ -513,6 +647,22 @@ private:
         double roll, pitch, yaw;
         tf2::Matrix3x3(q).getRPY(roll, pitch, yaw);
         imu_yaw_ = yaw;
+    }
+
+    void OdomCallback(const nav_msgs::msg::Odometry::SharedPtr msg) {
+        robot_pose_.x = msg->pose.pose.position.x;
+        robot_pose_.y = msg->pose.pose.position.y;
+
+        tf2::Quaternion q(
+            msg->pose.pose.orientation.x,
+            msg->pose.pose.orientation.y,
+            msg->pose.pose.orientation.z,
+            msg->pose.pose.orientation.w
+        );
+        double roll, pitch, yaw;
+        tf2::Matrix3x3(q).getRPY(roll, pitch, yaw);
+
+        robot_pose_.yaw = yaw;
     }
 
     void publish_odom() {
@@ -775,8 +925,8 @@ private:
                 twist_msg->linear.x = following_wall_linear_;
                 twist_msg->angular.z = angular_z;
     
-                RCLCPP_INFO(this->get_logger(), "Dist: %.2f, DistErr: %.2f, AngleErr: %.2f, AngularZ: %.2f", min_dist, distance_error, angle_error,
-                            angular_z);
+                // RCLCPP_INFO(this->get_logger(), "Dist: %.2f, DistErr: %.2f, AngleErr: %.2f, AngularZ: %.2f", min_dist, distance_error, angle_error,
+                //             angular_z);
             }
         }
 
@@ -816,6 +966,9 @@ private:
     }
 
     void line_laser_process() {
+
+        // test
+
         /*
             -查找gap，判断并补偿；分离地面点
                 1.根据数据点之间的距离值判断gap位置；
@@ -837,7 +990,6 @@ private:
         // 重置laser顺序
         std::vector<Point3D> order_points = ResetPointsOrder(line_laser);
         std::pair<int, std::vector<Point3D>> pair_out = FindGapFunction(order_points);
-
         std::vector<Point3D> points_in_laser = pair_out.second;
 
         if (points_in_laser.size() != 0) {
@@ -889,11 +1041,74 @@ private:
             sensor_msgs::msg::PointCloud2 wall_point_cloud = Point3DToPointCloud(line_laser, odom_wall_points);
     
             // 发布墙体历史点云数据
-            if (pair_out.first == 0) pub_wall_points(wall_point_cloud);
-            else if (pair_out.first == 1) pub_gap_wall_points(wall_point_cloud);
-            else return;
+            if (pair_out.first == 0) {
+                std::cout << "Retract the side brush or roller" << std::endl;
+                pub_wall_points(wall_point_cloud);
+            } else if (pair_out.first == 1) {
+                std::cout << Color::GREEN_BOLD << "Extended the side brush or roller" << Color::RESET << std::endl;
+                pub_gap_wall_points(wall_point_cloud);
+            } else return;
         }
-    // }
+    }
+
+    //ros2 run tf2_ros static_transform_publisher 0.0 -0.18 0.08 -0.5 0.5 -0.5 0.5 odom line_laser
+    void TestPointCloud2(){
+        std::vector<Frame> points_frames;
+        ReadTxtToLaserPoints3D("/home/shan2/Mypro/create3_ws/src/edge_following/data/line_points_in_odom.txt", points_frames);
+
+        std::vector<Point3D> points_in_odom;
+        for (auto& frame : points_frames) {
+            for (auto& p : frame.xyz_points) {
+                points_in_odom.emplace_back(Point3D(p.x, p.y, p.z));
+            }
+        }
+        
+        sensor_msgs::msg::LaserScan line_laser;
+        line_laser.header.frame_id = "line_laser";
+        line_laser.header.stamp = this->get_clock()->now();
+        sensor_msgs::msg::PointCloud2 point_clouds = Point3DToPointCloud(line_laser, points_in_odom);
+        wall_clouds_pub_->publish(point_clouds);
+
+        // 平面检测
+        // 转换 ROS 消息为 PCL 点云
+        pcl::PointCloud<pcl::PointXYZ>::Ptr pcl_cloud(new pcl::PointCloud<pcl::PointXYZ>);
+        pcl::fromROSMsg(point_clouds, *pcl_cloud);
+
+        // 平面模型分割
+        pcl::SACSegmentation<pcl::PointXYZ> seg;
+        pcl::PointIndices::Ptr inliers(new pcl::PointIndices); // 存储平面内点的索引
+        pcl::ModelCoefficients::Ptr coefficients(new pcl::ModelCoefficients); // 存储平面模型系数[a, b, c, d]
+
+        seg.setOptimizeCoefficients(true); // 设置是否优化平面系数，true为RANSAC找到平面后会对模型进行最小二乘优化得到更精确的平面系数
+        seg.setModelType(pcl::SACMODEL_PLANE); // 指定要拟合的模型类型 plane为平面
+        seg.setMethodType(pcl::SAC_RANSAC); // 设置分割方法 这里为ransac
+        seg.setDistanceThreshold(0.01); // 平面距离阈值
+        seg.setInputCloud(pcl_cloud);
+        seg.segment(*inliers, *coefficients);
+
+        if (inliers->indices.empty()) {
+            RCLCPP_WARN(this->get_logger(), "No planar surface found.");
+            return;
+        }
+
+        RCLCPP_INFO(this->get_logger(),
+            "Plane detected: %zu inliers, coefficients: [%f, %f, %f, %f]",
+            inliers->indices.size(),
+            coefficients->values[0], coefficients->values[1],
+            coefficients->values[2], coefficients->values[3]);
+
+        // 提取平面点云
+        pcl::ExtractIndices<pcl::PointXYZ> extract; // 用于从原始点云中提取某些索引对应的点
+        pcl::PointCloud<pcl::PointXYZ>::Ptr pcl_plane_points(new pcl::PointCloud<pcl::PointXYZ>);
+        extract.setInputCloud(pcl_cloud);
+        extract.setIndices(inliers);
+        extract.setNegative(false); // 设置提取模式 false为提取平面点 true为提取平面以外的点
+        extract.filter(*pcl_plane_points);
+
+        sensor_msgs::msg::PointCloud2 point_cloud_plane_points;
+        pcl::toROSMsg(*pcl_plane_points, point_cloud_plane_points);
+
+        gap_wall_clouds_pub_->publish(point_cloud_plane_points);
     }
 
     /**
@@ -945,7 +1160,7 @@ private:
                 
                 if(max_dis > gap_dis) {
                     if (std::fabs(gap_first_point.x - gap_second_point.x) > 0.01) {
-                        std::cout << "real gap" << std::endl;
+                        // std::cout << "real gap" << std::endl;
                         key = 1;
                     } else {
                         // 补偿gap处的点云数据
@@ -1047,7 +1262,7 @@ private:
         }
         // 插入新断点
         new_np_end_points.col(insert_pos) = break_point;
-        std::cout << "break_point: " << break_point.z() << std::endl;
+        // std::cout << "break_point: " << break_point.z() << std::endl;
         // 复制插入点之后的值
         if ((old_cols - insert_pos) > 0) {
             new_np_end_points.block(0, insert_pos + 1, 3, old_cols - insert_pos) = np_end_points.block(0, insert_pos, 3, old_cols - insert_pos);
@@ -1169,7 +1384,7 @@ private:
 
                 // 保存到 Point3D
                 Point3D p;
-                if (point_in_odom.point.z > 0.1) continue;
+                // if (point_in_odom.point.z > 0.1) continue;
                 p.x = point_in_odom.point.x;
                 p.y = point_in_odom.point.y;
                 p.z = point_in_odom.point.z;
@@ -1333,6 +1548,8 @@ private:
         ground_cloud_pub_->publish(ground_point_clouds);
     }
 
+    void pub_all_points(){}
+
     size_t find_index_for_angle(const sensor_msgs::msg::LaserScan& laser, float angle_rad) {
         int index = static_cast<int>((angle_rad - laser.angle_min) / laser.angle_increment);
         // 确保索引不会超出范围
@@ -1470,32 +1687,6 @@ private:
         return dis;
     }
 
-    void SaveOdomPoints3DToTxt(const std::vector<Point3D>& points, const std::string& file_path) {
-        if (points.empty()) {
-            std::cerr << "[WARN] SavePointsToTxt: empty points vector, skip saving.\n";
-            return;
-        }
-        auto now = std::chrono::system_clock::now();
-        auto now_ms = std::chrono::duration_cast<std::chrono::milliseconds>(now.time_since_epoch()).count();
-
-        std::ofstream ofs(file_path, std::ios::app);
-        if (!ofs.is_open()) {
-            std::cerr << "Failed to open file: " << file_path << std::endl;
-            return;
-        }
-
-        ofs << "---" << "\n";
-        ofs << "timestamp: " << now_ms << "\n";
-        // 设置浮点型精度
-        ofs << std::fixed << std::setprecision(6);
-
-        for (const auto& p : points) {
-            ofs << p.x << " " << p.y << " " << p.z << "\n";
-        }
-
-        ofs.close();
-    }
-
     void SaveLaserPoints3DToTxt(const std::vector<Point3D>& points, const std::string& file_path) {
         if (points.empty()) {
             std::cerr << "[WARN] SavePointsToTxt: empty points vector, skip saving.\n";
@@ -1522,11 +1713,42 @@ private:
         ofs.close();       
     }
 
+    void ReadTxtToLaserPoints3D(std::string filename, std::vector<Frame>& frames) {
+
+        std::ifstream ifs(filename);
+        if (!ifs.is_open()) {
+            std::cerr << "Cannot open file: " << filename << std::endl;
+            return;
+        }
+
+        Frame              current_frame;
+        std::string        line;
+
+        while (std::getline(ifs, line)) {
+            if (line.empty()) continue;
+
+            if (line.substr(0, 3) == "---") {
+                if (!current_frame.xyz_points.empty()) frames.push_back(current_frame);
+                current_frame = Frame();
+            } else if (line.substr(0, 9) == "timestamp") {
+                current_frame.timestamp = line.substr(line.find(":") + 1);
+            } else {
+                std::istringstream iss(line);
+                float              x, y, z;
+                if (!(iss >> x >> y >> z)) continue;
+                current_frame.xyz_points.emplace_back(x, y, z);
+            }
+        }
+        if (!current_frame.xyz_points.empty()) frames.push_back(current_frame);
+        ifs.close();
+    }
+
     rclcpp::Subscription<sensor_msgs::msg::LaserScan>::SharedPtr                    scan_laser_sub_;
     rclcpp::Subscription<sensor_msgs::msg::LaserScan>::SharedPtr                    line_laser_sub_;
     rclcpp::Subscription<irobot_create_msgs::msg::HazardDetectionVector>::SharedPtr hazard_sub_;
     rclcpp::Subscription<irobot_create_msgs::msg::WheelVels>::SharedPtr             wheel_sub_;
     rclcpp::Subscription<sensor_msgs::msg::Imu>::SharedPtr                          imu_sub_;
+    rclcpp::Subscription<nav_msgs::msg::Odometry>::SharedPtr                          odom_sub_;
 
     rclcpp::Publisher<visualization_msgs::msg::Marker>::SharedPtr marker_pub_;
     rclcpp::Publisher<geometry_msgs::msg::Twist>::SharedPtr       cmd_publisher_;
@@ -1534,12 +1756,14 @@ private:
     rclcpp::Publisher<sensor_msgs::msg::PointCloud2>::SharedPtr   gap_wall_clouds_pub_;
     rclcpp::Publisher<sensor_msgs::msg::PointCloud2>::SharedPtr   ground_cloud_pub_;
     rclcpp::Publisher<nav_msgs::msg::Odometry>::SharedPtr         odom_pub_;
+    rclcpp::Publisher<geometry_msgs::msg::PoseStamped>::SharedPtr         pose_pub_;
 
     rclcpp::Time                 rotation_start_time_;
     rclcpp::Time                 align_start_time_;
     rclcpp::Time                 odom_last_time_;
     rclcpp::TimerBase::SharedPtr control_loop_timer_;
     rclcpp::TimerBase::SharedPtr line_laser_process_timer_;
+    rclcpp::TimerBase::SharedPtr pose_pub_timer_;
 
     laser_geometry::LaserProjection projector_;
 
@@ -1548,6 +1772,7 @@ private:
     std::unique_ptr<tf2_ros::TransformBroadcaster> tf_broadcaster_;
 
     Point2D                                target_point_;
+    Pose2D robot_pose_;
     sensor_msgs::msg::LaserScan            line_laser_;
     sensor_msgs::msg::LaserScan            scan_laser_;
 

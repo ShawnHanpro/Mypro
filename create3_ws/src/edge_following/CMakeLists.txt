@@ -19,6 +19,14 @@ find_package(irobot_create_msgs REQUIRED)
 find_package(laser_geometry REQUIRED)
 find_package(nav_msgs REQUIRED)
 
+# pcl
+find_package(pcl_conversions REQUIRED)
+find_package(PCL REQUIRED)
+include_directories(
+  ${PCL_INCLUDE_DIRS}           # 默认系统路径
+  /usr/include/pcl-1.10         # 显式加上你安装的 PCL 路径
+)
+
 # msg
 find_package(rosidl_default_generators REQUIRED)
 
@@ -43,9 +51,13 @@ ament_target_dependencies(
   "irobot_create_msgs"
   "laser_geometry"
   "nav_msgs"
+  "pcl_conversions" # pcl
 )
 install(TARGETS edge_following_node
   DESTINATION lib/${PROJECT_NAME})
+
+# pcl
+target_link_libraries(edge_following_node ${PCL_LIBRARIES})
 
 add_executable(dwa src/DWA.cpp)
 target_include_directories(dwa PUBLIC
