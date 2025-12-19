@@ -1,0 +1,1 @@
+g++ CMakeFiles/main.dir/main.cpp.o -o /home/shan2/Mypro/vslam/bin/main   -L/home/shan2/Mypro/vslam/build/lib  -Wl,-rpath,/home/shan2/Mypro/vslam/build/lib 

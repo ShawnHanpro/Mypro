@@ -1,0 +1,49 @@
+#include "slamBase.h"
+
+pcl::PointCloud<pcl::PointXYZRGB>::Ptr image2PointCloud(cv::Mat& rgb, cv::Mat& depth, CAMERA_INTRINSIC_PARAMETERS& camera) {
+    // 点云变量
+    pcl::PointCloud<pcl::PointXYZRGB>::Ptr cloud(new pcl::PointCloud<pcl::PointXYZRGB>);
+    // 遍历深度图
+    for (int m = 0; m < depth.rows; ++m) {
+        for (int n = 0; n < depth.cols; ++n) {
+            // 获取(m,n)处值
+            ushort d = depth.ptr<ushort>(m)[n];
+            // 判断数据是否有效
+            if (d == 0) continue;
+
+            // 计算该点的空间坐标
+            pcl::PointXYZRGB p;
+            // z = d / s
+            // x = (u - cx) * z/fx
+            // y = (v - cy) * z/fy
+            p.z = double(d) / camera.scale;
+            p.x = (n - camera.cx) * p.z / camera.fx;
+            p.y = (m - camera.cy) * p.z / camera.fy;
+
+            // 从rgb获取颜色
+            // rgb是三通道的BGR格式图 所以按下面顺序取色
+            cv::Vec3b color = rgb.at<cv::Vec3b>(m,n);
+            p.b = color[0];
+            p.g = color[1];
+            p.r = color[2];
+
+            cloud->points.push_back(p);
+        }
+    }
+
+    // cloud参数
+    cloud->height = 1;
+    cloud->width = cloud->points.size();
+    cloud->is_dense = false;
+
+    return cloud;
+}
+
+cv::Point3f point2dTo3d(cv::Point3f& point, CAMERA_INTRINSIC_PARAMETERS& camera) {
+    cv::Point3f p;
+    p.z = double(point.z);
+    p.x = (point.x - camera.cx) * p.z / camera.fx;
+    p.y = (point.y - camera.cy) * p.z / camera.fy;
+
+    return p;
+}
