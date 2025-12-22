@@ -1,21 +1,18 @@
 #include <iostream>
 #include <vector>
+#include <limits>
 
 using namespace std;
 
 class Solution {
 public:
-    int removeDuplicates(vector<int>& nums) {
-        int num = nums.size();
-        int slow=2, fast=2;
-        while(fast < num) {
-            if (nums[fast] != nums[slow-2]) {
-                nums[slow] = nums[fast];
-                slow++;
-            }
-            fast++;
+    int maxProfit(vector<int>& prices) {
+        int minprice = std::numeric_limits<int>::max(), maxprice = 0;
+        for (auto& p : prices) {
+            minprice = min(minprice, p);
+            maxprice = max(maxprice, p - minprice);
         }
-        return slow;
+        return maxprice;
     }
 };
 
@@ -23,14 +20,15 @@ public:
 int main(int argc, char** argv) {
     
     std::cout << "hello vslam" << std::endl;
-    vector<int> nums={2,2,1,1,1,2,2};
+    // vector<int> nums={1,2};
+    vector<int> nums={7,1,5,3,6,4};
     int val = 2;
     Solution sol;
-    sol.removeDuplicates(nums);
-    for (auto& n : nums) {
-        std::cout << n << " ";
-    }
-    std::cout << std::endl;
+    int res = sol.maxProfit(nums);
+    // for (auto& n : nums) {
+    //     std::cout << n << " ";
+    // }
+    std::cout << res << std::endl;
 
     return 0;
 }

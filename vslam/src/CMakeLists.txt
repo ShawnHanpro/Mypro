@@ -13,13 +13,14 @@ link_libraries(${PCL_LIBRARY_DIRS})
 add_executable(generate_pointcloud generatePointCloud.cpp)
 add_executable(main main.cpp)
 
-target_link_libraries( generate_pointcloud 
+add_library(slamBase slamBase.cpp)
+target_link_libraries( slamBase
     ${OpenCV_LIBS}
     ${PCL_LIBRARIES}
 )
 
-add_library(slamBase slamBase.cpp)
-target_link_libraries( slamBase
+target_link_libraries( generate_pointcloud 
+    slamBase
     ${OpenCV_LIBS}
     ${PCL_LIBRARIES}
 )

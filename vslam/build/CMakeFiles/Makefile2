@@ -97,7 +97,7 @@ src/clean: src/CMakeFiles/slamBase.dir/clean
 # Target rules for target src/CMakeFiles/generate_pointcloud.dir
 
 # All Build rule for target.
-src/CMakeFiles/generate_pointcloud.dir/all:
+src/CMakeFiles/generate_pointcloud.dir/all: src/CMakeFiles/slamBase.dir/all
 	$(MAKE) $(MAKESILENT) -f src/CMakeFiles/generate_pointcloud.dir/build.make src/CMakeFiles/generate_pointcloud.dir/depend
 	$(MAKE) $(MAKESILENT) -f src/CMakeFiles/generate_pointcloud.dir/build.make src/CMakeFiles/generate_pointcloud.dir/build
 	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --progress-dir=/home/shan2/Mypro/vslam/build/CMakeFiles --progress-num=1,2 "Built target generate_pointcloud"
@@ -105,7 +105,7 @@ src/CMakeFiles/generate_pointcloud.dir/all:
 
 # Build rule for subdir invocation for target.
 src/CMakeFiles/generate_pointcloud.dir/rule: cmake_check_build_system
-	$(CMAKE_COMMAND) -E cmake_progress_start /home/shan2/Mypro/vslam/build/CMakeFiles 2
+	$(CMAKE_COMMAND) -E cmake_progress_start /home/shan2/Mypro/vslam/build/CMakeFiles 4
 	$(MAKE) $(MAKESILENT) -f CMakeFiles/Makefile2 src/CMakeFiles/generate_pointcloud.dir/all
 	$(CMAKE_COMMAND) -E cmake_progress_start /home/shan2/Mypro/vslam/build/CMakeFiles 0
 .PHONY : src/CMakeFiles/generate_pointcloud.dir/rule

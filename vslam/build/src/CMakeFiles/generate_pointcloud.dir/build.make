@@ -92,6 +92,7 @@ generate_pointcloud_EXTERNAL_OBJECTS =
 
 /home/shan2/Mypro/vslam/bin/generate_pointcloud: src/CMakeFiles/generate_pointcloud.dir/generatePointCloud.cpp.o
 /home/shan2/Mypro/vslam/bin/generate_pointcloud: src/CMakeFiles/generate_pointcloud.dir/build.make
+/home/shan2/Mypro/vslam/bin/generate_pointcloud: /home/shan2/Mypro/vslam/lib/libslamBase.a
 /home/shan2/Mypro/vslam/bin/generate_pointcloud: /usr/lib/x86_64-linux-gnu/libopencv_stitching.so.4.2.0
 /home/shan2/Mypro/vslam/bin/generate_pointcloud: /usr/lib/x86_64-linux-gnu/libopencv_aruco.so.4.2.0
 /home/shan2/Mypro/vslam/bin/generate_pointcloud: /usr/lib/x86_64-linux-gnu/libopencv_bgsegm.so.4.2.0
@@ -145,16 +146,16 @@ generate_pointcloud_EXTERNAL_OBJECTS =
 /home/shan2/Mypro/vslam/bin/generate_pointcloud: /usr/lib/x86_64-linux-gnu/libvtkViewsCore-7.1.so.7.1p.1
 /home/shan2/Mypro/vslam/bin/generate_pointcloud: /usr/lib/x86_64-linux-gnu/libvtkRenderingContextOpenGL2-7.1.so.7.1p.1
 /home/shan2/Mypro/vslam/bin/generate_pointcloud: /usr/lib/x86_64-linux-gnu/libopencv_highgui.so.4.2.0
+/home/shan2/Mypro/vslam/bin/generate_pointcloud: /usr/lib/x86_64-linux-gnu/libopencv_phase_unwrapping.so.4.2.0
+/home/shan2/Mypro/vslam/bin/generate_pointcloud: /usr/lib/x86_64-linux-gnu/libopencv_optflow.so.4.2.0
 /home/shan2/Mypro/vslam/bin/generate_pointcloud: /usr/lib/x86_64-linux-gnu/libopencv_datasets.so.4.2.0
 /home/shan2/Mypro/vslam/bin/generate_pointcloud: /usr/lib/x86_64-linux-gnu/libopencv_plot.so.4.2.0
 /home/shan2/Mypro/vslam/bin/generate_pointcloud: /usr/lib/x86_64-linux-gnu/libopencv_text.so.4.2.0
 /home/shan2/Mypro/vslam/bin/generate_pointcloud: /usr/lib/x86_64-linux-gnu/libopencv_dnn.so.4.2.0
 /home/shan2/Mypro/vslam/bin/generate_pointcloud: /usr/lib/x86_64-linux-gnu/libopencv_ml.so.4.2.0
-/home/shan2/Mypro/vslam/bin/generate_pointcloud: /usr/lib/x86_64-linux-gnu/libopencv_phase_unwrapping.so.4.2.0
-/home/shan2/Mypro/vslam/bin/generate_pointcloud: /usr/lib/x86_64-linux-gnu/libopencv_optflow.so.4.2.0
+/home/shan2/Mypro/vslam/bin/generate_pointcloud: /usr/lib/x86_64-linux-gnu/libopencv_videoio.so.4.2.0
 /home/shan2/Mypro/vslam/bin/generate_pointcloud: /usr/lib/x86_64-linux-gnu/libopencv_ximgproc.so.4.2.0
 /home/shan2/Mypro/vslam/bin/generate_pointcloud: /usr/lib/x86_64-linux-gnu/libopencv_video.so.4.2.0
-/home/shan2/Mypro/vslam/bin/generate_pointcloud: /usr/lib/x86_64-linux-gnu/libopencv_videoio.so.4.2.0
 /home/shan2/Mypro/vslam/bin/generate_pointcloud: /usr/lib/x86_64-linux-gnu/libopencv_imgcodecs.so.4.2.0
 /home/shan2/Mypro/vslam/bin/generate_pointcloud: /usr/lib/x86_64-linux-gnu/libopencv_objdetect.so.4.2.0
 /home/shan2/Mypro/vslam/bin/generate_pointcloud: /usr/lib/x86_64-linux-gnu/libopencv_calib3d.so.4.2.0
@@ -165,6 +166,17 @@ generate_pointcloud_EXTERNAL_OBJECTS =
 /home/shan2/Mypro/vslam/bin/generate_pointcloud: /usr/lib/x86_64-linux-gnu/libopencv_core.so.4.2.0
 /home/shan2/Mypro/vslam/bin/generate_pointcloud: /usr/lib/x86_64-linux-gnu/libpcl_octree.so
 /home/shan2/Mypro/vslam/bin/generate_pointcloud: /usr/lib/x86_64-linux-gnu/libpcl_common.so
+/home/shan2/Mypro/vslam/bin/generate_pointcloud: /usr/lib/x86_64-linux-gnu/libboost_system.so
+/home/shan2/Mypro/vslam/bin/generate_pointcloud: /usr/lib/x86_64-linux-gnu/libboost_filesystem.so
+/home/shan2/Mypro/vslam/bin/generate_pointcloud: /usr/lib/x86_64-linux-gnu/libboost_date_time.so
+/home/shan2/Mypro/vslam/bin/generate_pointcloud: /usr/lib/x86_64-linux-gnu/libboost_iostreams.so
+/home/shan2/Mypro/vslam/bin/generate_pointcloud: /usr/lib/x86_64-linux-gnu/libboost_regex.so
+/home/shan2/Mypro/vslam/bin/generate_pointcloud: /usr/lib/libOpenNI.so
+/home/shan2/Mypro/vslam/bin/generate_pointcloud: /usr/lib/libOpenNI2.so
+/home/shan2/Mypro/vslam/bin/generate_pointcloud: /usr/lib/x86_64-linux-gnu/libjpeg.so
+/home/shan2/Mypro/vslam/bin/generate_pointcloud: /usr/lib/x86_64-linux-gnu/libpng.so
+/home/shan2/Mypro/vslam/bin/generate_pointcloud: /usr/lib/x86_64-linux-gnu/libtiff.so
+/home/shan2/Mypro/vslam/bin/generate_pointcloud: /usr/lib/x86_64-linux-gnu/libexpat.so
 /home/shan2/Mypro/vslam/bin/generate_pointcloud: /usr/lib/x86_64-linux-gnu/libvtkInteractionWidgets-7.1.so.7.1p.1
 /home/shan2/Mypro/vslam/bin/generate_pointcloud: /usr/lib/x86_64-linux-gnu/libvtkFiltersModeling-7.1.so.7.1p.1
 /home/shan2/Mypro/vslam/bin/generate_pointcloud: /usr/lib/x86_64-linux-gnu/libvtkInteractionStyle-7.1.so.7.1p.1
