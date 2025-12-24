@@ -1,18 +1,22 @@
 #include <iostream>
 #include <vector>
 #include <limits>
+#include <algorithm>
 
 using namespace std;
 
 class Solution {
 public:
-    int maxProfit(vector<int>& prices) {
-        int minprice = std::numeric_limits<int>::max(), maxprice = 0;
-        for (auto& p : prices) {
-            minprice = min(minprice, p);
-            maxprice = max(maxprice, p - minprice);
+    bool canJump(vector<int>& nums) {
+        int max_len = 0;
+        for (int i = 0; i < nums.size(); ++i) {
+            if (i < max_len) {
+                max_len = std::max(i + nums[i], max_len);
+                std::cout << max_len << " ";
+                if (max_len >= nums.size() - 1) return true;
+            }
         }
-        return maxprice;
+        return false;
     }
 };
 
@@ -20,15 +24,14 @@ public:
 int main(int argc, char** argv) {
     
     std::cout << "hello vslam" << std::endl;
-    // vector<int> nums={1,2};
-    vector<int> nums={7,1,5,3,6,4};
+    vector<int> nums={2,3,1,1,4};
     int val = 2;
     Solution sol;
-    int res = sol.maxProfit(nums);
+    bool res = sol.canJump(nums);
     // for (auto& n : nums) {
     //     std::cout << n << " ";
     // }
-    std::cout << res << std::endl;
+    std::cout << std::boolalpha << res << std::endl;
 
     return 0;
 }

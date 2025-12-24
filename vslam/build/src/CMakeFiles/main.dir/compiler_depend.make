@@ -178,8 +178,30 @@ src/CMakeFiles/main.dir/main.cpp.o: /home/shan2/Mypro/vslam/src/main.cpp \
   /usr/include/c++/9/bits/stl_vector.h \
   /usr/include/c++/9/bits/stl_bvector.h \
   /usr/include/c++/9/bits/vector.tcc \
-  /usr/include/c++/9/limits
+  /usr/include/c++/9/limits \
+  /usr/include/c++/9/algorithm \
+  /usr/include/c++/9/utility \
+  /usr/include/c++/9/bits/stl_relops.h \
+  /usr/include/c++/9/bits/stl_algo.h \
+  /usr/include/c++/9/bits/algorithmfwd.h \
+  /usr/include/c++/9/bits/stl_heap.h \
+  /usr/include/c++/9/bits/stl_tempbuf.h \
+  /usr/include/c++/9/bits/uniform_int_dist.h
 
+
+/usr/include/c++/9/bits/uniform_int_dist.h:
+
+/usr/include/c++/9/bits/stl_heap.h:
+
+/usr/include/c++/9/bits/algorithmfwd.h:
+
+/usr/include/c++/9/bits/stl_algo.h:
+
+/usr/include/c++/9/bits/stl_tempbuf.h:
+
+/usr/include/c++/9/bits/stl_relops.h:
+
+/usr/include/c++/9/utility:
 
 /usr/include/c++/9/limits:
 
@@ -284,6 +306,8 @@ src/CMakeFiles/main.dir/main.cpp.o: /home/shan2/Mypro/vslam/src/main.cpp \
 /usr/include/x86_64-linux-gnu/bits/setjmp.h:
 
 /usr/include/c++/9/bits/concept_check.h:
+
+/usr/include/c++/9/algorithm:
 
 /usr/include/x86_64-linux-gnu/bits/floatn.h:
 

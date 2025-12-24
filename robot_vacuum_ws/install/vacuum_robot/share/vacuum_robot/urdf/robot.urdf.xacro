@@ -1,0 +1,129 @@
+<?xml version="1.0"?>
+<robot xmlns:xacro="http://www.ros.org/wiki/xacro" name="sweeper">
+
+  <link name="base_footprint"/>
+  <joint name="base_joint" type="fixed">
+    <parent link="base_footprint"/><child link="base_link"/>
+    <origin xyz="0 0 0.1" rpy="0 0 0"/>
+  </joint>
+
+  <link name="base_link">
+    <visual><geometry><cylinder radius="0.15" length="0.08"/></geometry></visual>
+    <collision><geometry><cylinder radius="0.15" length="0.08"/></geometry></collision>
+    <inertial><mass value="2.0"/><inertia ixx="0.01" ixy="0" ixz="0" iyy="0.01" iyz="0" izz="0.02"/></inertial>
+  </link>
+
+  <link name="left_wheel">
+    <visual><geometry><cylinder radius="0.05" length="0.04"/></geometry></visual>
+    <collision><geometry><cylinder radius="0.05" length="0.04"/></geometry></collision>
+    <inertial><mass value="0.5"/><inertia ixx="0.001" ixy="0" ixz="0" iyy="0.001" iyz="0" izz="0.001"/></inertial>
+  </link>
+  <joint name="left_wheel_joint" type="continuous">
+    <parent link="base_link"/><child link="left_wheel"/>
+    <origin xyz="0 0.12 -0.05" rpy="-1.5708 0 0"/><axis xyz="0 0 1"/>
+  </joint>
+
+  <link name="right_wheel">
+    <visual><geometry><cylinder radius="0.05" length="0.04"/></geometry></visual>
+    <collision><geometry><cylinder radius="0.05" length="0.04"/></geometry></collision>
+    <inertial><mass value="0.5"/><inertia ixx="0.001" ixy="0" ixz="0" iyy="0.001" iyz="0" izz="0.001"/></inertial>
+  </link>
+  <joint name="right_wheel_joint" type="continuous">
+    <parent link="base_link"/><child link="right_wheel"/>
+    <origin xyz="0 -0.12 -0.05" rpy="-1.5708 0 0"/><axis xyz="0 0 1"/>
+  </joint>
+
+  <link name="laser_frame">
+    <visual><geometry><cylinder radius="0.03" length="0.04"/></geometry></visual>
+  </link>
+  <joint name="laser_joint" type="fixed">
+    <parent link="base_link"/><child link="laser_frame"/>
+    <origin xyz="0 0 0.06" rpy="0 0 0"/>
+  </joint>
+
+    <link name="front_caster">
+        <visual>
+            <geometry><sphere radius="0.05"/></geometry>
+            <material name="black"/>
+        </visual>
+        <collision>
+            <geometry><sphere radius="0.05"/></geometry>
+        </collision>
+        <inertial>
+            <mass value="0.1"/>
+            <inertia ixx="0.0001" ixy="0" ixz="0" iyy="0.0001" iyz="0" izz="0.0001"/>
+        </inertial>
+    </link>
+
+    <joint name="front_caster_joint" type="fixed">
+        <parent link="base_link"/>
+        <child link="front_caster"/>
+        <origin xyz="0.1 0 -0.05" rpy="0 0 0"/>
+    </joint>
+
+    <gazebo reference="front_caster">
+        <mu1 value="0.0"/>
+        <mu2 value="0.0"/>
+        <kp value="1000000.0"/>
+        <kd value="10.0"/>
+    </gazebo>
+
+    <link name="back_caster">
+        <visual>
+            <geometry><sphere radius="0.05"/></geometry>
+            <material name="black"/>
+        </visual>
+        <collision>
+            <geometry><sphere radius="0.05"/></geometry>
+        </collision>
+        <inertial>
+            <mass value="0.1"/>
+            <inertia ixx="0.0001" ixy="0" ixz="0" iyy="0.0001" iyz="0" izz="0.0001"/>
+        </inertial>
+    </link>
+
+    <joint name="back_caster_joint" type="fixed">
+        <parent link="base_link"/>
+        <child link="back_caster"/>
+        <origin xyz="-0.1 0 -0.05" rpy="0 0 0"/>
+    </joint>
+
+    <gazebo reference="back_caster">
+        <mu1 value="0.0"/>
+        <mu2 value="0.0"/>
+        <kp value="1000000.0"/>
+        <kd value="10.0"/>
+    </gazebo>
+
+  <gazebo>
+    <plugin name="diff_drive" filename="libgazebo_ros_diff_drive.so">
+      <left_joint>left_wheel_joint</left_joint>
+      <right_joint>right_wheel_joint</right_joint>
+      <wheel_separation>0.24</wheel_separation>
+      <wheel_diameter>0.1</wheel_diameter>
+      <publish_odom>true</publish_odom>
+      <publish_odom_tf>true</publish_odom_tf>
+      <publish_wheel_tf>true</publish_wheel_tf>
+      <odometry_frame>odom</odometry_frame>
+      <robot_base_frame>base_footprint</robot_base_frame>
+      <!-- 运行100ms后停止 避免机器人一直在运行 -->
+      <command_timeout>0.1</command_timeout>
+      <cmd_vel_timeout>0.1</cmd_vel_timeout>
+    </plugin>
+  </gazebo>
+
+  <gazebo reference="laser_frame">
+    <sensor name="lidar" type="ray">
+      <always_on>true</always_on><visualize>true</visualize><update_rate>10</update_rate>
+      <ray>
+        <scan><horizontal><samples>360</samples><resolution>1</resolution><min_angle>-3.14</min_angle><max_angle>3.14</max_angle></horizontal></scan>
+        <range><min>0.12</min><max>12.0</max></range>
+      </ray>
+      <plugin name="laser_controller" filename="libgazebo_ros_ray_sensor.so">
+        <ros><remapping>~/out:=scan</remapping></ros>
+        <output_type>sensor_msgs/LaserScan</output_type>
+        <frame_name>laser_frame</frame_name>
+      </plugin>
+    </sensor>
+  </gazebo>
+</robot>

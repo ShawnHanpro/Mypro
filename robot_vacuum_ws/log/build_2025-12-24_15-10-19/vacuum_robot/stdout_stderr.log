@@ -1,0 +1,22 @@
+[100%] Built target vacuum_robot_node
+-- Install configuration: ""
+-- Up-to-date: /home/shan2/Mypro/robot_vacuum_ws/install/vacuum_robot/share/vacuum_robot/urdf
+-- Installing: /home/shan2/Mypro/robot_vacuum_ws/install/vacuum_robot/share/vacuum_robot/urdf/robot.urdf.xacro
+-- Up-to-date: /home/shan2/Mypro/robot_vacuum_ws/install/vacuum_robot/share/vacuum_robot/launch
+-- Up-to-date: /home/shan2/Mypro/robot_vacuum_ws/install/vacuum_robot/share/vacuum_robot/launch/vacuum_robot.launch.py
+-- Up-to-date: /home/shan2/Mypro/robot_vacuum_ws/install/vacuum_robot/share/vacuum_robot/config
+-- Up-to-date: /home/shan2/Mypro/robot_vacuum_ws/install/vacuum_robot/share/ament_index/resource_index/package_run_dependencies/vacuum_robot
+-- Up-to-date: /home/shan2/Mypro/robot_vacuum_ws/install/vacuum_robot/share/ament_index/resource_index/parent_prefix_path/vacuum_robot
+-- Up-to-date: /home/shan2/Mypro/robot_vacuum_ws/install/vacuum_robot/share/vacuum_robot/environment/ament_prefix_path.sh
+-- Up-to-date: /home/shan2/Mypro/robot_vacuum_ws/install/vacuum_robot/share/vacuum_robot/environment/ament_prefix_path.dsv
+-- Up-to-date: /home/shan2/Mypro/robot_vacuum_ws/install/vacuum_robot/share/vacuum_robot/environment/path.sh
+-- Up-to-date: /home/shan2/Mypro/robot_vacuum_ws/install/vacuum_robot/share/vacuum_robot/environment/path.dsv
+-- Up-to-date: /home/shan2/Mypro/robot_vacuum_ws/install/vacuum_robot/share/vacuum_robot/local_setup.bash
+-- Up-to-date: /home/shan2/Mypro/robot_vacuum_ws/install/vacuum_robot/share/vacuum_robot/local_setup.sh
+-- Up-to-date: /home/shan2/Mypro/robot_vacuum_ws/install/vacuum_robot/share/vacuum_robot/local_setup.zsh
+-- Up-to-date: /home/shan2/Mypro/robot_vacuum_ws/install/vacuum_robot/share/vacuum_robot/local_setup.dsv
+-- Installing: /home/shan2/Mypro/robot_vacuum_ws/install/vacuum_robot/share/vacuum_robot/package.dsv
+-- Up-to-date: /home/shan2/Mypro/robot_vacuum_ws/install/vacuum_robot/share/ament_index/resource_index/packages/vacuum_robot
+-- Up-to-date: /home/shan2/Mypro/robot_vacuum_ws/install/vacuum_robot/share/vacuum_robot/cmake/vacuum_robotConfig.cmake
+-- Up-to-date: /home/shan2/Mypro/robot_vacuum_ws/install/vacuum_robot/share/vacuum_robot/cmake/vacuum_robotConfig-version.cmake
+-- Up-to-date: /home/shan2/Mypro/robot_vacuum_ws/install/vacuum_robot/share/vacuum_robot/package.xml

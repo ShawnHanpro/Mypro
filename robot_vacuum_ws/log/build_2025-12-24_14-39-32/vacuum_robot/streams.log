@@ -1,0 +1,36 @@
+[0.009s] Invoking command in '/home/shan2/Mypro/robot_vacuum_ws/build/vacuum_robot': CMAKE_PREFIX_PATH=/opt/ros/galactic /usr/bin/cmake /home/shan2/Mypro/robot_vacuum_ws/src/vacuum_robot -DCMAKE_INSTALL_PREFIX=/home/shan2/Mypro/robot_vacuum_ws/install/vacuum_robot
+[0.055s] -- The C compiler identification is GNU 9.4.0
+[0.095s] -- The CXX compiler identification is GNU 9.4.0
+[0.103s] -- Detecting C compiler ABI info
+[0.138s] -- Detecting C compiler ABI info - done
+[0.145s] -- Check for working C compiler: /usr/bin/cc - skipped
+[0.146s] -- Detecting C compile features
+[0.146s] -- Detecting C compile features - done
+[0.149s] -- Detecting CXX compiler ABI info
+[0.191s] -- Detecting CXX compiler ABI info - done
+[0.197s] -- Check for working CXX compiler: /usr/bin/c++ - skipped
+[0.198s] -- Detecting CXX compile features
+[0.198s] -- Detecting CXX compile features - done
+[0.200s] -- Found ament_cmake: 1.1.6 (/opt/ros/galactic/share/ament_cmake/cmake)
+[0.218s] -- Found PythonInterp: /usr/bin/python3 (found suitable version "3.8.10", minimum required is "3") 
+[0.219s] -- Using PYTHON_EXECUTABLE: /usr/bin/python3
+[0.286s] [31mCMake Error at CMakeLists.txt:10 (find_package):
+[0.286s]   By not providing "Findxacro.cmake" in CMAKE_MODULE_PATH this project has
+[0.286s]   asked CMake to find a package configuration file provided by "xacro", but
+[0.286s]   CMake did not find one.
+[0.286s] 
+[0.286s]   Could not find a package configuration file provided by "xacro" with any of
+[0.286s]   the following names:
+[0.286s] 
+[0.287s]     xacroConfig.cmake
+[0.287s] -- Configuring incomplete, errors occurred!
+[0.287s] See also "/home/shan2/Mypro/robot_vacuum_ws/build/vacuum_robot/CMakeFiles/CMakeOutput.log".
+[0.287s]     xacro-config.cmake
+[0.287s] 
+[0.287s]   Add the installation prefix of "xacro" to CMAKE_PREFIX_PATH or set
+[0.287s]   "xacro_DIR" to a directory containing one of the above files.  If "xacro"
+[0.287s]   provides a separate development package or SDK, be sure it has been
+[0.287s]   installed.
+[0.287s] 
+[0.287s] [0m
+[0.289s] Invoked command in '/home/shan2/Mypro/robot_vacuum_ws/build/vacuum_robot' returned '1': CMAKE_PREFIX_PATH=/opt/ros/galactic /usr/bin/cmake /home/shan2/Mypro/robot_vacuum_ws/src/vacuum_robot -DCMAKE_INSTALL_PREFIX=/home/shan2/Mypro/robot_vacuum_ws/install/vacuum_robot

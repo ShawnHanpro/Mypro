@@ -1,0 +1,4 @@
+Invoking command in '/home/shan2/Mypro/robot_vacuum_ws/build/vacuum_robot': CMAKE_PREFIX_PATH=${CMAKE_PREFIX_PATH}:/opt/ros/galactic /usr/bin/cmake --build /home/shan2/Mypro/robot_vacuum_ws/build/vacuum_robot -- -j16 -l16
+Invoked command in '/home/shan2/Mypro/robot_vacuum_ws/build/vacuum_robot' returned '0': CMAKE_PREFIX_PATH=${CMAKE_PREFIX_PATH}:/opt/ros/galactic /usr/bin/cmake --build /home/shan2/Mypro/robot_vacuum_ws/build/vacuum_robot -- -j16 -l16
+Invoking command in '/home/shan2/Mypro/robot_vacuum_ws/build/vacuum_robot': CMAKE_PREFIX_PATH=${CMAKE_PREFIX_PATH}:/opt/ros/galactic /usr/bin/cmake --install /home/shan2/Mypro/robot_vacuum_ws/build/vacuum_robot
+Invoked command in '/home/shan2/Mypro/robot_vacuum_ws/build/vacuum_robot' returned '0': CMAKE_PREFIX_PATH=${CMAKE_PREFIX_PATH}:/opt/ros/galactic /usr/bin/cmake --install /home/shan2/Mypro/robot_vacuum_ws/build/vacuum_robot

@@ -1,0 +1,88 @@
+[0.009s] Invoking command in '/home/shan2/Mypro/robot_vacuum_ws/build/vacuum_robot': CMAKE_PREFIX_PATH=/opt/ros/galactic /usr/bin/cmake /home/shan2/Mypro/robot_vacuum_ws/src/vacuum_robot -DCMAKE_INSTALL_PREFIX=/home/shan2/Mypro/robot_vacuum_ws/install/vacuum_robot
+[0.016s] -- Found ament_cmake: 1.1.6 (/opt/ros/galactic/share/ament_cmake/cmake)
+[0.030s] -- Using PYTHON_EXECUTABLE: /usr/bin/python3
+[0.071s] -- Found gazebo_ros: 3.5.2 (/opt/ros/galactic/share/gazebo_ros/cmake)
+[0.096s] -- Using all available rosidl_typesupport_c: rosidl_typesupport_fastrtps_c;rosidl_typesupport_introspection_c
+[0.098s] -- Found rosidl_adapter: 2.2.3 (/opt/ros/galactic/share/rosidl_adapter/cmake)
+[0.188s] -- Using all available rosidl_typesupport_cpp: rosidl_typesupport_fastrtps_cpp;rosidl_typesupport_introspection_cpp
+[0.220s] -- Found rmw_implementation_cmake: 3.3.1 (/opt/ros/galactic/share/rmw_implementation_cmake/cmake)
+[0.221s] -- Found rmw_cyclonedds_cpp: 0.22.6 (/opt/ros/galactic/share/rmw_cyclonedds_cpp/cmake)
+[0.235s] -- Using RMW implementation 'rmw_cyclonedds_cpp' as default
+[0.332s] [33mCMake Warning (dev) at /opt/cmake-3.25.0/share/cmake-3.25/Modules/FindPackageHandleStandardArgs.cmake:438 (message):
+[0.332s]   The package name passed to `find_package_handle_standard_args` (PkgConfig)
+[0.332s]   does not match the name of the calling package (gazebo).  This can lead to
+[0.332s]   problems in calling code that expects `find_package` result variables
+[0.332s]   (e.g., `_FOUND`) to follow a certain pattern.
+[0.332s] Call Stack (most recent call first):
+[0.332s]   /opt/cmake-3.25.0/share/cmake-3.25/Modules/FindPkgConfig.cmake:99 (find_package_handle_standard_args)
+[0.332s]   /usr/lib/x86_64-linux-gnu/cmake/gazebo/gazebo-config.cmake:72 (include)
+[0.332s]   /opt/ros/galactic/share/gazebo_dev/cmake/gazebo_dev-extras.cmake:2 (find_package)
+[0.332s]   /opt/ros/galactic/share/gazebo_dev/cmake/gazebo_devConfig.cmake:41 (include)
+[0.332s]   /opt/ros/galactic/share/gazebo_ros/cmake/ament_cmake_export_dependencies-extras.cmake:21 (find_package)
+[0.332s]   /opt/ros/galactic/share/gazebo_ros/cmake/gazebo_rosConfig.cmake:41 (include)
+[0.332s]   CMakeLists.txt:11 (find_package)
+[0.332s] This warning is for project developers.  Use -Wno-dev to suppress it.
+[0.332s] [0m
+[0.362s] -- Found DART: /usr/include (Required is at least version "6.6") found components: dart 
+[0.384s] -- Found Protobuf: /usr/lib/x86_64-linux-gnu/libprotobuf.so;-lpthread (found version "3.6.1") 
+[0.385s] -- Looking for ignition-math6 -- found version 6.15.1
+[0.388s] -- Searching for dependencies of ignition-math6
+[0.389s] -- Looking for OGRE...
+[0.393s] -- Found Ogre Ghadamon (1.9.0)
+[0.393s] -- Found OGRE: optimized;/usr/lib/x86_64-linux-gnu/libOgreMain.so;debug;/usr/lib/x86_64-linux-gnu/libOgreMain.so
+[0.400s] -- Looking for OGRE_Paging...
+[0.400s] -- Found OGRE_Paging: optimized;/usr/lib/x86_64-linux-gnu/libOgrePaging.so;debug;/usr/lib/x86_64-linux-gnu/libOgrePaging.so
+[0.400s] -- Looking for OGRE_Terrain...
+[0.400s] -- Found OGRE_Terrain: optimized;/usr/lib/x86_64-linux-gnu/libOgreTerrain.so;debug;/usr/lib/x86_64-linux-gnu/libOgreTerrain.so
+[0.400s] -- Looking for OGRE_Property...
+[0.401s] -- Found OGRE_Property: optimized;/usr/lib/x86_64-linux-gnu/libOgreProperty.so;debug;/usr/lib/x86_64-linux-gnu/libOgreProperty.so
+[0.401s] -- Looking for OGRE_RTShaderSystem...
+[0.401s] -- Found OGRE_RTShaderSystem: optimized;/usr/lib/x86_64-linux-gnu/libOgreRTShaderSystem.so;debug;/usr/lib/x86_64-linux-gnu/libOgreRTShaderSystem.so
+[0.401s] -- Looking for OGRE_Volume...
+[0.401s] -- Found OGRE_Volume: optimized;/usr/lib/x86_64-linux-gnu/libOgreVolume.so;debug;/usr/lib/x86_64-linux-gnu/libOgreVolume.so
+[0.401s] -- Looking for OGRE_Overlay...
+[0.401s] -- Found OGRE_Overlay: optimized;/usr/lib/x86_64-linux-gnu/libOgreOverlay.so;debug;/usr/lib/x86_64-linux-gnu/libOgreOverlay.so
+[0.541s] -- Looking for ignition-math6 -- found version 6.15.1
+[0.542s] -- Looking for ignition-transport8 -- found version 8.3.0
+[0.542s] -- Searching for dependencies of ignition-transport8
+[0.556s] -- Found Protobuf: /usr/lib/x86_64-linux-gnu/libprotobuf.so;-lpthread (found suitable version "3.6.1", minimum required is "3") 
+[0.564s] -- Config-file not installed for ZeroMQ -- checking for pkg-config
+[0.567s] -- Checking for module 'libzmq >= 4'
+[0.578s] --   Found libzmq , version 4.3.2
+[0.607s] -- Checking for module 'uuid'
+[0.617s] --   Found uuid, version 2.34.0
+[0.642s] -- Looking for ignition-msgs5 -- found version 5.10.0
+[0.642s] -- Searching for dependencies of ignition-msgs5
+[0.657s] -- Looking for ignition-math6 -- found version 6.15.1
+[0.660s] -- Checking for module 'tinyxml2'
+[0.670s] --   Found tinyxml2, version 6.2.0
+[0.696s] -- Looking for ignition-msgs5 -- found version 5.10.0
+[0.696s] -- Looking for ignition-common3 -- found version 3.14.2
+[0.697s] -- Searching for dependencies of ignition-common3
+[0.697s] -- Looking for dlfcn.h - found
+[0.697s] -- Looking for libdl - found
+[0.705s] -- Searching for <ignition-common3> component [graphics]
+[0.705s] -- Looking for ignition-common3-graphics -- found version 3.14.2
+[0.706s] -- Searching for dependencies of ignition-common3-graphics
+[0.706s] -- Looking for ignition-math6 -- found version 6.15.1
+[0.707s] -- Looking for ignition-fuel_tools4 -- found version 4.6.0
+[0.707s] -- Searching for dependencies of ignition-fuel_tools4
+[0.736s] -- Checking for module 'jsoncpp'
+[0.746s] --   Found jsoncpp, version 1.7.4
+[0.773s] -- Checking for module 'libzip'
+[0.783s] --   Found libzip, version 1.5.1
+[0.808s] -- Looking for ignition-common3 -- found version 3.14.2
+[0.809s] -- Looking for ignition-math6 -- found version 6.15.1
+[0.809s] -- Looking for ignition-msgs5 -- found version 5.10.0
+[0.810s] -- Gazebo version: 11.11
+[0.815s] [31mCMake Error at /opt/ros/galactic/share/ament_cmake_target_dependencies/cmake/ament_target_dependencies.cmake:77 (message):
+[0.815s]   ament_target_dependencies() the passed package name 'xacro' was not found
+[0.815s]   before
+[0.815s] Call Stack (most recent call first):
+[0.815s]   CMakeLists.txt:19 (ament_target_dependencies)
+[0.815s] 
+[0.815s] [0m
+[0.815s] -- Configuring incomplete, errors occurred!
+[0.815s] See also "/home/shan2/Mypro/robot_vacuum_ws/build/vacuum_robot/CMakeFiles/CMakeOutput.log".
+[0.815s] See also "/home/shan2/Mypro/robot_vacuum_ws/build/vacuum_robot/CMakeFiles/CMakeError.log".
+[0.823s] Invoked command in '/home/shan2/Mypro/robot_vacuum_ws/build/vacuum_robot' returned '1': CMAKE_PREFIX_PATH=/opt/ros/galactic /usr/bin/cmake /home/shan2/Mypro/robot_vacuum_ws/src/vacuum_robot -DCMAKE_INSTALL_PREFIX=/home/shan2/Mypro/robot_vacuum_ws/install/vacuum_robot

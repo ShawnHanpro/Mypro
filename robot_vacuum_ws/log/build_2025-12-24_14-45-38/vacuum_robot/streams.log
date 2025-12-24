@@ -1,0 +1,122 @@
+[0.008s] Invoking command in '/home/shan2/Mypro/robot_vacuum_ws/build/vacuum_robot': CMAKE_PREFIX_PATH=/opt/ros/galactic /usr/bin/cmake /home/shan2/Mypro/robot_vacuum_ws/src/vacuum_robot -DCMAKE_INSTALL_PREFIX=/home/shan2/Mypro/robot_vacuum_ws/install/vacuum_robot
+[0.014s] -- Found ament_cmake: 1.1.6 (/opt/ros/galactic/share/ament_cmake/cmake)
+[0.028s] -- Using PYTHON_EXECUTABLE: /usr/bin/python3
+[0.068s] -- Found gazebo_ros: 3.5.2 (/opt/ros/galactic/share/gazebo_ros/cmake)
+[0.098s] -- Using all available rosidl_typesupport_c: rosidl_typesupport_fastrtps_c;rosidl_typesupport_introspection_c
+[0.100s] -- Found rosidl_adapter: 2.2.3 (/opt/ros/galactic/share/rosidl_adapter/cmake)
+[0.186s] -- Using all available rosidl_typesupport_cpp: rosidl_typesupport_fastrtps_cpp;rosidl_typesupport_introspection_cpp
+[0.218s] -- Found rmw_implementation_cmake: 3.3.1 (/opt/ros/galactic/share/rmw_implementation_cmake/cmake)
+[0.219s] -- Found rmw_cyclonedds_cpp: 0.22.6 (/opt/ros/galactic/share/rmw_cyclonedds_cpp/cmake)
+[0.233s] -- Using RMW implementation 'rmw_cyclonedds_cpp' as default
+[0.330s] [33mCMake Warning (dev) at /opt/cmake-3.25.0/share/cmake-3.25/Modules/FindPackageHandleStandardArgs.cmake:438 (message):
+[0.330s]   The package name passed to `find_package_handle_standard_args` (PkgConfig)
+[0.330s]   does not match the name of the calling package (gazebo).  This can lead to
+[0.331s]   problems in calling code that expects `find_package` result variables
+[0.331s]   (e.g., `_FOUND`) to follow a certain pattern.
+[0.331s] Call Stack (most recent call first):
+[0.331s]   /opt/cmake-3.25.0/share/cmake-3.25/Modules/FindPkgConfig.cmake:99 (find_package_handle_standard_args)
+[0.331s]   /usr/lib/x86_64-linux-gnu/cmake/gazebo/gazebo-config.cmake:72 (include)
+[0.331s]   /opt/ros/galactic/share/gazebo_dev/cmake/gazebo_dev-extras.cmake:2 (find_package)
+[0.331s]   /opt/ros/galactic/share/gazebo_dev/cmake/gazebo_devConfig.cmake:41 (include)
+[0.331s]   /opt/ros/galactic/share/gazebo_ros/cmake/ament_cmake_export_dependencies-extras.cmake:21 (find_package)
+[0.331s]   /opt/ros/galactic/share/gazebo_ros/cmake/gazebo_rosConfig.cmake:41 (include)
+[0.331s]   CMakeLists.txt:11 (find_package)
+[0.331s] This warning is for project developers.  Use -Wno-dev to suppress it.
+[0.331s] [0m
+[0.364s] -- Found DART: /usr/include (Required is at least version "6.6") found components: dart 
+[0.390s] -- Found Protobuf: /usr/lib/x86_64-linux-gnu/libprotobuf.so;-lpthread (found version "3.6.1") 
+[0.391s] -- Looking for ignition-math6 -- found version 6.15.1
+[0.395s] -- Searching for dependencies of ignition-math6
+[0.396s] -- Looking for OGRE...
+[0.400s] -- Found Ogre Ghadamon (1.9.0)
+[0.401s] -- Found OGRE: optimized;/usr/lib/x86_64-linux-gnu/libOgreMain.so;debug;/usr/lib/x86_64-linux-gnu/libOgreMain.so
+[0.410s] -- Looking for OGRE_Paging...
+[0.410s] -- Found OGRE_Paging: optimized;/usr/lib/x86_64-linux-gnu/libOgrePaging.so;debug;/usr/lib/x86_64-linux-gnu/libOgrePaging.so
+[0.410s] -- Looking for OGRE_Terrain...
+[0.410s] -- Found OGRE_Terrain: optimized;/usr/lib/x86_64-linux-gnu/libOgreTerrain.so;debug;/usr/lib/x86_64-linux-gnu/libOgreTerrain.so
+[0.410s] -- Looking for OGRE_Property...
+[0.410s] -- Found OGRE_Property: optimized;/usr/lib/x86_64-linux-gnu/libOgreProperty.so;debug;/usr/lib/x86_64-linux-gnu/libOgreProperty.so
+[0.410s] -- Looking for OGRE_RTShaderSystem...
+[0.410s] -- Found OGRE_RTShaderSystem: optimized;/usr/lib/x86_64-linux-gnu/libOgreRTShaderSystem.so;debug;/usr/lib/x86_64-linux-gnu/libOgreRTShaderSystem.so
+[0.410s] -- Looking for OGRE_Volume...
+[0.410s] -- Found OGRE_Volume: optimized;/usr/lib/x86_64-linux-gnu/libOgreVolume.so;debug;/usr/lib/x86_64-linux-gnu/libOgreVolume.so
+[0.410s] -- Looking for OGRE_Overlay...
+[0.410s] -- Found OGRE_Overlay: optimized;/usr/lib/x86_64-linux-gnu/libOgreOverlay.so;debug;/usr/lib/x86_64-linux-gnu/libOgreOverlay.so
+[0.566s] -- Looking for ignition-math6 -- found version 6.15.1
+[0.566s] -- Looking for ignition-transport8 -- found version 8.3.0
+[0.566s] -- Searching for dependencies of ignition-transport8
+[0.580s] -- Found Protobuf: /usr/lib/x86_64-linux-gnu/libprotobuf.so;-lpthread (found suitable version "3.6.1", minimum required is "3") 
+[0.589s] -- Config-file not installed for ZeroMQ -- checking for pkg-config
+[0.592s] -- Checking for module 'libzmq >= 4'
+[0.602s] --   Found libzmq , version 4.3.2
+[0.632s] -- Checking for module 'uuid'
+[0.641s] --   Found uuid, version 2.34.0
+[0.665s] -- Looking for ignition-msgs5 -- found version 5.10.0
+[0.665s] -- Searching for dependencies of ignition-msgs5
+[0.679s] -- Looking for ignition-math6 -- found version 6.15.1
+[0.683s] -- Checking for module 'tinyxml2'
+[0.692s] --   Found tinyxml2, version 6.2.0
+[0.718s] -- Looking for ignition-msgs5 -- found version 5.10.0
+[0.718s] -- Looking for ignition-common3 -- found version 3.14.2
+[0.718s] -- Searching for dependencies of ignition-common3
+[0.718s] -- Looking for dlfcn.h - found
+[0.718s] -- Looking for libdl - found
+[0.727s] -- Searching for <ignition-common3> component [graphics]
+[0.727s] -- Looking for ignition-common3-graphics -- found version 3.14.2
+[0.727s] -- Searching for dependencies of ignition-common3-graphics
+[0.727s] -- Looking for ignition-math6 -- found version 6.15.1
+[0.728s] -- Looking for ignition-fuel_tools4 -- found version 4.6.0
+[0.728s] -- Searching for dependencies of ignition-fuel_tools4
+[0.758s] -- Checking for module 'jsoncpp'
+[0.767s] --   Found jsoncpp, version 1.7.4
+[0.797s] -- Checking for module 'libzip'
+[0.807s] --   Found libzip, version 1.5.1
+[0.832s] -- Looking for ignition-common3 -- found version 3.14.2
+[0.832s] -- Looking for ignition-math6 -- found version 6.15.1
+[0.833s] -- Looking for ignition-msgs5 -- found version 5.10.0
+[0.833s] -- Gazebo version: 11.11
+[0.847s] -- Found ament_lint_auto: 0.10.7 (/opt/ros/galactic/share/ament_lint_auto/cmake)
+[0.902s] -- Added test 'copyright' to check source files copyright and LICENSE
+[0.903s] -- Added test 'cppcheck' to perform static code analysis on C / C++ code
+[0.903s] -- Configured cppcheck include dirs: $<BUILD_INTERFACE:/home/shan2/Mypro/robot_vacuum_ws/src/vacuum_robot/include>
+[0.903s] -- Configured cppcheck exclude dirs and/or files: 
+[0.904s] -- Added test 'cpplint' to check C / C++ code against the Google style
+[0.904s] -- Configured cpplint exclude dirs and/or files: 
+[0.904s] -- Added test 'flake8' to check Python code syntax and style conventions
+[0.905s] -- Added test 'lint_cmake' to check CMake code style
+[0.905s] -- Added test 'pep257' to check Python code against some of the style conventions in PEP 257
+[0.906s] -- Added test 'uncrustify' to check C / C++ code style
+[0.906s] -- Configured uncrustify additional arguments: 
+[0.906s] -- Added test 'xmllint' to check XML markup files
+[0.907s] -- Configuring done
+[0.912s] -- Generating done
+[0.914s] -- Build files have been written to: /home/shan2/Mypro/robot_vacuum_ws/build/vacuum_robot
+[0.922s] Invoked command in '/home/shan2/Mypro/robot_vacuum_ws/build/vacuum_robot' returned '0': CMAKE_PREFIX_PATH=/opt/ros/galactic /usr/bin/cmake /home/shan2/Mypro/robot_vacuum_ws/src/vacuum_robot -DCMAKE_INSTALL_PREFIX=/home/shan2/Mypro/robot_vacuum_ws/install/vacuum_robot
+[0.924s] Invoking command in '/home/shan2/Mypro/robot_vacuum_ws/build/vacuum_robot': CMAKE_PREFIX_PATH=/opt/ros/galactic /usr/bin/cmake --build /home/shan2/Mypro/robot_vacuum_ws/build/vacuum_robot -- -j16 -l16
+[0.938s] [ 50%] [32mBuilding CXX object CMakeFiles/vacuum_robot_node.dir/src/vacuum_robot_node.cpp.o[0m
+[0.954s] [100%] [32m[1mLinking CXX executable vacuum_robot_node[0m
+[0.974s] [100%] Built target vacuum_robot_node
+[0.977s] Invoked command in '/home/shan2/Mypro/robot_vacuum_ws/build/vacuum_robot' returned '0': CMAKE_PREFIX_PATH=/opt/ros/galactic /usr/bin/cmake --build /home/shan2/Mypro/robot_vacuum_ws/build/vacuum_robot -- -j16 -l16
+[0.981s] Invoking command in '/home/shan2/Mypro/robot_vacuum_ws/build/vacuum_robot': CMAKE_PREFIX_PATH=/opt/ros/galactic /usr/bin/cmake --install /home/shan2/Mypro/robot_vacuum_ws/build/vacuum_robot
+[0.983s] -- Install configuration: ""
+[0.983s] -- Installing: /home/shan2/Mypro/robot_vacuum_ws/install/vacuum_robot/share/vacuum_robot/urdf
+[0.983s] -- Installing: /home/shan2/Mypro/robot_vacuum_ws/install/vacuum_robot/share/vacuum_robot/urdf/robot.urdf.xacro
+[0.983s] -- Installing: /home/shan2/Mypro/robot_vacuum_ws/install/vacuum_robot/share/vacuum_robot/launch
+[0.983s] -- Installing: /home/shan2/Mypro/robot_vacuum_ws/install/vacuum_robot/share/vacuum_robot/launch/vacuum_robot.launch.py
+[0.983s] -- Installing: /home/shan2/Mypro/robot_vacuum_ws/install/vacuum_robot/share/vacuum_robot/config
+[0.983s] -- Installing: /home/shan2/Mypro/robot_vacuum_ws/install/vacuum_robot/share/ament_index/resource_index/package_run_dependencies/vacuum_robot
+[0.983s] -- Installing: /home/shan2/Mypro/robot_vacuum_ws/install/vacuum_robot/share/ament_index/resource_index/parent_prefix_path/vacuum_robot
+[0.983s] -- Installing: /home/shan2/Mypro/robot_vacuum_ws/install/vacuum_robot/share/vacuum_robot/environment/ament_prefix_path.sh
+[0.983s] -- Installing: /home/shan2/Mypro/robot_vacuum_ws/install/vacuum_robot/share/vacuum_robot/environment/ament_prefix_path.dsv
+[0.983s] -- Installing: /home/shan2/Mypro/robot_vacuum_ws/install/vacuum_robot/share/vacuum_robot/environment/path.sh
+[0.983s] -- Installing: /home/shan2/Mypro/robot_vacuum_ws/install/vacuum_robot/share/vacuum_robot/environment/path.dsv
+[0.983s] -- Installing: /home/shan2/Mypro/robot_vacuum_ws/install/vacuum_robot/share/vacuum_robot/local_setup.bash
+[0.983s] -- Installing: /home/shan2/Mypro/robot_vacuum_ws/install/vacuum_robot/share/vacuum_robot/local_setup.sh
+[0.984s] -- Installing: /home/shan2/Mypro/robot_vacuum_ws/install/vacuum_robot/share/vacuum_robot/local_setup.zsh
+[0.984s] -- Installing: /home/shan2/Mypro/robot_vacuum_ws/install/vacuum_robot/share/vacuum_robot/local_setup.dsv
+[0.984s] -- Installing: /home/shan2/Mypro/robot_vacuum_ws/install/vacuum_robot/share/vacuum_robot/package.dsv
+[0.984s] -- Installing: /home/shan2/Mypro/robot_vacuum_ws/install/vacuum_robot/share/ament_index/resource_index/packages/vacuum_robot
+[0.984s] -- Installing: /home/shan2/Mypro/robot_vacuum_ws/install/vacuum_robot/share/vacuum_robot/cmake/vacuum_robotConfig.cmake
+[0.984s] -- Installing: /home/shan2/Mypro/robot_vacuum_ws/install/vacuum_robot/share/vacuum_robot/cmake/vacuum_robotConfig-version.cmake
+[0.984s] -- Installing: /home/shan2/Mypro/robot_vacuum_ws/install/vacuum_robot/share/vacuum_robot/package.xml
+[0.985s] Invoked command in '/home/shan2/Mypro/robot_vacuum_ws/build/vacuum_robot' returned '0': CMAKE_PREFIX_PATH=/opt/ros/galactic /usr/bin/cmake --install /home/shan2/Mypro/robot_vacuum_ws/build/vacuum_robot

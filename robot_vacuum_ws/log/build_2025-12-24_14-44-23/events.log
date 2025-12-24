@@ -1,0 +1,102 @@
+[0.000000] (-) TimerEvent: {}
+[0.000396] (vacuum_robot) JobQueued: {'identifier': 'vacuum_robot', 'dependencies': OrderedDict()}
+[0.000852] (vacuum_robot) JobStarted: {'identifier': 'vacuum_robot'}
+[0.006867] (vacuum_robot) JobProgress: {'identifier': 'vacuum_robot', 'progress': 'cmake'}
+[0.007668] (vacuum_robot) Command: {'cmd': ['/usr/bin/cmake', '/home/shan2/Mypro/robot_vacuum_ws/src/vacuum_robot', '-DCMAKE_INSTALL_PREFIX=/home/shan2/Mypro/robot_vacuum_ws/install/vacuum_robot'], 'cwd': '/home/shan2/Mypro/robot_vacuum_ws/build/vacuum_robot', 'env': OrderedDict([('GJS_DEBUG_TOPICS', 'JS ERROR;JS LOG'), ('LESSOPEN', '| /usr/bin/lesspipe %s'), ('LANGUAGE', 'zh_CN:en'), ('USER', 'shan2'), ('LC_TIME', 'zh_CN.UTF-8'), ('SSH_AGENT_PID', '7402'), ('XDG_SESSION_TYPE', 'x11'), ('DA_SESSION_ID_AUTH', '4fb428a8-6429-4b45-b7dd-155fe8918782'), ('SHLVL', '1'), ('CDC_JOINED_DOMAIN', 'wardrobe.irobot.com'), ('LD_LIBRARY_PATH', '/usr/lib/x86_64-linux-gnu/gazebo-11/plugins:/opt/ros/galactic/opt/yaml_cpp_vendor/lib:/opt/ros/galactic/opt/rviz_ogre_vendor/lib:/opt/ros/galactic/lib/x86_64-linux-gnu:/opt/ros/galactic/lib'), ('QT4_IM_MODULE', 'fcitx'), ('HOME', '/home/shan2'), ('OLDPWD', '/home/shan2/Mypro/robot_vacuum_ws/src'), ('DESKTOP_SESSION', 'ubuntu'), ('GIO_LAUNCHED_DESKTOP_FILE', '/usr/share/applications/terminator.desktop'), ('ROS_PYTHON_VERSION', '3'), ('GNOME_SHELL_SESSION_MODE', 'ubuntu'), ('GTK_MODULES', 'gail:atk-bridge'), ('XDG_SEAT_PATH', '/org/freedesktop/DisplayManager/Seat0'), ('LC_MONETARY', 'zh_CN.UTF-8'), ('MANAGERPID', '7324'), ('DBUS_SESSION_BUS_ADDRESS', 'unix:path=/run/user/612592084/bus'), ('COLORTERM', 'truecolor'), ('TERMINATOR_DBUS_NAME', 'net.tenshu.Terminator21a9d5db22c73a993ff0b42f64b396873'), ('CDC_JOINED_DC', 'gz-dcw-01.wardrobe.irobot.com'), ('GIO_LAUNCHED_DESKTOP_FILE_PID', '117871'), ('IM_CONFIG_PHASE', '1'), ('ROS_DISTRO', 'galactic'), ('GTK_IM_MODULE', 'fcitx'), ('LOGNAME', 'shan2'), ('JOURNAL_STREAM', '8:59657'), ('_', '/usr/bin/colcon'), ('ROS_VERSION', '2'), ('XDG_SESSION_CLASS', 'user'), ('TERM', 'xterm-256color'), ('GNOME_DESKTOP_SESSION_ID', 'this-is-deprecated'), ('ROS_LOCALHOST_ONLY', '0'), ('PATH', '/opt/ros/galactic/bin:/home/shan2/.local/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:/usr/games:/usr/local/games:/snap/bin'), ('SESSION_MANAGER', 'local/APAC-CS7J7M3:@/tmp/.ICE-unix/7447,unix/APAC-CS7J7M3:/tmp/.ICE-unix/7447'), ('GDM_LANG', 'zh_CN'), ('INVOCATION_ID', '8d57344689d64b1dbb96421e76af5d66'), ('PAPERSIZE', 'a4'), ('XDG_SESSION_PATH', '/org/freedesktop/DisplayManager/Session0'), ('XDG_MENU_PREFIX', 'gnome-'), ('LC_ADDRESS', 'zh_CN.UTF-8'), ('XDG_RUNTIME_DIR', '/run/user/612592084'), ('CDC_LOCALHOST', 'APAC-CS7J7M3.wardrobe.irobot.com'), ('DISPLAY', ':0'), ('TERMINATOR_DBUS_PATH', '/net/tenshu/Terminator2'), ('USER_PRINCIPAL_NAME', 'shan2@WARDROBE.IROBOT.COM'), ('LANG', 'zh_CN.UTF-8'), ('XDG_CURRENT_DESKTOP', 'ubuntu:GNOME'), ('CDC_PREW2KHOST', 'APAC-CS7J7M3'), ('LC_TELEPHONE', 'zh_CN.UTF-8'), ('XMODIFIERS', '@im=fcitx'), ('XDG_SESSION_DESKTOP', 'ubuntu'), ('XAUTHORITY', '/home/shan2/.Xauthority'), ('LS_COLORS', 'rs=0:di=01;34:ln=01;36:mh=00:pi=40;33:so=01;35:do=01;35:bd=40;33;01:cd=40;33;01:or=40;31;01:mi=00:su=37;41:sg=30;43:ca=30;41:tw=30;42:ow=34;42:st=37;44:ex=01;32:*.tar=01;31:*.tgz=01;31:*.arc=01;31:*.arj=01;31:*.taz=01;31:*.lha=01;31:*.lz4=01;31:*.lzh=01;31:*.lzma=01;31:*.tlz=01;31:*.txz=01;31:*.tzo=01;31:*.t7z=01;31:*.zip=01;31:*.z=01;31:*.dz=01;31:*.gz=01;31:*.lrz=01;31:*.lz=01;31:*.lzo=01;31:*.xz=01;31:*.zst=01;31:*.tzst=01;31:*.bz2=01;31:*.bz=01;31:*.tbz=01;31:*.tbz2=01;31:*.tz=01;31:*.deb=01;31:*.rpm=01;31:*.jar=01;31:*.war=01;31:*.ear=01;31:*.sar=01;31:*.rar=01;31:*.alz=01;31:*.ace=01;31:*.zoo=01;31:*.cpio=01;31:*.7z=01;31:*.rz=01;31:*.cab=01;31:*.wim=01;31:*.swm=01;31:*.dwm=01;31:*.esd=01;31:*.jpg=01;35:*.jpeg=01;35:*.mjpg=01;35:*.mjpeg=01;35:*.gif=01;35:*.bmp=01;35:*.pbm=01;35:*.pgm=01;35:*.ppm=01;35:*.tga=01;35:*.xbm=01;35:*.xpm=01;35:*.tif=01;35:*.tiff=01;35:*.png=01;35:*.svg=01;35:*.svgz=01;35:*.mng=01;35:*.pcx=01;35:*.mov=01;35:*.mpg=01;35:*.mpeg=01;35:*.m2v=01;35:*.mkv=01;35:*.webm=01;35:*.ogm=01;35:*.mp4=01;35:*.m4v=01;35:*.mp4v=01;35:*.vob=01;35:*.qt=01;35:*.nuv=01;35:*.wmv=01;35:*.asf=01;35:*.rm=01;35:*.rmvb=01;35:*.flc=01;35:*.avi=01;35:*.fli=01;35:*.flv=01;35:*.gl=01;35:*.dl=01;35:*.xcf=01;35:*.xwd=01;35:*.yuv=01;35:*.cgm=01;35:*.emf=01;35:*.ogv=01;35:*.ogx=01;35:*.aac=00;36:*.au=00;36:*.flac=00;36:*.m4a=00;36:*.mid=00;36:*.midi=00;36:*.mka=00;36:*.mp3=00;36:*.mpc=00;36:*.ogg=00;36:*.ra=00;36:*.wav=00;36:*.oga=00;36:*.opus=00;36:*.spx=00;36:*.xspf=00;36:'), ('SSH_AUTH_SOCK', '/run/user/612592084/keyring/ssh'), ('ROS_DOMAIN_ID', '25'), ('XDG_GREETER_DATA_DIR', '/var/lib/lightdm-data/shan2'), ('AMENT_PREFIX_PATH', '/opt/ros/galactic'), ('SHELL', '/bin/bash'), ('LC_NAME', 'zh_CN.UTF-8'), ('TERMINATOR_UUID', 'urn:uuid:2f8181d4-99b7-42da-bca1-e51e1a575736'), ('QT_ACCESSIBILITY', '1'), ('GDMSESSION', 'ubuntu'), ('LESSCLOSE', '/usr/bin/lesspipe %s %s'), ('CDC_JOINED_SITE', 'Guangzhou'), ('LC_MEASUREMENT', 'zh_CN.UTF-8'), ('GPG_AGENT_INFO', '/run/user/612592084/gnupg/S.gpg-agent:0:1'), ('GJS_DEBUG_OUTPUT', 'stderr'), ('LC_IDENTIFICATION', 'zh_CN.UTF-8'), ('QT_IM_MODULE', 'fcitx'), ('PWD', '/home/shan2/Mypro/robot_vacuum_ws/build/vacuum_robot'), ('LC_ALL', 'en_US.UTF-8'), ('XDG_CONFIG_DIRS', '/etc/xdg/xdg-ubuntu:/etc/xdg'), ('CLUTTER_IM_MODULE', 'fcitx'), ('XDG_DATA_DIRS', '/usr/share/ubuntu:/usr/local/share:/usr/share:/var/lib/snapd/desktop'), ('PYTHONPATH', '/opt/ros/galactic/lib/python3.8/site-packages'), ('LC_NUMERIC', 'zh_CN.UTF-8'), ('LC_PAPER', 'zh_CN.UTF-8'), ('COLCON', '1'), ('VTE_VERSION', '6003'), ('CDC_JOINED_ZONE', 'DC=wardrobe,DC=irobot,DC=com'), ('CMAKE_PREFIX_PATH', '/opt/ros/galactic')]), 'shell': False}
+[0.016374] (vacuum_robot) StdoutLine: {'line': b'-- Found ament_cmake: 1.1.6 (/opt/ros/galactic/share/ament_cmake/cmake)\n'}
+[0.030958] (vacuum_robot) StdoutLine: {'line': b'-- Using PYTHON_EXECUTABLE: /usr/bin/python3\n'}
+[0.071400] (vacuum_robot) StdoutLine: {'line': b'-- Found gazebo_ros: 3.5.2 (/opt/ros/galactic/share/gazebo_ros/cmake)\n'}
+[0.096816] (vacuum_robot) StdoutLine: {'line': b'-- Using all available rosidl_typesupport_c: rosidl_typesupport_fastrtps_c;rosidl_typesupport_introspection_c\n'}
+[0.098997] (vacuum_robot) StdoutLine: {'line': b'-- Found rosidl_adapter: 2.2.3 (/opt/ros/galactic/share/rosidl_adapter/cmake)\n'}
+[0.099931] (-) TimerEvent: {}
+[0.189131] (vacuum_robot) StdoutLine: {'line': b'-- Using all available rosidl_typesupport_cpp: rosidl_typesupport_fastrtps_cpp;rosidl_typesupport_introspection_cpp\n'}
+[0.200023] (-) TimerEvent: {}
+[0.220928] (vacuum_robot) StdoutLine: {'line': b'-- Found rmw_implementation_cmake: 3.3.1 (/opt/ros/galactic/share/rmw_implementation_cmake/cmake)\n'}
+[0.222079] (vacuum_robot) StdoutLine: {'line': b'-- Found rmw_cyclonedds_cpp: 0.22.6 (/opt/ros/galactic/share/rmw_cyclonedds_cpp/cmake)\n'}
+[0.235607] (vacuum_robot) StdoutLine: {'line': b"-- Using RMW implementation 'rmw_cyclonedds_cpp' as default\n"}
+[0.300133] (-) TimerEvent: {}
+[0.332394] (vacuum_robot) StderrLine: {'line': b'\x1b[33mCMake Warning (dev) at /opt/cmake-3.25.0/share/cmake-3.25/Modules/FindPackageHandleStandardArgs.cmake:438 (message):\n'}
+[0.332558] (vacuum_robot) StderrLine: {'line': b'  The package name passed to `find_package_handle_standard_args` (PkgConfig)\n'}
+[0.332604] (vacuum_robot) StderrLine: {'line': b'  does not match the name of the calling package (gazebo).  This can lead to\n'}
+[0.332643] (vacuum_robot) StderrLine: {'line': b'  problems in calling code that expects `find_package` result variables\n'}
+[0.332680] (vacuum_robot) StderrLine: {'line': b'  (e.g., `_FOUND`) to follow a certain pattern.\n'}
+[0.332717] (vacuum_robot) StderrLine: {'line': b'Call Stack (most recent call first):\n'}
+[0.332753] (vacuum_robot) StderrLine: {'line': b'  /opt/cmake-3.25.0/share/cmake-3.25/Modules/FindPkgConfig.cmake:99 (find_package_handle_standard_args)\n'}
+[0.332790] (vacuum_robot) StderrLine: {'line': b'  /usr/lib/x86_64-linux-gnu/cmake/gazebo/gazebo-config.cmake:72 (include)\n'}
+[0.332826] (vacuum_robot) StderrLine: {'line': b'  /opt/ros/galactic/share/gazebo_dev/cmake/gazebo_dev-extras.cmake:2 (find_package)\n'}
+[0.332865] (vacuum_robot) StderrLine: {'line': b'  /opt/ros/galactic/share/gazebo_dev/cmake/gazebo_devConfig.cmake:41 (include)\n'}
+[0.332902] (vacuum_robot) StderrLine: {'line': b'  /opt/ros/galactic/share/gazebo_ros/cmake/ament_cmake_export_dependencies-extras.cmake:21 (find_package)\n'}
+[0.332937] (vacuum_robot) StderrLine: {'line': b'  /opt/ros/galactic/share/gazebo_ros/cmake/gazebo_rosConfig.cmake:41 (include)\n'}
+[0.332973] (vacuum_robot) StderrLine: {'line': b'  CMakeLists.txt:11 (find_package)\n'}
+[0.333009] (vacuum_robot) StderrLine: {'line': b'This warning is for project developers.  Use -Wno-dev to suppress it.\n'}
+[0.333045] (vacuum_robot) StderrLine: {'line': b'\x1b[0m\n'}
+[0.362820] (vacuum_robot) StdoutLine: {'line': b'-- Found DART: /usr/include (Required is at least version "6.6") found components: dart \n'}
+[0.384928] (vacuum_robot) StdoutLine: {'line': b'-- Found Protobuf: /usr/lib/x86_64-linux-gnu/libprotobuf.so;-lpthread (found version "3.6.1") \n'}
+[0.385914] (vacuum_robot) StdoutLine: {'line': b'-- Looking for ignition-math6 -- found version 6.15.1\n'}
+[0.388984] (vacuum_robot) StdoutLine: {'line': b'-- Searching for dependencies of ignition-math6\n'}
+[0.390024] (vacuum_robot) StdoutLine: {'line': b'-- Looking for OGRE...\n'}
+[0.393666] (vacuum_robot) StdoutLine: {'line': b'-- Found Ogre Ghadamon (1.9.0)\n'}
+[0.393814] (vacuum_robot) StdoutLine: {'line': b'-- Found OGRE: optimized;/usr/lib/x86_64-linux-gnu/libOgreMain.so;debug;/usr/lib/x86_64-linux-gnu/libOgreMain.so\n'}
+[0.400294] (-) TimerEvent: {}
+[0.400849] (vacuum_robot) StdoutLine: {'line': b'-- Looking for OGRE_Paging...\n'}
+[0.400967] (vacuum_robot) StdoutLine: {'line': b'-- Found OGRE_Paging: optimized;/usr/lib/x86_64-linux-gnu/libOgrePaging.so;debug;/usr/lib/x86_64-linux-gnu/libOgrePaging.so\n'}
+[0.401017] (vacuum_robot) StdoutLine: {'line': b'-- Looking for OGRE_Terrain...\n'}
+[0.401177] (vacuum_robot) StdoutLine: {'line': b'-- Found OGRE_Terrain: optimized;/usr/lib/x86_64-linux-gnu/libOgreTerrain.so;debug;/usr/lib/x86_64-linux-gnu/libOgreTerrain.so\n'}
+[0.401282] (vacuum_robot) StdoutLine: {'line': b'-- Looking for OGRE_Property...\n'}
+[0.401331] (vacuum_robot) StdoutLine: {'line': b'-- Found OGRE_Property: optimized;/usr/lib/x86_64-linux-gnu/libOgreProperty.so;debug;/usr/lib/x86_64-linux-gnu/libOgreProperty.so\n'}
+[0.401473] (vacuum_robot) StdoutLine: {'line': b'-- Looking for OGRE_RTShaderSystem...\n'}
+[0.401544] (vacuum_robot) StdoutLine: {'line': b'-- Found OGRE_RTShaderSystem: optimized;/usr/lib/x86_64-linux-gnu/libOgreRTShaderSystem.so;debug;/usr/lib/x86_64-linux-gnu/libOgreRTShaderSystem.so\n'}
+[0.401588] (vacuum_robot) StdoutLine: {'line': b'-- Looking for OGRE_Volume...\n'}
+[0.401628] (vacuum_robot) StdoutLine: {'line': b'-- Found OGRE_Volume: optimized;/usr/lib/x86_64-linux-gnu/libOgreVolume.so;debug;/usr/lib/x86_64-linux-gnu/libOgreVolume.so\n'}
+[0.401665] (vacuum_robot) StdoutLine: {'line': b'-- Looking for OGRE_Overlay...\n'}
+[0.401703] (vacuum_robot) StdoutLine: {'line': b'-- Found OGRE_Overlay: optimized;/usr/lib/x86_64-linux-gnu/libOgreOverlay.so;debug;/usr/lib/x86_64-linux-gnu/libOgreOverlay.so\n'}
+[0.500410] (-) TimerEvent: {}
+[0.542080] (vacuum_robot) StdoutLine: {'line': b'-- Looking for ignition-math6 -- found version 6.15.1\n'}
+[0.542326] (vacuum_robot) StdoutLine: {'line': b'-- Looking for ignition-transport8 -- found version 8.3.0\n'}
+[0.542688] (vacuum_robot) StdoutLine: {'line': b'-- Searching for dependencies of ignition-transport8\n'}
+[0.556477] (vacuum_robot) StdoutLine: {'line': b'-- Found Protobuf: /usr/lib/x86_64-linux-gnu/libprotobuf.so;-lpthread (found suitable version "3.6.1", minimum required is "3") \n'}
+[0.564970] (vacuum_robot) StdoutLine: {'line': b'-- Config-file not installed for ZeroMQ -- checking for pkg-config\n'}
+[0.568202] (vacuum_robot) StdoutLine: {'line': b"-- Checking for module 'libzmq >= 4'\n"}
+[0.578673] (vacuum_robot) StdoutLine: {'line': b'--   Found libzmq , version 4.3.2\n'}
+[0.600505] (-) TimerEvent: {}
+[0.607939] (vacuum_robot) StdoutLine: {'line': b"-- Checking for module 'uuid'\n"}
+[0.617772] (vacuum_robot) StdoutLine: {'line': b'--   Found uuid, version 2.34.0\n'}
+[0.642697] (vacuum_robot) StdoutLine: {'line': b'-- Looking for ignition-msgs5 -- found version 5.10.0\n'}
+[0.642962] (vacuum_robot) StdoutLine: {'line': b'-- Searching for dependencies of ignition-msgs5\n'}
+[0.657585] (vacuum_robot) StdoutLine: {'line': b'-- Looking for ignition-math6 -- found version 6.15.1\n'}
+[0.660910] (vacuum_robot) StdoutLine: {'line': b"-- Checking for module 'tinyxml2'\n"}
+[0.670904] (vacuum_robot) StdoutLine: {'line': b'--   Found tinyxml2, version 6.2.0\n'}
+[0.696686] (vacuum_robot) StdoutLine: {'line': b'-- Looking for ignition-msgs5 -- found version 5.10.0\n'}
+[0.697002] (vacuum_robot) StdoutLine: {'line': b'-- Looking for ignition-common3 -- found version 3.14.2\n'}
+[0.697392] (vacuum_robot) StdoutLine: {'line': b'-- Searching for dependencies of ignition-common3\n'}
+[0.697529] (vacuum_robot) StdoutLine: {'line': b'-- Looking for dlfcn.h - found\n'}
+[0.697617] (vacuum_robot) StdoutLine: {'line': b'-- Looking for libdl - found\n'}
+[0.700570] (-) TimerEvent: {}
+[0.705825] (vacuum_robot) StdoutLine: {'line': b'-- Searching for <ignition-common3> component [graphics]\n'}
+[0.706135] (vacuum_robot) StdoutLine: {'line': b'-- Looking for ignition-common3-graphics -- found version 3.14.2\n'}
+[0.706537] (vacuum_robot) StdoutLine: {'line': b'-- Searching for dependencies of ignition-common3-graphics\n'}
+[0.706819] (vacuum_robot) StdoutLine: {'line': b'-- Looking for ignition-math6 -- found version 6.15.1\n'}
+[0.707645] (vacuum_robot) StdoutLine: {'line': b'-- Looking for ignition-fuel_tools4 -- found version 4.6.0\n'}
+[0.708000] (vacuum_robot) StdoutLine: {'line': b'-- Searching for dependencies of ignition-fuel_tools4\n'}
+[0.736821] (vacuum_robot) StdoutLine: {'line': b"-- Checking for module 'jsoncpp'\n"}
+[0.746459] (vacuum_robot) StdoutLine: {'line': b'--   Found jsoncpp, version 1.7.4\n'}
+[0.773990] (vacuum_robot) StdoutLine: {'line': b"-- Checking for module 'libzip'\n"}
+[0.784123] (vacuum_robot) StdoutLine: {'line': b'--   Found libzip, version 1.5.1\n'}
+[0.800656] (-) TimerEvent: {}
+[0.809142] (vacuum_robot) StdoutLine: {'line': b'-- Looking for ignition-common3 -- found version 3.14.2\n'}
+[0.809467] (vacuum_robot) StdoutLine: {'line': b'-- Looking for ignition-math6 -- found version 6.15.1\n'}
+[0.809811] (vacuum_robot) StdoutLine: {'line': b'-- Looking for ignition-msgs5 -- found version 5.10.0\n'}
+[0.810701] (vacuum_robot) StdoutLine: {'line': b'-- Gazebo version: 11.11\n'}
+[0.815761] (vacuum_robot) StderrLine: {'line': b'\x1b[31mCMake Error at /opt/ros/galactic/share/ament_cmake_target_dependencies/cmake/ament_target_dependencies.cmake:77 (message):\n'}
+[0.815866] (vacuum_robot) StderrLine: {'line': b"  ament_target_dependencies() the passed package name 'xacro' was not found\n"}
+[0.815911] (vacuum_robot) StderrLine: {'line': b'  before\n'}
+[0.815949] (vacuum_robot) StderrLine: {'line': b'Call Stack (most recent call first):\n'}
+[0.815984] (vacuum_robot) StderrLine: {'line': b'  CMakeLists.txt:19 (ament_target_dependencies)\n'}
+[0.816019] (vacuum_robot) StderrLine: {'line': b'\n'}
+[0.816055] (vacuum_robot) StderrLine: {'line': b'\x1b[0m\n'}
+[0.816090] (vacuum_robot) StdoutLine: {'line': b'-- Configuring incomplete, errors occurred!\n'}
+[0.816129] (vacuum_robot) StdoutLine: {'line': b'See also "/home/shan2/Mypro/robot_vacuum_ws/build/vacuum_robot/CMakeFiles/CMakeOutput.log".\n'}
+[0.816165] (vacuum_robot) StdoutLine: {'line': b'See also "/home/shan2/Mypro/robot_vacuum_ws/build/vacuum_robot/CMakeFiles/CMakeError.log".\n'}
+[0.824131] (vacuum_robot) CommandEnded: {'returncode': 1}
+[0.835323] (vacuum_robot) JobEnded: {'identifier': 'vacuum_robot', 'rc': 1}
+[0.845918] (-) EventReactorShutdown: {}

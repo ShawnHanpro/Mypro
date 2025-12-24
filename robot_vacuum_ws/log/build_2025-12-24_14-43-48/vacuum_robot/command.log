@@ -1,0 +1,2 @@
+Invoking command in '/home/shan2/Mypro/robot_vacuum_ws/build/vacuum_robot': CMAKE_PREFIX_PATH=/opt/ros/galactic /usr/bin/cmake /home/shan2/Mypro/robot_vacuum_ws/src/vacuum_robot -DCMAKE_INSTALL_PREFIX=/home/shan2/Mypro/robot_vacuum_ws/install/vacuum_robot
+Invoked command in '/home/shan2/Mypro/robot_vacuum_ws/build/vacuum_robot' returned '1': CMAKE_PREFIX_PATH=/opt/ros/galactic /usr/bin/cmake /home/shan2/Mypro/robot_vacuum_ws/src/vacuum_robot -DCMAKE_INSTALL_PREFIX=/home/shan2/Mypro/robot_vacuum_ws/install/vacuum_robot
