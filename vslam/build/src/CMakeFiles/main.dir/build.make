@@ -73,15 +73,15 @@ src/CMakeFiles/main.dir/main.cpp.o: src/CMakeFiles/main.dir/flags.make
 src/CMakeFiles/main.dir/main.cpp.o: /home/shan2/Mypro/vslam/src/main.cpp
 src/CMakeFiles/main.dir/main.cpp.o: src/CMakeFiles/main.dir/compiler_depend.ts
 	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=/home/shan2/Mypro/vslam/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_1) "Building CXX object src/CMakeFiles/main.dir/main.cpp.o"
-	cd /home/shan2/Mypro/vslam/build/src && g++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -MD -MT src/CMakeFiles/main.dir/main.cpp.o -MF CMakeFiles/main.dir/main.cpp.o.d -o CMakeFiles/main.dir/main.cpp.o -c /home/shan2/Mypro/vslam/src/main.cpp
+	cd /home/shan2/Mypro/vslam/build/src && /usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -MD -MT src/CMakeFiles/main.dir/main.cpp.o -MF CMakeFiles/main.dir/main.cpp.o.d -o CMakeFiles/main.dir/main.cpp.o -c /home/shan2/Mypro/vslam/src/main.cpp
 
 src/CMakeFiles/main.dir/main.cpp.i: cmake_force
 	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Preprocessing CXX source to CMakeFiles/main.dir/main.cpp.i"
-	cd /home/shan2/Mypro/vslam/build/src && g++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -E /home/shan2/Mypro/vslam/src/main.cpp > CMakeFiles/main.dir/main.cpp.i
+	cd /home/shan2/Mypro/vslam/build/src && /usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -E /home/shan2/Mypro/vslam/src/main.cpp > CMakeFiles/main.dir/main.cpp.i
 
 src/CMakeFiles/main.dir/main.cpp.s: cmake_force
 	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Compiling CXX source to assembly CMakeFiles/main.dir/main.cpp.s"
-	cd /home/shan2/Mypro/vslam/build/src && g++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -S /home/shan2/Mypro/vslam/src/main.cpp -o CMakeFiles/main.dir/main.cpp.s
+	cd /home/shan2/Mypro/vslam/build/src && /usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -S /home/shan2/Mypro/vslam/src/main.cpp -o CMakeFiles/main.dir/main.cpp.s
 
 # Object files for target main
 main_OBJECTS = \
@@ -92,6 +92,144 @@ main_EXTERNAL_OBJECTS =
 
 /home/shan2/Mypro/vslam/bin/main: src/CMakeFiles/main.dir/main.cpp.o
 /home/shan2/Mypro/vslam/bin/main: src/CMakeFiles/main.dir/build.make
+/home/shan2/Mypro/vslam/bin/main: /home/shan2/Mypro/vslam/lib/libslamBase.a
+/home/shan2/Mypro/vslam/bin/main: /usr/lib/x86_64-linux-gnu/libopencv_stitching.so.4.2.0
+/home/shan2/Mypro/vslam/bin/main: /usr/lib/x86_64-linux-gnu/libopencv_aruco.so.4.2.0
+/home/shan2/Mypro/vslam/bin/main: /usr/lib/x86_64-linux-gnu/libopencv_bgsegm.so.4.2.0
+/home/shan2/Mypro/vslam/bin/main: /usr/lib/x86_64-linux-gnu/libopencv_bioinspired.so.4.2.0
+/home/shan2/Mypro/vslam/bin/main: /usr/lib/x86_64-linux-gnu/libopencv_ccalib.so.4.2.0
+/home/shan2/Mypro/vslam/bin/main: /usr/lib/x86_64-linux-gnu/libopencv_dnn_objdetect.so.4.2.0
+/home/shan2/Mypro/vslam/bin/main: /usr/lib/x86_64-linux-gnu/libopencv_dnn_superres.so.4.2.0
+/home/shan2/Mypro/vslam/bin/main: /usr/lib/x86_64-linux-gnu/libopencv_dpm.so.4.2.0
+/home/shan2/Mypro/vslam/bin/main: /usr/lib/x86_64-linux-gnu/libopencv_face.so.4.2.0
+/home/shan2/Mypro/vslam/bin/main: /usr/lib/x86_64-linux-gnu/libopencv_freetype.so.4.2.0
+/home/shan2/Mypro/vslam/bin/main: /usr/lib/x86_64-linux-gnu/libopencv_fuzzy.so.4.2.0
+/home/shan2/Mypro/vslam/bin/main: /usr/lib/x86_64-linux-gnu/libopencv_hdf.so.4.2.0
+/home/shan2/Mypro/vslam/bin/main: /usr/lib/x86_64-linux-gnu/libopencv_hfs.so.4.2.0
+/home/shan2/Mypro/vslam/bin/main: /usr/lib/x86_64-linux-gnu/libopencv_img_hash.so.4.2.0
+/home/shan2/Mypro/vslam/bin/main: /usr/lib/x86_64-linux-gnu/libopencv_line_descriptor.so.4.2.0
+/home/shan2/Mypro/vslam/bin/main: /usr/lib/x86_64-linux-gnu/libopencv_quality.so.4.2.0
+/home/shan2/Mypro/vslam/bin/main: /usr/lib/x86_64-linux-gnu/libopencv_reg.so.4.2.0
+/home/shan2/Mypro/vslam/bin/main: /usr/lib/x86_64-linux-gnu/libopencv_rgbd.so.4.2.0
+/home/shan2/Mypro/vslam/bin/main: /usr/lib/x86_64-linux-gnu/libopencv_saliency.so.4.2.0
+/home/shan2/Mypro/vslam/bin/main: /usr/lib/x86_64-linux-gnu/libopencv_shape.so.4.2.0
+/home/shan2/Mypro/vslam/bin/main: /usr/lib/x86_64-linux-gnu/libopencv_stereo.so.4.2.0
+/home/shan2/Mypro/vslam/bin/main: /usr/lib/x86_64-linux-gnu/libopencv_structured_light.so.4.2.0
+/home/shan2/Mypro/vslam/bin/main: /usr/lib/x86_64-linux-gnu/libopencv_superres.so.4.2.0
+/home/shan2/Mypro/vslam/bin/main: /usr/lib/x86_64-linux-gnu/libopencv_surface_matching.so.4.2.0
+/home/shan2/Mypro/vslam/bin/main: /usr/lib/x86_64-linux-gnu/libopencv_tracking.so.4.2.0
+/home/shan2/Mypro/vslam/bin/main: /usr/lib/x86_64-linux-gnu/libopencv_videostab.so.4.2.0
+/home/shan2/Mypro/vslam/bin/main: /usr/lib/x86_64-linux-gnu/libopencv_viz.so.4.2.0
+/home/shan2/Mypro/vslam/bin/main: /usr/lib/x86_64-linux-gnu/libopencv_xobjdetect.so.4.2.0
+/home/shan2/Mypro/vslam/bin/main: /usr/lib/x86_64-linux-gnu/libopencv_xphoto.so.4.2.0
+/home/shan2/Mypro/vslam/bin/main: /usr/lib/x86_64-linux-gnu/libpcl_visualization.so
+/home/shan2/Mypro/vslam/bin/main: /usr/lib/x86_64-linux-gnu/libpcl_filters.so
+/home/shan2/Mypro/vslam/bin/main: /usr/lib/x86_64-linux-gnu/libboost_system.so
+/home/shan2/Mypro/vslam/bin/main: /usr/lib/x86_64-linux-gnu/libboost_filesystem.so
+/home/shan2/Mypro/vslam/bin/main: /usr/lib/x86_64-linux-gnu/libboost_date_time.so
+/home/shan2/Mypro/vslam/bin/main: /usr/lib/x86_64-linux-gnu/libboost_iostreams.so
+/home/shan2/Mypro/vslam/bin/main: /usr/lib/x86_64-linux-gnu/libboost_regex.so
+/home/shan2/Mypro/vslam/bin/main: /usr/lib/libOpenNI.so
+/home/shan2/Mypro/vslam/bin/main: /usr/lib/libOpenNI2.so
+/home/shan2/Mypro/vslam/bin/main: /usr/lib/x86_64-linux-gnu/libvtkChartsCore-7.1.so.7.1p.1
+/home/shan2/Mypro/vslam/bin/main: /usr/lib/x86_64-linux-gnu/libvtkInfovisCore-7.1.so.7.1p.1
+/home/shan2/Mypro/vslam/bin/main: /usr/lib/x86_64-linux-gnu/libfreetype.so
+/home/shan2/Mypro/vslam/bin/main: /usr/lib/x86_64-linux-gnu/libz.so
+/home/shan2/Mypro/vslam/bin/main: /usr/lib/x86_64-linux-gnu/libjpeg.so
+/home/shan2/Mypro/vslam/bin/main: /usr/lib/x86_64-linux-gnu/libpng.so
+/home/shan2/Mypro/vslam/bin/main: /usr/lib/x86_64-linux-gnu/libtiff.so
+/home/shan2/Mypro/vslam/bin/main: /usr/lib/x86_64-linux-gnu/libexpat.so
+/home/shan2/Mypro/vslam/bin/main: /usr/lib/x86_64-linux-gnu/libvtkIOGeometry-7.1.so.7.1p.1
+/home/shan2/Mypro/vslam/bin/main: /usr/lib/x86_64-linux-gnu/libvtkIOLegacy-7.1.so.7.1p.1
+/home/shan2/Mypro/vslam/bin/main: /usr/lib/x86_64-linux-gnu/libvtkIOPLY-7.1.so.7.1p.1
+/home/shan2/Mypro/vslam/bin/main: /usr/lib/x86_64-linux-gnu/libvtkRenderingLOD-7.1.so.7.1p.1
+/home/shan2/Mypro/vslam/bin/main: /usr/lib/x86_64-linux-gnu/libvtkViewsContext2D-7.1.so.7.1p.1
+/home/shan2/Mypro/vslam/bin/main: /usr/lib/x86_64-linux-gnu/libvtkViewsCore-7.1.so.7.1p.1
+/home/shan2/Mypro/vslam/bin/main: /usr/lib/x86_64-linux-gnu/libvtkRenderingContextOpenGL2-7.1.so.7.1p.1
+/home/shan2/Mypro/vslam/bin/main: /usr/lib/x86_64-linux-gnu/libflann_cpp.so
+/home/shan2/Mypro/vslam/bin/main: /usr/lib/x86_64-linux-gnu/libopencv_highgui.so.4.2.0
+/home/shan2/Mypro/vslam/bin/main: /usr/lib/x86_64-linux-gnu/libopencv_phase_unwrapping.so.4.2.0
+/home/shan2/Mypro/vslam/bin/main: /usr/lib/x86_64-linux-gnu/libopencv_optflow.so.4.2.0
+/home/shan2/Mypro/vslam/bin/main: /usr/lib/x86_64-linux-gnu/libopencv_datasets.so.4.2.0
+/home/shan2/Mypro/vslam/bin/main: /usr/lib/x86_64-linux-gnu/libopencv_plot.so.4.2.0
+/home/shan2/Mypro/vslam/bin/main: /usr/lib/x86_64-linux-gnu/libopencv_text.so.4.2.0
+/home/shan2/Mypro/vslam/bin/main: /usr/lib/x86_64-linux-gnu/libopencv_dnn.so.4.2.0
+/home/shan2/Mypro/vslam/bin/main: /usr/lib/x86_64-linux-gnu/libopencv_ml.so.4.2.0
+/home/shan2/Mypro/vslam/bin/main: /usr/lib/x86_64-linux-gnu/libopencv_videoio.so.4.2.0
+/home/shan2/Mypro/vslam/bin/main: /usr/lib/x86_64-linux-gnu/libopencv_ximgproc.so.4.2.0
+/home/shan2/Mypro/vslam/bin/main: /usr/lib/x86_64-linux-gnu/libopencv_video.so.4.2.0
+/home/shan2/Mypro/vslam/bin/main: /usr/lib/x86_64-linux-gnu/libopencv_imgcodecs.so.4.2.0
+/home/shan2/Mypro/vslam/bin/main: /usr/lib/x86_64-linux-gnu/libopencv_objdetect.so.4.2.0
+/home/shan2/Mypro/vslam/bin/main: /usr/lib/x86_64-linux-gnu/libopencv_calib3d.so.4.2.0
+/home/shan2/Mypro/vslam/bin/main: /usr/lib/x86_64-linux-gnu/libopencv_features2d.so.4.2.0
+/home/shan2/Mypro/vslam/bin/main: /usr/lib/x86_64-linux-gnu/libopencv_flann.so.4.2.0
+/home/shan2/Mypro/vslam/bin/main: /usr/lib/x86_64-linux-gnu/libopencv_photo.so.4.2.0
+/home/shan2/Mypro/vslam/bin/main: /usr/lib/x86_64-linux-gnu/libopencv_imgproc.so.4.2.0
+/home/shan2/Mypro/vslam/bin/main: /usr/lib/x86_64-linux-gnu/libopencv_core.so.4.2.0
+/home/shan2/Mypro/vslam/bin/main: /usr/lib/x86_64-linux-gnu/libpcl_io.so
+/home/shan2/Mypro/vslam/bin/main: /usr/lib/x86_64-linux-gnu/libpcl_sample_consensus.so
+/home/shan2/Mypro/vslam/bin/main: /usr/lib/x86_64-linux-gnu/libpcl_search.so
+/home/shan2/Mypro/vslam/bin/main: /usr/lib/x86_64-linux-gnu/libpcl_octree.so
+/home/shan2/Mypro/vslam/bin/main: /usr/lib/x86_64-linux-gnu/libpcl_kdtree.so
+/home/shan2/Mypro/vslam/bin/main: /usr/lib/x86_64-linux-gnu/libpcl_common.so
+/home/shan2/Mypro/vslam/bin/main: /usr/lib/x86_64-linux-gnu/libboost_system.so
+/home/shan2/Mypro/vslam/bin/main: /usr/lib/x86_64-linux-gnu/libboost_filesystem.so
+/home/shan2/Mypro/vslam/bin/main: /usr/lib/x86_64-linux-gnu/libboost_date_time.so
+/home/shan2/Mypro/vslam/bin/main: /usr/lib/x86_64-linux-gnu/libboost_iostreams.so
+/home/shan2/Mypro/vslam/bin/main: /usr/lib/x86_64-linux-gnu/libboost_regex.so
+/home/shan2/Mypro/vslam/bin/main: /usr/lib/libOpenNI.so
+/home/shan2/Mypro/vslam/bin/main: /usr/lib/libOpenNI2.so
+/home/shan2/Mypro/vslam/bin/main: /usr/lib/x86_64-linux-gnu/libjpeg.so
+/home/shan2/Mypro/vslam/bin/main: /usr/lib/x86_64-linux-gnu/libpng.so
+/home/shan2/Mypro/vslam/bin/main: /usr/lib/x86_64-linux-gnu/libtiff.so
+/home/shan2/Mypro/vslam/bin/main: /usr/lib/x86_64-linux-gnu/libexpat.so
+/home/shan2/Mypro/vslam/bin/main: /usr/lib/x86_64-linux-gnu/libvtkInteractionWidgets-7.1.so.7.1p.1
+/home/shan2/Mypro/vslam/bin/main: /usr/lib/x86_64-linux-gnu/libvtkFiltersModeling-7.1.so.7.1p.1
+/home/shan2/Mypro/vslam/bin/main: /usr/lib/x86_64-linux-gnu/libvtkInteractionStyle-7.1.so.7.1p.1
+/home/shan2/Mypro/vslam/bin/main: /usr/lib/x86_64-linux-gnu/libvtkFiltersExtraction-7.1.so.7.1p.1
+/home/shan2/Mypro/vslam/bin/main: /usr/lib/x86_64-linux-gnu/libvtkFiltersStatistics-7.1.so.7.1p.1
+/home/shan2/Mypro/vslam/bin/main: /usr/lib/x86_64-linux-gnu/libvtkImagingFourier-7.1.so.7.1p.1
+/home/shan2/Mypro/vslam/bin/main: /usr/lib/x86_64-linux-gnu/libvtkalglib-7.1.so.7.1p.1
+/home/shan2/Mypro/vslam/bin/main: /usr/lib/x86_64-linux-gnu/libvtkFiltersHybrid-7.1.so.7.1p.1
+/home/shan2/Mypro/vslam/bin/main: /usr/lib/x86_64-linux-gnu/libvtkImagingGeneral-7.1.so.7.1p.1
+/home/shan2/Mypro/vslam/bin/main: /usr/lib/x86_64-linux-gnu/libvtkImagingSources-7.1.so.7.1p.1
+/home/shan2/Mypro/vslam/bin/main: /usr/lib/x86_64-linux-gnu/libvtkImagingHybrid-7.1.so.7.1p.1
+/home/shan2/Mypro/vslam/bin/main: /usr/lib/x86_64-linux-gnu/libvtkRenderingAnnotation-7.1.so.7.1p.1
+/home/shan2/Mypro/vslam/bin/main: /usr/lib/x86_64-linux-gnu/libvtkImagingColor-7.1.so.7.1p.1
+/home/shan2/Mypro/vslam/bin/main: /usr/lib/x86_64-linux-gnu/libvtkRenderingVolume-7.1.so.7.1p.1
+/home/shan2/Mypro/vslam/bin/main: /usr/lib/x86_64-linux-gnu/libvtkIOXML-7.1.so.7.1p.1
+/home/shan2/Mypro/vslam/bin/main: /usr/lib/x86_64-linux-gnu/libvtkIOXMLParser-7.1.so.7.1p.1
+/home/shan2/Mypro/vslam/bin/main: /usr/lib/x86_64-linux-gnu/libvtkIOCore-7.1.so.7.1p.1
+/home/shan2/Mypro/vslam/bin/main: /usr/lib/x86_64-linux-gnu/libvtkRenderingContext2D-7.1.so.7.1p.1
+/home/shan2/Mypro/vslam/bin/main: /usr/lib/x86_64-linux-gnu/libvtkRenderingFreeType-7.1.so.7.1p.1
+/home/shan2/Mypro/vslam/bin/main: /usr/lib/x86_64-linux-gnu/libfreetype.so
+/home/shan2/Mypro/vslam/bin/main: /usr/lib/x86_64-linux-gnu/libvtkRenderingOpenGL2-7.1.so.7.1p.1
+/home/shan2/Mypro/vslam/bin/main: /usr/lib/x86_64-linux-gnu/libvtkImagingCore-7.1.so.7.1p.1
+/home/shan2/Mypro/vslam/bin/main: /usr/lib/x86_64-linux-gnu/libvtkRenderingCore-7.1.so.7.1p.1
+/home/shan2/Mypro/vslam/bin/main: /usr/lib/x86_64-linux-gnu/libvtkCommonColor-7.1.so.7.1p.1
+/home/shan2/Mypro/vslam/bin/main: /usr/lib/x86_64-linux-gnu/libvtkFiltersGeometry-7.1.so.7.1p.1
+/home/shan2/Mypro/vslam/bin/main: /usr/lib/x86_64-linux-gnu/libvtkFiltersSources-7.1.so.7.1p.1
+/home/shan2/Mypro/vslam/bin/main: /usr/lib/x86_64-linux-gnu/libvtkFiltersGeneral-7.1.so.7.1p.1
+/home/shan2/Mypro/vslam/bin/main: /usr/lib/x86_64-linux-gnu/libvtkCommonComputationalGeometry-7.1.so.7.1p.1
+/home/shan2/Mypro/vslam/bin/main: /usr/lib/x86_64-linux-gnu/libvtkFiltersCore-7.1.so.7.1p.1
+/home/shan2/Mypro/vslam/bin/main: /usr/lib/x86_64-linux-gnu/libvtkIOImage-7.1.so.7.1p.1
+/home/shan2/Mypro/vslam/bin/main: /usr/lib/x86_64-linux-gnu/libvtkCommonExecutionModel-7.1.so.7.1p.1
+/home/shan2/Mypro/vslam/bin/main: /usr/lib/x86_64-linux-gnu/libvtkCommonDataModel-7.1.so.7.1p.1
+/home/shan2/Mypro/vslam/bin/main: /usr/lib/x86_64-linux-gnu/libvtkCommonTransforms-7.1.so.7.1p.1
+/home/shan2/Mypro/vslam/bin/main: /usr/lib/x86_64-linux-gnu/libvtkCommonMisc-7.1.so.7.1p.1
+/home/shan2/Mypro/vslam/bin/main: /usr/lib/x86_64-linux-gnu/libvtkCommonMath-7.1.so.7.1p.1
+/home/shan2/Mypro/vslam/bin/main: /usr/lib/x86_64-linux-gnu/libvtkCommonSystem-7.1.so.7.1p.1
+/home/shan2/Mypro/vslam/bin/main: /usr/lib/x86_64-linux-gnu/libvtkCommonCore-7.1.so.7.1p.1
+/home/shan2/Mypro/vslam/bin/main: /usr/lib/x86_64-linux-gnu/libvtksys-7.1.so.7.1p.1
+/home/shan2/Mypro/vslam/bin/main: /usr/lib/x86_64-linux-gnu/libvtkDICOMParser-7.1.so.7.1p.1
+/home/shan2/Mypro/vslam/bin/main: /usr/lib/x86_64-linux-gnu/libvtkmetaio-7.1.so.7.1p.1
+/home/shan2/Mypro/vslam/bin/main: /usr/lib/x86_64-linux-gnu/libz.so
+/home/shan2/Mypro/vslam/bin/main: /usr/lib/x86_64-linux-gnu/libGLEW.so
+/home/shan2/Mypro/vslam/bin/main: /usr/lib/x86_64-linux-gnu/libSM.so
+/home/shan2/Mypro/vslam/bin/main: /usr/lib/x86_64-linux-gnu/libICE.so
+/home/shan2/Mypro/vslam/bin/main: /usr/lib/x86_64-linux-gnu/libX11.so
+/home/shan2/Mypro/vslam/bin/main: /usr/lib/x86_64-linux-gnu/libXext.so
+/home/shan2/Mypro/vslam/bin/main: /usr/lib/x86_64-linux-gnu/libXt.so
 /home/shan2/Mypro/vslam/bin/main: src/CMakeFiles/main.dir/link.txt
 	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --bold --progress-dir=/home/shan2/Mypro/vslam/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_2) "Linking CXX executable /home/shan2/Mypro/vslam/bin/main"
 	cd /home/shan2/Mypro/vslam/build/src && $(CMAKE_COMMAND) -E cmake_link_script CMakeFiles/main.dir/link.txt --verbose=$(VERBOSE)

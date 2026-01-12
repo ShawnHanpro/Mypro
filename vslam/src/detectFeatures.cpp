@@ -15,74 +15,58 @@ int main( int argc, char** argv )
     cv::Mat depth1 = cv::imread( "../data/depth1.png", -1);
     cv::Mat depth2 = cv::imread( "../data/depth2.png", -1);
 
-    // 声明特征提取器与描述子提取器
-    cv::Ptr<cv::FeatureDetector> detector;
-    cv::Ptr<cv::DescriptorExtractor> descriptor;
+    // 使用orb检测特征并描述特征 包含特征提取器和描述子提取器
+    cv::Ptr<cv::ORB> orb = cv::ORB::create();
 
-    // 构建提取器，默认两者都为 ORB
-    
-    // 如果使用 sift, surf ，之前要初始化nonfree模块
-    // cv::initModule_nonfree();
-    // _detector = cv::FeatureDetector::create( "SIFT" );
-    // _descriptor = cv::DescriptorExtractor::create( "SIFT" );
-    
-    detector = cv::FeatureDetector::create("ORB");
-    descriptor = cv::DescriptorExtractor::create("ORB");
+    vector<cv::KeyPoint> kp1, kp2;
+    cv::Mat desp1, desp2;
 
-    vector< cv::KeyPoint > kp1, kp2; //关键点
-    detector->detect( rgb1, kp1 );  //提取关键点
-    detector->detect( rgb2, kp2 );
+    orb->detectAndCompute(rgb1, cv::Mat(), kp1, desp1);
+    orb->detectAndCompute(rgb2, cv::Mat(), kp2, desp2);
 
     cout<<"Key points of two images: "<<kp1.size()<<", "<<kp2.size()<<endl;
     
     // 可视化， 显示关键点
-    cv::Mat imgShow;
-    cv::drawKeypoints( rgb1, kp1, imgShow, cv::Scalar::all(-1), cv::DrawMatchesFlags::DRAW_RICH_KEYPOINTS );
-    cv::imshow( "keypoints", imgShow );
-    cv::imwrite( "./data/keypoints.png", imgShow );
+    cv::Mat imgShow1;
+    cv::Mat imgShow2;
+    cv::drawKeypoints( rgb1, kp1, imgShow1, cv::Scalar::all(-1), cv::DrawMatchesFlags::DRAW_RICH_KEYPOINTS );
+    cv::drawKeypoints( rgb2, kp2, imgShow2, cv::Scalar::all(-1), cv::DrawMatchesFlags::DRAW_RICH_KEYPOINTS );
+    cv::imshow( "keypoints1", imgShow1 );
+    cv::imshow( "keypoints2", imgShow2 );
+    // cv::imwrite( "../data/rgb1_keypoints.png", imgShow );
     cv::waitKey(0); //暂停等待一个按键
-   
-    // 计算描述子
-    cv::Mat desp1, desp2;
-    descriptor->compute( rgb1, kp1, desp1 );
-    descriptor->compute( rgb2, kp2, desp2 );
 
     // 匹配描述子
-    vector< cv::DMatch > matches; 
-    cv::BFMatcher matcher;
-    matcher.match( desp1, desp2, matches );
-    cout<<"Find total "<<matches.size()<<" matches."<<endl;
+
+    // 暴力匹配，不推荐
+    /*
+        vector< cv::DMatch > matches; 
+        cv::BFMatcher matcher(cv::NORM_HAMMING);
+        matcher.match( desp1, desp2, matches );
+    */
+
+    // knn匹配
+    vector<vector<cv::DMatch>> knn_matches; // 汉明距离值，原理是比较二进制描述子中有多少bit不一样
+    cv::BFMatcher matcher(cv::NORM_HAMMING);
+    matcher.knnMatch(desp1, desp2, knn_matches, 2);
+
+    // 比值筛选（ratio test）
+    vector<cv::DMatch> good_matches;
+    const float ratio_thresh = 0.75f;
+    for (const auto& m : knn_matches) {
+        if (m.size() == 2 && m[0].distance < ratio_thresh * m[1].distance) {
+            good_matches.push_back(m[0]);
+        }
+    }
+
+    cout<<"Find total "<<good_matches.size()<<" matches."<<endl;
 
     // 可视化：显示匹配的特征
     cv::Mat imgMatches;
-    cv::drawMatches( rgb1, kp1, rgb2, kp2, matches, imgMatches );
+    cv::drawMatches( rgb1, kp1, rgb2, kp2, good_matches, imgMatches );
     cv::imshow( "matches", imgMatches );
-    cv::imwrite( "./data/matches.png", imgMatches );
+    // cv::imwrite( "../data/matches.png", imgMatches );
     cv::waitKey( 0 );
-
-    // 筛选匹配，把距离太大的去掉
-    // 这里使用的准则是去掉大于四倍最小距离的匹配
-    vector< cv::DMatch > goodMatches;
-    double minDis = 9999;
-    for ( size_t i=0; i<matches.size(); i++ )
-    {
-        if ( matches[i].distance < minDis )
-            minDis = matches[i].distance;
-    }
-    cout<<"min dis = "<<minDis<<endl;
-
-    for ( size_t i=0; i<matches.size(); i++ )
-    {
-        if (matches[i].distance < 10*minDis)
-            goodMatches.push_back( matches[i] );
-    }
-
-    // 显示 good matches
-    cout<<"good matches="<<goodMatches.size()<<endl;
-    cv::drawMatches( rgb1, kp1, rgb2, kp2, goodMatches, imgMatches );
-    cv::imshow( "good matches", imgMatches );
-    cv::imwrite( "./data/good_matches.png", imgMatches );
-    cv::waitKey(0);
 
     // 计算图像间的运动关系
     // 关键函数：cv::solvePnPRansac()
@@ -101,15 +85,15 @@ int main( int argc, char** argv )
     C.fy = 519.0;
     C.scale = 1000.0;
 
-    for (size_t i=0; i<goodMatches.size(); i++)
+    for (size_t i=0; i<good_matches.size(); i++)
     {
         // query 是第一个, train 是第二个
-        cv::Point2f p = kp1[goodMatches[i].queryIdx].pt;
+        cv::Point2f p = kp1[good_matches[i].queryIdx].pt;
         // 获取d是要小心！x是向右的，y是向下的，所以y才是行，x是列！
         ushort d = depth1.ptr<ushort>( int(p.y) )[ int(p.x) ];
         if (d == 0)
             continue;
-        pts_img.push_back( cv::Point2f( kp2[goodMatches[i].trainIdx].pt ) );
+        pts_img.push_back( cv::Point2f( kp2[good_matches[i].trainIdx].pt ) );
 
         // 将(u,v,d)转成(x,y,z)
         cv::Point3f pt ( p.x, p.y, d );
@@ -127,17 +111,18 @@ int main( int argc, char** argv )
     cv::Mat cameraMatrix( 3, 3, CV_64F, camera_matrix_data );
     cv::Mat rvec, tvec, inliers;
     // 求解pnp
-    cv::solvePnPRansac( pts_obj, pts_img, cameraMatrix, cv::Mat(), rvec, tvec, false, 100, 1.0, 100, inliers );
+    // 使用第一帧的3D点 和 第二帧中看到他们的位置 计算 相机的运动
+    cv::solvePnPRansac( pts_obj, pts_img, cameraMatrix, cv::Mat(), rvec, tvec, false, 100, 1.0, 0.99, inliers );
 
-    cout<<"inliers: "<<inliers.rows<<endl;
-    cout<<"R="<<rvec<<endl;
-    cout<<"t="<<tvec<<endl;
+    cout << "inliers: " << inliers.rows << endl;
+    cout << "R=" << rvec << endl;
+    cout << "t=" << tvec << endl;
 
     // 画出inliers匹配 
     vector< cv::DMatch > matchesShow;
     for (size_t i=0; i<inliers.rows; i++)
     {
-        matchesShow.push_back( goodMatches[inliers.ptr<int>(i)[0]] );    
+        matchesShow.push_back( good_matches[inliers.ptr<int>(i)[0]] );    
     }
     cv::drawMatches( rgb1, kp1, rgb2, kp2, matchesShow, imgMatches );
     cv::imshow( "inlier matches", imgMatches );

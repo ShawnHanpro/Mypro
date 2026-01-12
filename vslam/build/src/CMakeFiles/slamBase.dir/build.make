@@ -73,15 +73,15 @@ src/CMakeFiles/slamBase.dir/slamBase.cpp.o: src/CMakeFiles/slamBase.dir/flags.ma
 src/CMakeFiles/slamBase.dir/slamBase.cpp.o: /home/shan2/Mypro/vslam/src/slamBase.cpp
 src/CMakeFiles/slamBase.dir/slamBase.cpp.o: src/CMakeFiles/slamBase.dir/compiler_depend.ts
 	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=/home/shan2/Mypro/vslam/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_1) "Building CXX object src/CMakeFiles/slamBase.dir/slamBase.cpp.o"
-	cd /home/shan2/Mypro/vslam/build/src && g++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -MD -MT src/CMakeFiles/slamBase.dir/slamBase.cpp.o -MF CMakeFiles/slamBase.dir/slamBase.cpp.o.d -o CMakeFiles/slamBase.dir/slamBase.cpp.o -c /home/shan2/Mypro/vslam/src/slamBase.cpp
+	cd /home/shan2/Mypro/vslam/build/src && /usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -MD -MT src/CMakeFiles/slamBase.dir/slamBase.cpp.o -MF CMakeFiles/slamBase.dir/slamBase.cpp.o.d -o CMakeFiles/slamBase.dir/slamBase.cpp.o -c /home/shan2/Mypro/vslam/src/slamBase.cpp
 
 src/CMakeFiles/slamBase.dir/slamBase.cpp.i: cmake_force
 	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Preprocessing CXX source to CMakeFiles/slamBase.dir/slamBase.cpp.i"
-	cd /home/shan2/Mypro/vslam/build/src && g++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -E /home/shan2/Mypro/vslam/src/slamBase.cpp > CMakeFiles/slamBase.dir/slamBase.cpp.i
+	cd /home/shan2/Mypro/vslam/build/src && /usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -E /home/shan2/Mypro/vslam/src/slamBase.cpp > CMakeFiles/slamBase.dir/slamBase.cpp.i
 
 src/CMakeFiles/slamBase.dir/slamBase.cpp.s: cmake_force
 	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Compiling CXX source to assembly CMakeFiles/slamBase.dir/slamBase.cpp.s"
-	cd /home/shan2/Mypro/vslam/build/src && g++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -S /home/shan2/Mypro/vslam/src/slamBase.cpp -o CMakeFiles/slamBase.dir/slamBase.cpp.s
+	cd /home/shan2/Mypro/vslam/build/src && /usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -S /home/shan2/Mypro/vslam/src/slamBase.cpp -o CMakeFiles/slamBase.dir/slamBase.cpp.s
 
 # Object files for target slamBase
 slamBase_OBJECTS = \

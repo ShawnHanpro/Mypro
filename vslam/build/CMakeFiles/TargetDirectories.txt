@@ -1,6 +1,6 @@
 /home/shan2/Mypro/vslam/build/CMakeFiles/edit_cache.dir
 /home/shan2/Mypro/vslam/build/CMakeFiles/rebuild_cache.dir
-/home/shan2/Mypro/vslam/build/src/CMakeFiles/generate_pointcloud.dir
+/home/shan2/Mypro/vslam/build/src/CMakeFiles/slam.dir
 /home/shan2/Mypro/vslam/build/src/CMakeFiles/main.dir
 /home/shan2/Mypro/vslam/build/src/CMakeFiles/slamBase.dir
 /home/shan2/Mypro/vslam/build/src/CMakeFiles/edit_cache.dir

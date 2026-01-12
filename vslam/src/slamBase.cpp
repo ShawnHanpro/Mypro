@@ -41,9 +41,118 @@ pcl::PointCloud<pcl::PointXYZRGB>::Ptr image2PointCloud(cv::Mat& rgb, cv::Mat& d
 
 cv::Point3f point2dTo3d(cv::Point3f& point, CAMERA_INTRINSIC_PARAMETERS& camera) {
     cv::Point3f p;
-    p.z = double(point.z);
+    p.z = double(point.z) / camera.scale;
     p.x = (point.x - camera.cx) * p.z / camera.fx;
     p.y = (point.y - camera.cy) * p.z / camera.fy;
 
     return p;
+}
+
+void OrbComputerKeyPointsAndDesp(FRAME& frame) {
+    cv::Ptr<cv::ORB> orb = cv::ORB::create();
+
+    std::vector<cv::KeyPoint> kp;
+    cv::Mat desp;
+
+    orb->detectAndCompute(frame.rgb, cv::Mat(), frame.kp, frame.desp);
+}
+
+RESULT_OF_PNP EstimateMotion(FRAME& frame1, FRAME& frame2, CAMERA_INTRINSIC_PARAMETERS& camera) {
+    ParameterReader param;
+    RESULT_OF_PNP result;
+    
+    // knn匹配
+    std::vector<std::vector<cv::DMatch>> knn_matches; // 汉明距离值，原理是比较二进制描述子中有多少bit不一样
+    cv::BFMatcher matcher(cv::NORM_HAMMING);
+    matcher.knnMatch(frame1.desp, frame2.desp, knn_matches, 2);
+
+    // 比值筛选（ratio test）
+    std::vector<cv::DMatch> good_matches;
+    const float ratio_thresh = 0.75f;
+    for (const auto& m : knn_matches) {
+        if (m.size() == 2 && m[0].distance < ratio_thresh * m[1].distance) {
+            good_matches.push_back(m[0]);
+        }
+    }
+
+    // 第一个帧的三维点
+    std::vector<cv::Point3f> pts_obj;
+    // 第二个帧的图像点
+    std::vector< cv::Point2f > pts_img;
+
+    for (size_t i=0; i<good_matches.size(); i++)
+    {
+        // query 是第一个, train 是第二个
+        cv::Point2f p = frame1.kp[good_matches[i].queryIdx].pt;
+        // 获取d是要小心！x是向右的，y是向下的，所以y才是行，x是列！
+        ushort d = frame1.depth.ptr<ushort>( int(p.y) )[ int(p.x) ];
+        if (d == 0)
+            continue;
+        pts_img.push_back( cv::Point2f( frame2.kp[good_matches[i].trainIdx].pt ) );
+
+        // 将(u,v,d)转成(x,y,z)
+        cv::Point3f pt ( p.x, p.y, d );
+        cv::Point3f pd = point2dTo3d( pt, camera );
+        pts_obj.push_back( pd );
+    }
+
+    double camera_matrix_data[3][3] = {
+        {camera.fx, 0, camera.cx},
+        {0, camera.fy, camera.cy},
+        {0, 0, 1}
+    };
+
+    // 构建相机矩阵
+    cv::Mat cameraMatrix( 3, 3, CV_64F, camera_matrix_data );
+    cv::Mat rvec, tvec, inliers;
+    // 求解pnp
+    // 使用第一帧的3D点 和 第二帧中看到他们的位置 计算 相机的运动
+    cv::solvePnPRansac( pts_obj, pts_img, cameraMatrix, cv::Mat(), rvec, tvec, false, 100, 1.0, 0.99, inliers );
+
+    result.rvec = rvec;
+    result.tvec = tvec;
+    result.inliers = inliers.rows;
+
+    return result;
+}
+
+Eigen::Isometry3d CvMat2Eigen(cv::Mat& rvec, cv::Mat& tvec) {
+    cv::Mat R;
+    cv::Rodrigues( rvec, R );
+    Eigen::Matrix3d r;
+    for ( int i=0; i<3; i++ )
+        for ( int j=0; j<3; j++ ) 
+            r(i,j) = R.at<double>(i,j);
+  
+    // 将平移向量和旋转矩阵转换成变换矩阵
+    Eigen::Isometry3d T = Eigen::Isometry3d::Identity();
+
+    T.linear() = r;
+    T.translation() << 
+        tvec.at<double>(0,0),
+        tvec.at<double>(0,1),
+        tvec.at<double>(0,2);
+
+    return T;
+}
+
+pcl::PointCloud<pcl::PointXYZRGB>::Ptr JoinPointCloud(pcl::PointCloud<pcl::PointXYZRGB>::Ptr original, FRAME& new_frame, Eigen::Isometry3d T, CAMERA_INTRINSIC_PARAMETERS& camera) {
+    // 转换点云
+    pcl::PointCloud<pcl::PointXYZRGB>::Ptr new_cloud = image2PointCloud(new_frame.rgb, new_frame.depth, camera);
+
+    // 合并点云
+    pcl::PointCloud<pcl::PointXYZRGB>::Ptr output (new pcl::PointCloud<pcl::PointXYZRGB>);
+    pcl::transformPointCloud( *original, *output, T.matrix() );
+    *new_cloud += *output;
+
+    // 滤波降采样
+    pcl::VoxelGrid<pcl::PointXYZRGB> voxel;
+    ParameterReader pd;
+    double gridsize = atof( pd.getData("voxel_grid").c_str() );
+    voxel.setLeafSize( gridsize, gridsize, gridsize );
+    voxel.setInputCloud( new_cloud );
+    pcl::PointCloud<pcl::PointXYZRGB>::Ptr filter_cloud( new pcl::PointCloud<pcl::PointXYZRGB> );
+    voxel.filter( *filter_cloud );
+    return filter_cloud;
+
 }

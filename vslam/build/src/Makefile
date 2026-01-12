@@ -117,18 +117,18 @@ depend:
 .PHONY : depend
 
 # Convenience name for target.
-src/CMakeFiles/generate_pointcloud.dir/rule:
-	cd /home/shan2/Mypro/vslam/build && $(MAKE) $(MAKESILENT) -f CMakeFiles/Makefile2 src/CMakeFiles/generate_pointcloud.dir/rule
-.PHONY : src/CMakeFiles/generate_pointcloud.dir/rule
+src/CMakeFiles/slam.dir/rule:
+	cd /home/shan2/Mypro/vslam/build && $(MAKE) $(MAKESILENT) -f CMakeFiles/Makefile2 src/CMakeFiles/slam.dir/rule
+.PHONY : src/CMakeFiles/slam.dir/rule
 
 # Convenience name for target.
-generate_pointcloud: src/CMakeFiles/generate_pointcloud.dir/rule
-.PHONY : generate_pointcloud
+slam: src/CMakeFiles/slam.dir/rule
+.PHONY : slam
 
 # fast build rule for target.
-generate_pointcloud/fast:
-	cd /home/shan2/Mypro/vslam/build && $(MAKE) $(MAKESILENT) -f src/CMakeFiles/generate_pointcloud.dir/build.make src/CMakeFiles/generate_pointcloud.dir/build
-.PHONY : generate_pointcloud/fast
+slam/fast:
+	cd /home/shan2/Mypro/vslam/build && $(MAKE) $(MAKESILENT) -f src/CMakeFiles/slam.dir/build.make src/CMakeFiles/slam.dir/build
+.PHONY : slam/fast
 
 # Convenience name for target.
 src/CMakeFiles/main.dir/rule:
@@ -158,30 +158,6 @@ slamBase/fast:
 	cd /home/shan2/Mypro/vslam/build && $(MAKE) $(MAKESILENT) -f src/CMakeFiles/slamBase.dir/build.make src/CMakeFiles/slamBase.dir/build
 .PHONY : slamBase/fast
 
-generatePointCloud.o: generatePointCloud.cpp.o
-.PHONY : generatePointCloud.o
-
-# target to build an object file
-generatePointCloud.cpp.o:
-	cd /home/shan2/Mypro/vslam/build && $(MAKE) $(MAKESILENT) -f src/CMakeFiles/generate_pointcloud.dir/build.make src/CMakeFiles/generate_pointcloud.dir/generatePointCloud.cpp.o
-.PHONY : generatePointCloud.cpp.o
-
-generatePointCloud.i: generatePointCloud.cpp.i
-.PHONY : generatePointCloud.i
-
-# target to preprocess a source file
-generatePointCloud.cpp.i:
-	cd /home/shan2/Mypro/vslam/build && $(MAKE) $(MAKESILENT) -f src/CMakeFiles/generate_pointcloud.dir/build.make src/CMakeFiles/generate_pointcloud.dir/generatePointCloud.cpp.i
-.PHONY : generatePointCloud.cpp.i
-
-generatePointCloud.s: generatePointCloud.cpp.s
-.PHONY : generatePointCloud.s
-
-# target to generate assembly for a file
-generatePointCloud.cpp.s:
-	cd /home/shan2/Mypro/vslam/build && $(MAKE) $(MAKESILENT) -f src/CMakeFiles/generate_pointcloud.dir/build.make src/CMakeFiles/generate_pointcloud.dir/generatePointCloud.cpp.s
-.PHONY : generatePointCloud.cpp.s
-
 main.o: main.cpp.o
 .PHONY : main.o
 
@@ -205,6 +181,30 @@ main.s: main.cpp.s
 main.cpp.s:
 	cd /home/shan2/Mypro/vslam/build && $(MAKE) $(MAKESILENT) -f src/CMakeFiles/main.dir/build.make src/CMakeFiles/main.dir/main.cpp.s
 .PHONY : main.cpp.s
+
+slam.o: slam.cpp.o
+.PHONY : slam.o
+
+# target to build an object file
+slam.cpp.o:
+	cd /home/shan2/Mypro/vslam/build && $(MAKE) $(MAKESILENT) -f src/CMakeFiles/slam.dir/build.make src/CMakeFiles/slam.dir/slam.cpp.o
+.PHONY : slam.cpp.o
+
+slam.i: slam.cpp.i
+.PHONY : slam.i
+
+# target to preprocess a source file
+slam.cpp.i:
+	cd /home/shan2/Mypro/vslam/build && $(MAKE) $(MAKESILENT) -f src/CMakeFiles/slam.dir/build.make src/CMakeFiles/slam.dir/slam.cpp.i
+.PHONY : slam.cpp.i
+
+slam.s: slam.cpp.s
+.PHONY : slam.s
+
+# target to generate assembly for a file
+slam.cpp.s:
+	cd /home/shan2/Mypro/vslam/build && $(MAKE) $(MAKESILENT) -f src/CMakeFiles/slam.dir/build.make src/CMakeFiles/slam.dir/slam.cpp.s
+.PHONY : slam.cpp.s
 
 slamBase.o: slamBase.cpp.o
 .PHONY : slamBase.o
@@ -238,15 +238,15 @@ help:
 	@echo "... depend"
 	@echo "... edit_cache"
 	@echo "... rebuild_cache"
-	@echo "... generate_pointcloud"
 	@echo "... main"
+	@echo "... slam"
 	@echo "... slamBase"
-	@echo "... generatePointCloud.o"
-	@echo "... generatePointCloud.i"
-	@echo "... generatePointCloud.s"
 	@echo "... main.o"
 	@echo "... main.i"
 	@echo "... main.s"
+	@echo "... slam.o"
+	@echo "... slam.i"
+	@echo "... slam.s"
 	@echo "... slamBase.o"
 	@echo "... slamBase.i"
 	@echo "... slamBase.s"

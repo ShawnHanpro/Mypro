@@ -1,6 +1,6 @@
 cmake_minimum_required(VERSION 3.8) # 设定版本
 project(vslam) # 工程名称
-set(CMAKE_CXX_COMPILER "g++") # 设定编译器
+# set(CMAKE_CXX_COMPILER "g++") # 设定编译器
 
 # 设定可执行的二进制文件目录
 set(EXECUTABLE_OUTPUT_PATH ${PROJECT_SOURCE_DIR}/bin)
