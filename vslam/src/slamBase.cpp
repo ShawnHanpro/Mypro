@@ -80,8 +80,7 @@ RESULT_OF_PNP EstimateMotion(FRAME& frame1, FRAME& frame2, CAMERA_INTRINSIC_PARA
     // 第二个帧的图像点
     std::vector< cv::Point2f > pts_img;
 
-    for (size_t i=0; i<good_matches.size(); i++)
-    {
+    for (size_t i=0; i<good_matches.size(); i++) {
         // query 是第一个, train 是第二个
         cv::Point2f p = frame1.kp[good_matches[i].queryIdx].pt;
         // 获取d是要小心！x是向右的，y是向下的，所以y才是行，x是列！
@@ -96,6 +95,20 @@ RESULT_OF_PNP EstimateMotion(FRAME& frame1, FRAME& frame2, CAMERA_INTRINSIC_PARA
         pts_obj.push_back( pd );
     }
 
+    if (pts_img.size() < 6) {
+        result.inliers = 0;
+        return result;
+    }
+
+
+    // 可视化：显示匹配的特征
+    // std::cout << "good matches: " << good_matches.size() << std::endl;
+    // cv::Mat imgMatches;
+    // cv::drawMatches( frame1.rgb, frame1.kp, frame2.rgb, frame2.kp, good_matches, imgMatches );
+    // cv::imshow( "matches", imgMatches );
+    // cv::waitKey( 0 );
+
+
     double camera_matrix_data[3][3] = {
         {camera.fx, 0, camera.cx},
         {0, camera.fy, camera.cy},
@@ -107,7 +120,7 @@ RESULT_OF_PNP EstimateMotion(FRAME& frame1, FRAME& frame2, CAMERA_INTRINSIC_PARA
     cv::Mat rvec, tvec, inliers;
     // 求解pnp
     // 使用第一帧的3D点 和 第二帧中看到他们的位置 计算 相机的运动
-    cv::solvePnPRansac( pts_obj, pts_img, cameraMatrix, cv::Mat(), rvec, tvec, false, 100, 1.0, 0.99, inliers );
+    cv::solvePnPRansac( pts_obj, pts_img, cameraMatrix, cv::Mat(), rvec, tvec, false, 100, 4.0, 0.99, inliers, cv::SOLVEPNP_EPNP );
 
     result.rvec = rvec;
     result.tvec = tvec;

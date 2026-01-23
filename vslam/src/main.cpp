@@ -1,4 +1,5 @@
 #include <iostream>
+#include <thread>
 #include "slamBase.h"
 using namespace std;
 
@@ -7,142 +8,282 @@ using namespace std;
 // #include <opencv2/nonfree/nonfree.hpp> // use this if you want to use SIFT or SURF
 #include <opencv2/calib3d/calib3d.hpp>
 
+#include <pcl/filters/voxel_grid.h>
+#include <pcl/filters/passthrough.h>
+
+#include <g2o/types/slam3d/types_slam3d.h>
+#include <g2o/core/sparse_optimizer.h>
+#include <g2o/core/block_solver.h>
+#include <g2o/core/factory.h>
+#include <g2o/core/optimization_algorithm_factory.h>
+#include <g2o/core/optimization_algorithm_gauss_newton.h>
+#include <g2o/solvers/eigen/linear_solver_eigen.h>
+#include <g2o/core/robust_kernel.h>
+#include <g2o/core/robust_kernel_impl.h>
+#include <g2o/core/optimization_algorithm_levenberg.h>
+
 FRAME readFrame( int index, ParameterReader& pd );
+double normofTransform( cv::Mat rvec, cv::Mat tvec );
 
-int main( int argc, char** argv )
-{
-    // 声明并从data文件夹里读取两个rgb与深度图
-    cv::Mat rgb1 = cv::imread( "../data/rgb1.png");
-    cv::Mat rgb2 = cv::imread( "../data/rgb2.png");
-    cv::Mat depth1 = cv::imread( "../data/depth1.png", -1);
-    cv::Mat depth2 = cv::imread( "../data/depth2.png", -1);
+// 检测两个帧，结果定义
+enum CHECK_RESULT {NOT_MATCHED=0, TOO_FAR_AWAY, TOO_CLOSE, KEYFRAME}; 
 
+CHECK_RESULT checkKeyframes( FRAME& f1, FRAME& f2, g2o::SparseOptimizer& opti, bool is_loops=false );
+// 检测近距离的回环
+void checkNearbyLoops( vector<FRAME>& frames, FRAME& currFrame, g2o::SparseOptimizer& opti );
+// 随机检测回环
+void checkRandomLoops( vector<FRAME>& frames, FRAME& currFrame, g2o::SparseOptimizer& opti );
+
+int main( int argc, char** argv ) {
     ParameterReader pd;
     CAMERA_INTRINSIC_PARAMETERS camera = GetDefaultCamera();
-    int start = 0;
-    int end = 700;
+    int start = 1;
+    int end = 500;
 
     FRAME last_frame = readFrame( start, pd );
     cv::Ptr<cv::ORB> orb = cv::ORB::create();
-    std::vector<cv::KeyPoint> kp;
-    cv::Mat desp;
     orb->detectAndCompute(last_frame.rgb, cv::Mat(), last_frame.kp, last_frame.desp);
+    std::cout << "===== " << start << " =====" << std::endl;
+    std::cout << "last frame kp: " << last_frame.kp.size() << std::endl;
+
+    pcl::PointCloud<pcl::PointXYZRGB>::Ptr cloud = image2PointCloud(last_frame.rgb, last_frame.depth, camera);
+    pcl::visualization::CloudViewer viewer("viewer");
+
+
+    // 选择优化方法
+    typedef g2o::BlockSolver_6_3 SlamBlockSolver;
+    typedef g2o::LinearSolverEigen<SlamBlockSolver::PoseMatrixType> SlamLinearSolver;
+
+    // 初始化求解器
+    // 1.线性求解器（用unique_ptr）
+    auto linearSolver = std::make_unique<SlamLinearSolver>();
+    
+    // 2.BlockSolver
+    auto blockSolver = std::make_unique<SlamBlockSolver>(std::move(linearSolver));
+    
+    // 3.LM优化器
+    auto solver = new g2o::OptimizationAlgorithmLevenberg(std::move(blockSolver));
+    
+    // 4.装入优化器
+    g2o::SparseOptimizer globalOptimizer; // 最后使用的是这个
+    globalOptimizer.setAlgorithm(solver);
+    // 不要输出调试信息
+    globalOptimizer.setVerbose(false);
+
+    // 向globalOptimizer增加第一个顶点
+    g2o::VertexSE3* v = new g2o::VertexSE3();
+    v->setId( start );
+    v->setEstimate( Eigen::Isometry3d::Identity() ); //估计为单位矩阵
+    v->setFixed( true ); //第一个顶点固定，不用优化
+    globalOptimizer.addVertex( v );
+
+    vector< FRAME > keyframes; 
+    keyframes.push_back( last_frame );
+
+    int last_index = start;
+
+#if 0
+    bool check_loop_closure = pd.getData("check_loop_closure")==string("yes");
 
     for (int cur_index = start+1; cur_index < end; ++cur_index) {
+        std::cout << "===== " << cur_index << " =====" << std::endl;
         FRAME cur_frame = readFrame( cur_index, pd );
-        cv::Ptr<cv::ORB> orb = cv::ORB::create();
-        std::vector<cv::KeyPoint> kp;
-        cv::Mat desp;
         orb->detectAndCompute(cur_frame.rgb, cv::Mat(), cur_frame.kp, cur_frame.desp);
 
-        
-    }
+        CHECK_RESULT result = checkKeyframes( keyframes.back(), cur_frame, globalOptimizer ); //匹配该帧与keyframes里最后一帧
 
-
-    // 使用orb检测特征并描述特征 包含特征提取器和描述子提取器
-    cv::Ptr<cv::ORB> orb = cv::ORB::create();
-
-    vector<cv::KeyPoint> kp1, kp2;
-    cv::Mat desp1, desp2;
-
-    orb->detectAndCompute(rgb1, cv::Mat(), kp1, desp1);
-    orb->detectAndCompute(rgb2, cv::Mat(), kp2, desp2);
-
-    cout<<"Key points of two images: "<<kp1.size()<<", "<<kp2.size()<<endl;
-    
-    // 可视化， 显示关键点
-    cv::Mat imgShow1;
-    cv::Mat imgShow2;
-    cv::drawKeypoints( rgb1, kp1, imgShow1, cv::Scalar::all(-1), cv::DrawMatchesFlags::DRAW_RICH_KEYPOINTS );
-    cv::drawKeypoints( rgb2, kp2, imgShow2, cv::Scalar::all(-1), cv::DrawMatchesFlags::DRAW_RICH_KEYPOINTS );
-    cv::imshow( "keypoints1", imgShow1 );
-    cv::imshow( "keypoints2", imgShow2 );
-    // cv::imwrite( "../data/rgb1_keypoints.png", imgShow );
-    cv::waitKey(0); //暂停等待一个按键
-
-    // knn匹配
-    vector<vector<cv::DMatch>> knn_matches; // 汉明距离值，原理是比较二进制描述子中有多少bit不一样
-    cv::BFMatcher matcher(cv::NORM_HAMMING);
-    matcher.knnMatch(desp1, desp2, knn_matches, 2);
-
-    // 比值筛选（ratio test）
-    vector<cv::DMatch> good_matches;
-    const float ratio_thresh = 0.75f;
-    for (const auto& m : knn_matches) {
-        if (m.size() == 2 && m[0].distance < ratio_thresh * m[1].distance) {
-            good_matches.push_back(m[0]);
+        switch (result) // 根据匹配结果不同采取不同策略
+        {
+        case NOT_MATCHED:
+            //没匹配上，直接跳过
+            cout<<RED"Not enough inliers."RESET<<endl;
+            break;
+        case TOO_FAR_AWAY:
+            // 太近了，也直接跳
+            cout<<RED"Too far away, may be an error."RESET<<endl;
+            break;
+        case TOO_CLOSE:
+            // 太远了，可能出错了
+            cout<<RED"Too close, not a keyframe"RESET<<endl;
+            break;
+        case KEYFRAME:
+            cout<<GREEN"This is a new keyframe"RESET<<endl;
+            // 不远不近，刚好
+            /**
+             * This is important!!
+             * This is important!!
+             * This is important!!
+             * (very important so I've said three times!)
+             */
+            // 检测回环
+            if (check_loop_closure)
+            {
+                checkNearbyLoops( keyframes, cur_frame, globalOptimizer );
+                checkRandomLoops( keyframes, cur_frame, globalOptimizer );
+            }
+            keyframes.push_back( cur_frame );
+            
+            break;
+        default:
+            break;
         }
     }
 
-    cout<<"Find total "<<good_matches.size()<<" matches."<<endl;
+        // 优化
+    cout<<RESET"optimizing pose graph, vertices: "<<globalOptimizer.vertices().size()<<endl;
+    // globalOptimizer.save("../data//result_before.g2o");
+    globalOptimizer.initializeOptimization();
+    globalOptimizer.optimize( 100 ); //可以指定优化步数
+    // globalOptimizer.save( "../data/result_after.g2o" );
+    cout<<"Optimization done."<<endl;
 
-    // 可视化：显示匹配的特征
-    cv::Mat imgMatches;
-    cv::drawMatches( rgb1, kp1, rgb2, kp2, good_matches, imgMatches );
-    cv::imshow( "matches", imgMatches );
-    // cv::imwrite( "../data/matches.png", imgMatches );
-    cv::waitKey( 0 );
+    // 拼接点云地图
+    cout<<"saving the point cloud map..."<<endl;
+    // PointCloud::Ptr output ( new PointCloud() ); //全局地图
+    pcl::PointCloud<pcl::PointXYZRGB>::Ptr output(new pcl::PointCloud<pcl::PointXYZRGB>()); //全局地图
+    // PointCloud::Ptr tmp ( new PointCloud() );
+    pcl::PointCloud<pcl::PointXYZRGB>::Ptr tmp(new pcl::PointCloud<pcl::PointXYZRGB>());
 
-    // 计算图像间的运动关系
-    // 关键函数：cv::solvePnPRansac()
-    // 为调用此函数准备必要的参数
-    
-    // 第一个帧的三维点
-    vector<cv::Point3f> pts_obj;
-    // 第二个帧的图像点
-    vector< cv::Point2f > pts_img;
+    pcl::VoxelGrid<pcl::PointXYZRGB> voxel; // 网格滤波器，调整地图分辨率
+    pcl::PassThrough<pcl::PointXYZRGB> pass; // z方向区间滤波器，由于rgbd相机的有效深度区间有限，把太远的去掉
+    pass.setFilterFieldName("z");
+    pass.setFilterLimits( 0.0, 6.0 ); //6m以上就不要了
 
-    // 相机内参
-    CAMERA_INTRINSIC_PARAMETERS C;
-    C.cx = 325.5;
-    C.cy = 253.5;
-    C.fx = 518.0;
-    C.fy = 519.0;
-    C.scale = 1000.0;
+    double gridsize = atof( pd.getData( "voxel_grid" ).c_str() ); //分辨图可以在parameters.txt里调
+    voxel.setLeafSize( gridsize, gridsize, gridsize );
 
-    for (size_t i=0; i<good_matches.size(); i++)
+    for (size_t i=0; i<keyframes.size(); i++)
     {
-        // query 是第一个, train 是第二个
-        cv::Point2f p = kp1[good_matches[i].queryIdx].pt;
-        // 获取d是要小心！x是向右的，y是向下的，所以y才是行，x是列！
-        ushort d = depth1.ptr<ushort>( int(p.y) )[ int(p.x) ];
-        if (d == 0)
+        // 从g2o里取出一帧
+        g2o::VertexSE3* vertex = dynamic_cast<g2o::VertexSE3*>(globalOptimizer.vertex( keyframes[i].frameID ));
+        Eigen::Isometry3d pose = vertex->estimate(); //该帧优化后的位姿
+        pcl::PointCloud<pcl::PointXYZRGB>::Ptr newCloud = image2PointCloud( keyframes[i].rgb, keyframes[i].depth, camera ); //转成点云
+        // 以下是滤波
+        voxel.setInputCloud( newCloud );
+        voxel.filter( *tmp );
+        pass.setInputCloud( tmp );
+        pass.filter( *newCloud );
+        // 把点云变换后加入全局地图中
+        pcl::transformPointCloud( *newCloud, *tmp, pose.matrix() );
+        *output += *tmp;
+        tmp->clear();
+        newCloud->clear();
+    }
+
+    voxel.setInputCloud( output );
+    voxel.filter( *tmp );
+
+
+    viewer.showCloud(output);
+    while (!viewer.wasStopped()) {
+        std::this_thread::sleep_for(std::chrono::milliseconds(100));
+    }
+#endif
+
+
+#if 1
+    for (int cur_index = start+1; cur_index < end; ++cur_index) {
+        std::cout << "===== " << cur_index << " =====" << std::endl;
+        FRAME cur_frame = readFrame( cur_index, pd );
+        orb->detectAndCompute(cur_frame.rgb, cv::Mat(), cur_frame.kp, cur_frame.desp);
+        std::cout << "cur frame kp: " << cur_frame.kp.size() << std::endl;
+
+        RESULT_OF_PNP result = EstimateMotion( last_frame, cur_frame, camera );
+        std::cout << "inliers: " << result.inliers << std::endl;
+        if ( result.inliers < 5 ) //inliers不够，放弃该帧
             continue;
-        pts_img.push_back( cv::Point2f( kp2[good_matches[i].trainIdx].pt ) );
+        double norm = normofTransform(result.rvec, result.tvec);
+        cout << "norm: " << norm << endl;
+        if ( norm >= 0.3 )
+            continue;
 
-        // 将(u,v,d)转成(x,y,z)
-        cv::Point3f pt ( p.x, p.y, d );
-        cv::Point3f pd = point2dTo3d( pt, C );
-        pts_obj.push_back( pd );
+        // cv::Mat img_show;
+        // cv::drawKeypoints(cur_frame.rgb, cur_frame.kp, img_show, cv::Scalar::all(-1), cv::DrawMatchesFlags::DRAW_RICH_KEYPOINTS);
+        // cv::imshow("keypoints", img_show);
+        // cv::waitKey(0);
+
+        // pnp计算的T是
+        Eigen::Isometry3d T = CvMat2Eigen( result.rvec, result.tvec );
+        Eigen::Isometry3d T_inv = T.inverse();
+        static Eigen::Isometry3d Twc = Eigen::Isometry3d::Identity();
+        Twc = Twc * T_inv;
+
+        // cout << "T=" << T.matrix() << endl;
+        // cloud = JoinPointCloud( cloud, cur_frame, T, camera );
+        // viewer.showCloud( cloud );
+
+        g2o::VertexSE3 *v = new g2o::VertexSE3();
+        v->setId( cur_index );
+        v->setEstimate(Twc);
+        globalOptimizer.addVertex(v);
+
+        g2o::EdgeSE3* edge = new g2o::EdgeSE3();
+        edge->vertices() [0] = globalOptimizer.vertex( last_index );
+        edge->vertices() [1] = globalOptimizer.vertex( cur_index );
+        
+        // 信息矩阵是协方差矩阵的逆，表示我们对边的精度的预先估计
+        // 因为pose为6D的，信息矩阵是6*6的阵，假设位置和角度的估计精度均为0.1且互相独立
+        // 那么协方差则为对角为0.01的矩阵，信息阵则为100的矩阵
+        Eigen::Matrix<double, 6, 6> information = Eigen::Matrix< double, 6,6 >::Identity();
+        information.diagonal() << 100,100,100, 100,100,100;
+
+        // 也可以将角度设大一些，表示对角度的估计更加准确
+        edge->setInformation( information );
+        // 边的估计即是pnp求解之结果
+        edge->setMeasurement( T_inv );
+        globalOptimizer.addEdge(edge);
+        
+        last_frame = cur_frame;
+        last_index = cur_index;   
     }
 
-    double camera_matrix_data[3][3] = {
-        {C.fx, 0, C.cx},
-        {0, C.fy, C.cy},
-        {0, 0, 1}
-    };
+    // 优化所有边
+    cout << "optimizing pose graph, vertices: " << globalOptimizer.vertices().size() << endl;
+    globalOptimizer.initializeOptimization();
+    globalOptimizer.optimize( 100 ); //可以指定优化步数
+    cout << "Optimization done." << endl;
 
-    // 构建相机矩阵
-    cv::Mat cameraMatrix( 3, 3, CV_64F, camera_matrix_data );
-    cv::Mat rvec, tvec, inliers;
-    // 求解pnp
-    // 使用第一帧的3D点 和 第二帧中看到他们的位置 计算 相机的运动
-    cv::solvePnPRansac( pts_obj, pts_img, cameraMatrix, cv::Mat(), rvec, tvec, false, 100, 1.0, 0.99, inliers );
-
-    cout << "inliers: " << inliers.rows << endl;
-    cout << "R=" << rvec << endl;
-    cout << "t=" << tvec << endl;
-
-    // 画出inliers匹配 
-    vector< cv::DMatch > matchesShow;
-    for (size_t i=0; i<inliers.rows; i++)
-    {
-        matchesShow.push_back( good_matches[inliers.ptr<int>(i)[0]] );    
+    // 取出所有优化后的位姿
+    vector<Eigen::Isometry3d> optimizedPoses;
+    for (int i = start; i < end; i++) {
+        g2o::VertexSE3 *v =
+            dynamic_cast<g2o::VertexSE3 *>(globalOptimizer.vertex(i));
+        if (v)
+            optimizedPoses.push_back(v->estimate());
     }
-    cv::drawMatches( rgb1, kp1, rgb2, kp2, matchesShow, imgMatches );
-    cv::imshow( "inlier matches", imgMatches );
-    cv::imwrite( "./data/inliers.png", imgMatches );
-    cv::waitKey( 0 );
+
+    // 使用优化后的位姿拼接地图
+    pcl::PointCloud<pcl::PointXYZRGB>::Ptr globalMap(
+        new pcl::PointCloud<pcl::PointXYZRGB>()
+    );
+
+    for (int i = start; i < end; i++) {
+        std::cout << "##### " << i << " #####" << std::endl;
+        FRAME f = readFrame(i, pd);
+        OrbComputerKeyPointsAndDesp(f);
+
+        pcl::PointCloud<pcl::PointXYZRGB>::Ptr pc =
+            image2PointCloud(f.rgb, f.depth, camera);
+
+        pcl::PointCloud<pcl::PointXYZRGB>::Ptr pc_transformed(
+            new pcl::PointCloud<pcl::PointXYZRGB>()
+        );
+
+        pcl::transformPointCloud(
+            *pc, *pc_transformed,
+            optimizedPoses[i - start].matrix()
+        );
+
+        *globalMap += *pc_transformed;
+        viewer.showCloud(globalMap);
+    }
+
+    while (!viewer.wasStopped()) {
+        std::this_thread::sleep_for(std::chrono::milliseconds(100));
+    }
+
+    globalOptimizer.clear();
+#endif
 
     return 0;
 }
@@ -167,5 +308,122 @@ FRAME readFrame( int index, ParameterReader& pd ) {
     ss>>filename;
 
     f.depth = cv::imread( filename, -1 );
+    f.frameID = index;
     return f;
+}
+
+double normofTransform( cv::Mat rvec, cv::Mat tvec ) {
+    return fabs(min(cv::norm(rvec), 2*M_PI-cv::norm(rvec)))+ fabs(cv::norm(tvec));
+}
+
+CHECK_RESULT checkKeyframes( FRAME& f1, FRAME& f2, g2o::SparseOptimizer& opti, bool is_loops) {
+    static ParameterReader pd;
+    static int min_inliers = atoi( pd.getData("min_inliers").c_str() );
+    static double max_norm = atof( pd.getData("max_norm").c_str() );
+    static double keyframe_threshold = atof( pd.getData("keyframe_threshold").c_str() );
+    static double max_norm_lp = atof( pd.getData("max_norm_lp").c_str() );
+    static CAMERA_INTRINSIC_PARAMETERS camera = GetDefaultCamera();
+    // 比较f1 和 f2
+    RESULT_OF_PNP result = EstimateMotion( f1, f2, camera );
+    // std::cout << "inliers: " << result.inliers << std::endl;
+
+    if ( result.inliers < min_inliers ) //inliers不够，放弃该帧
+        return NOT_MATCHED;
+    // 计算运动范围是否太大
+    double norm = normofTransform(result.rvec, result.tvec);
+    if ( is_loops == false )
+    {
+        if ( norm >= max_norm )
+            return TOO_FAR_AWAY;   // too far away, may be error
+    }
+    else
+    {
+        if ( norm >= max_norm_lp)
+            return TOO_FAR_AWAY;
+    }
+
+    if ( norm <= keyframe_threshold )
+        return TOO_CLOSE;   // too adjacent frame
+    // 向g2o中增加这个顶点与上一帧联系的边
+    // 顶点部分
+    // 顶点只需设定id即可
+    if (is_loops == false)
+    {
+        g2o::VertexSE3 *v = new g2o::VertexSE3();
+        v->setId( f2.frameID );
+        v->setEstimate( Eigen::Isometry3d::Identity() );
+        opti.addVertex(v);
+    }
+    // 边部分
+    g2o::EdgeSE3* edge = new g2o::EdgeSE3();
+    // 连接此边的两个顶点id
+    edge->setVertex( 0, opti.vertex(f1.frameID ));
+    edge->setVertex( 1, opti.vertex(f2.frameID ));
+    edge->setRobustKernel( new g2o::RobustKernelHuber() );
+    // 信息矩阵
+    Eigen::Matrix<double, 6, 6> information = Eigen::Matrix< double, 6,6 >::Identity();
+    // 信息矩阵是协方差矩阵的逆，表示我们对边的精度的预先估计
+    // 因为pose为6D的，信息矩阵是6*6的阵，假设位置和角度的估计精度均为0.1且互相独立
+    // 那么协方差则为对角为0.01的矩阵，信息阵则为100的矩阵
+    information(0,0) = information(1,1) = information(2,2) = 100;
+    information(3,3) = information(4,4) = information(5,5) = 100;
+    // 也可以将角度设大一些，表示对角度的估计更加准确
+    edge->setInformation( information );
+    // 边的估计即是pnp求解之结果
+    Eigen::Isometry3d T = CvMat2Eigen( result.rvec, result.tvec );
+    // edge->setMeasurement( T );
+    edge->setMeasurement( T.inverse() );
+    // 将此边加入图中
+    opti.addEdge(edge);
+    return KEYFRAME;
+}
+
+void checkNearbyLoops( vector<FRAME>& frames, FRAME& currFrame, g2o::SparseOptimizer& opti )
+{
+    static ParameterReader pd;
+    static int nearby_loops = atoi( pd.getData("nearby_loops").c_str() );
+    
+    // 就是把currFrame和 frames里末尾几个测一遍
+    if ( frames.size() <= nearby_loops )
+    {
+        // no enough keyframes, check everyone
+        for (size_t i=0; i<frames.size(); i++)
+        {
+            checkKeyframes( frames[i], currFrame, opti, true );
+        }
+    }
+    else
+    {
+        // check the nearest ones
+        for (size_t i = frames.size()-nearby_loops; i<frames.size(); i++)
+        {
+            checkKeyframes( frames[i], currFrame, opti, true );
+        }
+    }
+}
+
+void checkRandomLoops( vector<FRAME>& frames, FRAME& currFrame, g2o::SparseOptimizer& opti )
+{
+    static ParameterReader pd;
+    static int random_loops = atoi( pd.getData("random_loops").c_str() );
+    srand( (unsigned int) time(NULL) );
+    // 随机取一些帧进行检测
+    
+    if ( frames.size() <= random_loops )
+    {
+        // no enough keyframes, check everyone
+        for (size_t i=0; i<frames.size(); i++)
+        {
+            checkKeyframes( frames[i], currFrame, opti, true );
+        }
+    }
+    else
+    {
+        // randomly check loops
+        for (int i=0; i<random_loops; i++)
+        {
+            int index = rand()%frames.size();
+            checkKeyframes( frames[index], currFrame, opti, true );
+        }
+    }
 }

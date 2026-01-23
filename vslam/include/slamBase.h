@@ -4,8 +4,9 @@
 #include <string>
 #include <fstream>
 #include <vector>
-#include <fstream>
 #include <map>
+#include <unordered_map>
+#include <algorithm>
 
 // opencv
 #include <opencv2/opencv.hpp>
@@ -62,27 +63,22 @@ pcl::PointCloud<pcl::PointXYZRGB>::Ptr JoinPointCloud(pcl::PointCloud<pcl::Point
 class ParameterReader {
 public:
     ParameterReader( std::string filename="../param/parameters.txt" ) {
-        std::ifstream fin( filename.c_str() );
-        if (!fin)
-        {
+        std::ifstream fin(filename);
+        if (!fin) {
             std::cerr << "parameter file does not exist." << std::endl;
             return;
         }
-        while(!fin.eof())
-        {
-            std::string str;
-            getline( fin, str );
-            if (str[0] == '#')
-            {
-                // 以‘＃’开头的是注释
-                continue;
-            }
 
-            int pos = str.find("=");
-            if (pos == -1)
-                continue;
-            std::string key = str.substr( 0, pos );
-            std::string value = str.substr( pos+1, str.length() );
+        std::string line;
+        while(std::getline(fin, line)) {
+            if (line.empty() || line[0] == '#') continue;
+
+            
+            auto pos = line.find("=");
+            if (pos == std::string::npos) continue;
+            
+            std::string key = line.substr( 0, pos );
+            std::string value = line.substr( pos+1, line.length() );
             data[key] = value;
 
             if ( !fin.good() )
@@ -91,20 +87,27 @@ public:
     }
 
     std::string getData( std::string key ) {
-        std::map<std::string, std::string>::iterator iter = data.find(key);
-        if (iter == data.end())
-        {
+        std::unordered_map<std::string, std::string>::iterator iter = data.find(key);
+        if (iter == data.end()) {
             std::cerr << "Parameter name "<<key<<" not found!" << std::endl;
             return std::string("NOT_FOUND");
         }
         return iter->second;
     }
 public:
-    std::map<std::string, std::string> data;
+    std::unordered_map<std::string, std::string> data;
+
+private:
+    // 去掉首尾空格
+    static std::string trim(const std::string& s) {
+        auto start = std::find_if_not(s.begin(), s.end(), ::isspace);
+        auto end   = std::find_if_not(s.rbegin(), s.rend(), ::isspace).base();
+        if (start >= end) return "";
+        return std::string(start, end);
+    }
 };
 
-inline static CAMERA_INTRINSIC_PARAMETERS GetDefaultCamera()
-{
+inline static CAMERA_INTRINSIC_PARAMETERS GetDefaultCamera() {
     ParameterReader pd;
     CAMERA_INTRINSIC_PARAMETERS camera;
     camera.fx = atof( pd.getData( "camera.fx" ).c_str());

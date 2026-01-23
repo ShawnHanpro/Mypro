@@ -80,6 +80,7 @@ clean: src/clean
 # Recursive "all" directory target.
 src/all: src/CMakeFiles/slam.dir/all
 src/all: src/CMakeFiles/main.dir/all
+src/all: src/CMakeFiles/pcd2octomap.dir/all
 src/all: src/CMakeFiles/slamBase.dir/all
 .PHONY : src/all
 
@@ -90,6 +91,7 @@ src/preinstall:
 # Recursive "clean" directory target.
 src/clean: src/CMakeFiles/slam.dir/clean
 src/clean: src/CMakeFiles/main.dir/clean
+src/clean: src/CMakeFiles/pcd2octomap.dir/clean
 src/clean: src/CMakeFiles/slamBase.dir/clean
 .PHONY : src/clean
 
@@ -100,7 +102,7 @@ src/clean: src/CMakeFiles/slamBase.dir/clean
 src/CMakeFiles/slam.dir/all: src/CMakeFiles/slamBase.dir/all
 	$(MAKE) $(MAKESILENT) -f src/CMakeFiles/slam.dir/build.make src/CMakeFiles/slam.dir/depend
 	$(MAKE) $(MAKESILENT) -f src/CMakeFiles/slam.dir/build.make src/CMakeFiles/slam.dir/build
-	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --progress-dir=/home/shan2/Mypro/vslam/build/CMakeFiles --progress-num=3,4 "Built target slam"
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --progress-dir=/home/shan2/Mypro/vslam/build/CMakeFiles --progress-num=5,6 "Built target slam"
 .PHONY : src/CMakeFiles/slam.dir/all
 
 # Build rule for subdir invocation for target.
@@ -146,13 +148,39 @@ src/CMakeFiles/main.dir/clean:
 .PHONY : src/CMakeFiles/main.dir/clean
 
 #=============================================================================
+# Target rules for target src/CMakeFiles/pcd2octomap.dir
+
+# All Build rule for target.
+src/CMakeFiles/pcd2octomap.dir/all: src/CMakeFiles/slamBase.dir/all
+	$(MAKE) $(MAKESILENT) -f src/CMakeFiles/pcd2octomap.dir/build.make src/CMakeFiles/pcd2octomap.dir/depend
+	$(MAKE) $(MAKESILENT) -f src/CMakeFiles/pcd2octomap.dir/build.make src/CMakeFiles/pcd2octomap.dir/build
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --progress-dir=/home/shan2/Mypro/vslam/build/CMakeFiles --progress-num=3,4 "Built target pcd2octomap"
+.PHONY : src/CMakeFiles/pcd2octomap.dir/all
+
+# Build rule for subdir invocation for target.
+src/CMakeFiles/pcd2octomap.dir/rule: cmake_check_build_system
+	$(CMAKE_COMMAND) -E cmake_progress_start /home/shan2/Mypro/vslam/build/CMakeFiles 4
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/Makefile2 src/CMakeFiles/pcd2octomap.dir/all
+	$(CMAKE_COMMAND) -E cmake_progress_start /home/shan2/Mypro/vslam/build/CMakeFiles 0
+.PHONY : src/CMakeFiles/pcd2octomap.dir/rule
+
+# Convenience name for target.
+pcd2octomap: src/CMakeFiles/pcd2octomap.dir/rule
+.PHONY : pcd2octomap
+
+# clean rule for target.
+src/CMakeFiles/pcd2octomap.dir/clean:
+	$(MAKE) $(MAKESILENT) -f src/CMakeFiles/pcd2octomap.dir/build.make src/CMakeFiles/pcd2octomap.dir/clean
+.PHONY : src/CMakeFiles/pcd2octomap.dir/clean
+
+#=============================================================================
 # Target rules for target src/CMakeFiles/slamBase.dir
 
 # All Build rule for target.
 src/CMakeFiles/slamBase.dir/all:
 	$(MAKE) $(MAKESILENT) -f src/CMakeFiles/slamBase.dir/build.make src/CMakeFiles/slamBase.dir/depend
 	$(MAKE) $(MAKESILENT) -f src/CMakeFiles/slamBase.dir/build.make src/CMakeFiles/slamBase.dir/build
-	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --progress-dir=/home/shan2/Mypro/vslam/build/CMakeFiles --progress-num=5,6 "Built target slamBase"
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --progress-dir=/home/shan2/Mypro/vslam/build/CMakeFiles --progress-num=7,8 "Built target slamBase"
 .PHONY : src/CMakeFiles/slamBase.dir/all
 
 # Build rule for subdir invocation for target.

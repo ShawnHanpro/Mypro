@@ -145,6 +145,20 @@ main/fast:
 .PHONY : main/fast
 
 # Convenience name for target.
+src/CMakeFiles/pcd2octomap.dir/rule:
+	cd /home/shan2/Mypro/vslam/build && $(MAKE) $(MAKESILENT) -f CMakeFiles/Makefile2 src/CMakeFiles/pcd2octomap.dir/rule
+.PHONY : src/CMakeFiles/pcd2octomap.dir/rule
+
+# Convenience name for target.
+pcd2octomap: src/CMakeFiles/pcd2octomap.dir/rule
+.PHONY : pcd2octomap
+
+# fast build rule for target.
+pcd2octomap/fast:
+	cd /home/shan2/Mypro/vslam/build && $(MAKE) $(MAKESILENT) -f src/CMakeFiles/pcd2octomap.dir/build.make src/CMakeFiles/pcd2octomap.dir/build
+.PHONY : pcd2octomap/fast
+
+# Convenience name for target.
 src/CMakeFiles/slamBase.dir/rule:
 	cd /home/shan2/Mypro/vslam/build && $(MAKE) $(MAKESILENT) -f CMakeFiles/Makefile2 src/CMakeFiles/slamBase.dir/rule
 .PHONY : src/CMakeFiles/slamBase.dir/rule
@@ -181,6 +195,30 @@ main.s: main.cpp.s
 main.cpp.s:
 	cd /home/shan2/Mypro/vslam/build && $(MAKE) $(MAKESILENT) -f src/CMakeFiles/main.dir/build.make src/CMakeFiles/main.dir/main.cpp.s
 .PHONY : main.cpp.s
+
+pcd2octomap.o: pcd2octomap.cpp.o
+.PHONY : pcd2octomap.o
+
+# target to build an object file
+pcd2octomap.cpp.o:
+	cd /home/shan2/Mypro/vslam/build && $(MAKE) $(MAKESILENT) -f src/CMakeFiles/pcd2octomap.dir/build.make src/CMakeFiles/pcd2octomap.dir/pcd2octomap.cpp.o
+.PHONY : pcd2octomap.cpp.o
+
+pcd2octomap.i: pcd2octomap.cpp.i
+.PHONY : pcd2octomap.i
+
+# target to preprocess a source file
+pcd2octomap.cpp.i:
+	cd /home/shan2/Mypro/vslam/build && $(MAKE) $(MAKESILENT) -f src/CMakeFiles/pcd2octomap.dir/build.make src/CMakeFiles/pcd2octomap.dir/pcd2octomap.cpp.i
+.PHONY : pcd2octomap.cpp.i
+
+pcd2octomap.s: pcd2octomap.cpp.s
+.PHONY : pcd2octomap.s
+
+# target to generate assembly for a file
+pcd2octomap.cpp.s:
+	cd /home/shan2/Mypro/vslam/build && $(MAKE) $(MAKESILENT) -f src/CMakeFiles/pcd2octomap.dir/build.make src/CMakeFiles/pcd2octomap.dir/pcd2octomap.cpp.s
+.PHONY : pcd2octomap.cpp.s
 
 slam.o: slam.cpp.o
 .PHONY : slam.o
@@ -239,11 +277,15 @@ help:
 	@echo "... edit_cache"
 	@echo "... rebuild_cache"
 	@echo "... main"
+	@echo "... pcd2octomap"
 	@echo "... slam"
 	@echo "... slamBase"
 	@echo "... main.o"
 	@echo "... main.i"
 	@echo "... main.s"
+	@echo "... pcd2octomap.o"
+	@echo "... pcd2octomap.i"
+	@echo "... pcd2octomap.s"
 	@echo "... slam.o"
 	@echo "... slam.i"
 	@echo "... slam.s"

@@ -143,6 +143,19 @@ main/fast:
 .PHONY : main/fast
 
 #=============================================================================
+# Target rules for targets named pcd2octomap
+
+# Build rule for target.
+pcd2octomap: cmake_check_build_system
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/Makefile2 pcd2octomap
+.PHONY : pcd2octomap
+
+# fast build rule for target.
+pcd2octomap/fast:
+	$(MAKE) $(MAKESILENT) -f src/CMakeFiles/pcd2octomap.dir/build.make src/CMakeFiles/pcd2octomap.dir/build
+.PHONY : pcd2octomap/fast
+
+#=============================================================================
 # Target rules for targets named slamBase
 
 # Build rule for target.
@@ -164,6 +177,7 @@ help:
 	@echo "... edit_cache"
 	@echo "... rebuild_cache"
 	@echo "... main"
+	@echo "... pcd2octomap"
 	@echo "... slam"
 	@echo "... slamBase"
 .PHONY : help

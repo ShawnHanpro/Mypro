@@ -24,11 +24,26 @@ find_package(Eigen3 REQUIRED)
 
 add_executable(slam slam.cpp)
 add_executable(main main.cpp)
+add_executable(pcd2octomap pcd2octomap.cpp)
+
+# octomap
+target_include_directories(pcd2octomap PRIVATE
+    /home/shan2/Mypro/octomap/octomap/include/octomap
+)
+
 
 add_library(slamBase slamBase.cpp)
 target_link_libraries( slamBase
+${OpenCV_LIBS}
+${PCL_LIBRARIES}
+)
+
+target_link_libraries(pcd2octomap
+    slamBase
     ${OpenCV_LIBS}
     ${PCL_LIBRARIES}
+    /home/shan2/Mypro/octomap/build/octomap/liboctomap.so
+    /home/shan2/Mypro/octomap/build/octomap/liboctomath.so
 )
 
 target_link_libraries( slam 
@@ -40,10 +55,6 @@ target_link_libraries( slam
     g2o_solver_csparse
     g2o_csparse_extension
     g2o_types_slam3d
-    # ${G2O_CORE_LIBRARY}
-    # ${G2O_STUFF_LIBRARY}
-    # ${G2O_TYPES_SBA}
-    # ${G2O_TYPES_SLAM3D}
 )
 
 target_link_libraries( main 
@@ -55,8 +66,4 @@ target_link_libraries( main
     g2o_solver_csparse
     g2o_csparse_extension
     g2o_types_slam3d
-    # ${G2O_CORE_LIBRARY}
-    # ${G2O_STUFF_LIBRARY}
-    # ${G2O_TYPES_SBA}
-    # ${G2O_TYPES_SLAM3D}
 )
