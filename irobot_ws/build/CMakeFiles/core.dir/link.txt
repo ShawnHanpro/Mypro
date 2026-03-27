@@ -1,0 +1,2 @@
+/usr/bin/ar qc /home/shan2/Mypro/irobot_ws/lib/libcore.a CMakeFiles/core.dir/src/baselib.cpp.o CMakeFiles/core.dir/src/type/pose2d.cpp.o CMakeFiles/core.dir/src/map/grid2d.cpp.o CMakeFiles/core.dir/src/map/submap.cpp.o CMakeFiles/core.dir/src/hough_scan_match.cpp.o
+/usr/bin/ranlib /home/shan2/Mypro/irobot_ws/lib/libcore.a

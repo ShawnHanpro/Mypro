@@ -8,7 +8,8 @@
                 "/usr/include/eigen3",
                 "/opt/ros/galactic/include",
                 "/usr/local/include/**",
-                "/usr/include/**"
+                "/usr/include/**",
+                "${workspaceFolder}/irobot_ws/include"
             ],
             "defines": [],
             "compilerPath": "/usr/bin/gcc",

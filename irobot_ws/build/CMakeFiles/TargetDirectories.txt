@@ -1,0 +1,4 @@
+/home/shan2/Mypro/irobot_ws/build/CMakeFiles/main.dir
+/home/shan2/Mypro/irobot_ws/build/CMakeFiles/core.dir
+/home/shan2/Mypro/irobot_ws/build/CMakeFiles/edit_cache.dir
+/home/shan2/Mypro/irobot_ws/build/CMakeFiles/rebuild_cache.dir

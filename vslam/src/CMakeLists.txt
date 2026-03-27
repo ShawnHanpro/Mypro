@@ -34,8 +34,8 @@ target_include_directories(pcd2octomap PRIVATE
 
 add_library(slamBase slamBase.cpp)
 target_link_libraries( slamBase
-${OpenCV_LIBS}
-${PCL_LIBRARIES}
+    ${OpenCV_LIBS}
+    ${PCL_LIBRARIES}
 )
 
 target_link_libraries(pcd2octomap
