@@ -129,217 +129,101 @@ void RemoveSmallRegion(cv::Mat& src, cv::Mat& dst, int area_limit, int check_mod
     // cout<<RemoveCount<<" objects removed."<<endl;
 }
 
-void calIntersection(int width, int height, std::vector<cv::Vec4i>& lines, std::vector<Point2D>& intersections, float min_dist = 5.0f) {
+//
+int BfnnPoint(const std::vector<Eigen::Vector2f> &points, const Eigen::Vector2f &point) {
+    return std::min_element(points.begin(), points.end(),
+                            [&point](const Eigen::Vector2f &p1, const Eigen::Vector2f &p2) {
+                                return (p1 - point).norm() < (p2 - point).norm();
+                            }) -
+           points.begin();
+}
 
-    for (size_t i = 0; i < lines.size(); i++) {
-        for (size_t j = i + 1; j < lines.size(); j++) {
+Eigen::Vector2f Normalize(std::vector<Eigen::Vector2f> &points) {
+    Eigen::Vector2f mean(0.f, 0.f);
+    for (const auto &p : points) {
+        mean += p;
+    }
 
-            // 获取直线端点
-            float x1 = lines[i][0], y1 = lines[i][1], x2 = lines[i][2], y2 = lines[i][3];
-            float x3 = lines[j][0], y3 = lines[j][1], x4 = lines[j][2], y4 = lines[j][3];
-        
-            // 计算直线的参数 (a1, b1, c1) 和 (a2, b2, c2)
-            float a1 = y2 - y1;
-            float b1 = x1 - x2;
-            float c1 = a1 * x1 + b1 * y1;
-        
-            float a2 = y4 - y3;
-            float b2 = x3 - x4;
-            float c2 = a2 * x3 + b2 * y3;
-        
-            // 计算交点
-            float det = a1 * b2 - a2 * b1;
-            if (det != 0) {
-                float x_inter = (b2 * c1 - b1 * c2) / det;
-                float y_inter = (a1 * c2 - a2 * c1) / det;
+    mean.x() /= points.size();
+    mean.y() /= points.size();
 
-                if (x_inter < 0 || x_inter >= width || y_inter < 0 || y_inter >= height) {
-                    continue; // 交点不在图像范围内，跳过
-                }
+    return mean;
+}
+std::pair<Eigen::Vector2f, float> ICP(const std::vector<Eigen::Vector2f> &source,
+                                                      const std::vector<Eigen::Vector2f> &target,
+                                                      std::vector<Eigen::Vector2f> &re_points, const int &iter_num,
+                                                      const double &eps) {
+    auto source_points = source;
+    auto target_points = target;
 
-                Point2D new_pt(x_inter, y_inter);
+    auto source_mean = Normalize(source_points);
 
-                bool too_close = false;
-                for (const auto& existing_pt : intersections) {
-                    float dx = existing_pt.x - new_pt.x;
-                    float dy = existing_pt.y - new_pt.y;
-                    float dist2 = dx*dx + dy*dy;
+    Eigen::Matrix2f R;
+    float           res_angle = 0.f;
+    Eigen::Vector2f T(0.f, 0.f);
 
-                    if (dist2 < min_dist * min_dist) {
-                        too_close = true;
-                        break;
-                    }
-                }
+    float error = 0.0;
 
-                if (!too_close)
-                    intersections.push_back(new_pt);
-            }
+    for (int i = 0; i < iter_num; ++i) {
+        auto   target_mean = Normalize(target_points);
+        double t_nume = 0.f, t_deno = 0.f;
+
+        for (int j = 0; j < target_points.size(); ++j) {
+            int closet_index = BfnnPoint(source_points, target_points[j]);
+
+            // 旋转矩阵求旋转角公式
+            // tnume​=j=0∑N−1​(sy,j​⋅tx,j​−sx,j​⋅ty,j​)
+            t_nume += source_points[closet_index].y() * target_points[j].x() -
+                      source_points[closet_index].x() * target_points[j].y();
+            // tdeno​=j=0∑N−1​(sx,j​⋅tx,j​+sy,j​⋅ty,j​)
+            t_deno += source_points[closet_index].x() * target_points[j].x() +
+                      source_points[closet_index].y() * target_points[j].y();
+        }
+
+        double theta = std::atan2(t_nume, t_deno);
+        res_angle += theta / M_PI * 180.f;
+
+        Eigen::Matrix2f R_iter;
+        R_iter << std::cos(theta), -std::sin(theta), 
+                  std::sin(theta), std::cos(theta);
+
+        Eigen::Vector2f T_iter = source_mean - R_iter * target_mean;
+
+        for (int j = 0; j < target_points.size(); ++j) {
+            target_points[j] = R_iter * target_points[j] + T_iter;
+        }
+
+        R = R_iter * R;
+        T = R_iter * T + T_iter;
+
+        // 使用角度判断是否结束
+        // if (std::abs(theta / CV_PI * 180.f) < eps)
+        // {
+        //     break;
+        // }
+
+        // 使用距离判断是否结束
+        for (int j = 0; j < target_points.size(); ++j) {
+            int closet_index = BfnnPoint(source_points, target_points[j]);
+            error += (source_points[closet_index] - target_points[j]).norm();
+        }
+        error /= target_points.size();
+
+        if (error < eps) {
+            break;
         }
     }
+    re_points = target_points;
 
+    return std::make_pair(T, res_angle);
 }
 
-// 随机生成一个颜色
-cv::Scalar generateRandomColor() {
-    // 随机生成 RGB 值，每个值在 0-255 范围内
-    int r = rand() % 256;
-    int g = rand() % 256;
-    int b = rand() % 256;
-    return cv::Scalar(b, g, r);  // OpenCV 使用 BGR 顺序
-}
-
-struct PoseHypothesis {
-    float theta;
-    Eigen::Vector2f t;
-    int votes = 0;
-};
-
-float triangleSimilarity(const TriangleFeature& t1,
-                         const TriangleFeature& t2)
-{
-    std::vector<float> l1 = {t1.l1, t1.l2, t1.l3};
-    std::vector<float> l2 = {t2.l1, t2.l2, t2.l3};
-
-    std::sort(l1.begin(), l1.end());
-    std::sort(l2.begin(), l2.end());
-
-    float edge_err =
-        fabs(l1[0]-l2[0]) +
-        fabs(l1[1]-l2[1]) +
-        fabs(l1[2]-l2[2]);
-
-    std::vector<float> a1 = {t1.a1, t1.a2, t1.a3};
-    std::vector<float> a2 = {t2.a1, t2.a2, t2.a3};
-
-    std::sort(a1.begin(), a1.end());
-    std::sort(a2.begin(), a2.end());
-
-    float angle_err =
-        fabs(a1[0]-a2[0]) +
-        fabs(a1[1]-a2[1]) +
-        fabs(a1[2]-a2[2]);
-
-    return exp(-(edge_err + 0.01f * angle_err));
-}
-
-bool estimateSE2FromTriangle(
-    const TriangleFeature& t1,
-    const TriangleFeature& t2,
-    Eigen::Matrix2f& R,
-    Eigen::Vector2f& t)
-{
-    std::vector<Eigen::Vector2f> src = {
-        {t1.p1.x, t1.p1.y},
-        {t1.p2.x, t1.p2.y},
-        {t1.p3.x, t1.p3.y}
-    };
-
-    std::vector<Eigen::Vector2f> dst = {
-        {t2.p1.x, t2.p1.y},
-        {t2.p2.x, t2.p2.y},
-        {t2.p3.x, t2.p3.y}
-    };
-
-    // --- centroid ---
-    Eigen::Vector2f cs = Eigen::Vector2f::Zero();
-    Eigen::Vector2f cd = Eigen::Vector2f::Zero();
-
-    for(int i=0;i<3;i++){
-        cs += src[i];
-        cd += dst[i];
-    }
-    cs /= 3.f;
-    cd /= 3.f;
-
-    // --- covariance ---
-    Eigen::Matrix2f H = Eigen::Matrix2f::Zero();
-
-    for(int i=0;i<3;i++)
-        H += (src[i]-cs)*(dst[i]-cd).transpose();
-
-    Eigen::JacobiSVD<Eigen::Matrix2f> svd(
-        H, Eigen::ComputeFullU | Eigen::ComputeFullV);
-
-    R = svd.matrixV()*svd.matrixU().transpose();
-
-    if(R.determinant() < 0){
-        Eigen::Matrix2f V = svd.matrixV();
-        V.col(1) *= -1;
-        R = V*svd.matrixU().transpose();
-    }
-
-    t = cd - R*cs;
-
-    return true;
-}
-
-bool matchTriangles(
-    const std::vector<TriangleFeature>& A,
-    const std::vector<TriangleFeature>& B,
-    Eigen::Vector2f& best_t,
-    float& best_theta)
-{
-    std::vector<PoseHypothesis> hypotheses;
-
-    for(const auto& ta : A)
-    for(const auto& tb : B)
-    {
-        if(triangleSimilarity(ta,tb) < 0.8f)
-            continue;
-
-        Eigen::Matrix2f R;
-        Eigen::Vector2f t;
-
-        estimateSE2FromTriangle(ta,tb,R,t);
-
-        PoseHypothesis h;
-        h.theta = atan2(R(1,0),R(0,0));
-        h.t = t;
-
-        hypotheses.push_back(h);
-    }
-
-    if(hypotheses.empty()) return false;
-
-    const float rot_thresh = 5.0f * M_PI/180.f;
-    const float trans_thresh = 0.3f;
-
-    for(auto& h : hypotheses)
-    {
-        for(const auto& other : hypotheses)
-        {
-            float dtheta = fabs(h.theta - other.theta);
-            float dt = (h.t - other.t).norm();
-
-            if(dtheta < rot_thresh && dt < trans_thresh)
-                h.votes++;
-        }
-    }
-
-    auto best = std::max_element(
-        hypotheses.begin(),
-        hypotheses.end(),
-        [](const PoseHypothesis& a,
-           const PoseHypothesis& b)
-        {
-            return a.votes < b.votes;
-        });
-
-    if(best->votes < 5)
-        return false;
-
-    best_theta = best->theta;
-    best_t = best->t;
-
-    return true;
-}
-
-
+//
 
 int main (int argc, char** argv) {
-    std::string png_path = "/home/shan2/brewst/subgrids";
+    std::string png_path = "/home/shan2/brewst_files/subgrids";
 
-    cv::Mat image_0 = cv::imread(png_path+"/grid_1.png", cv::IMREAD_GRAYSCALE);
+    cv::Mat image_0 = cv::imread(png_path+"/grid_0.png", cv::IMREAD_GRAYSCALE);
     cv::Mat image_1 = cv::imread(png_path+"/grid_2.png", cv::IMREAD_GRAYSCALE);
     int width_0 = image_0.cols;
     int height_0 = image_0.rows;
@@ -358,23 +242,159 @@ int main (int argc, char** argv) {
     cv::cvtColor(image_0, result_0, cv::COLOR_GRAY2BGR); 
     cv::cvtColor(image_1, result_1, cv::COLOR_GRAY2BGR); 
 
+
+    std::vector<Eigen::Vector2f> target_points;
+    std::vector<Eigen::Vector2f> source_points;
+    Image2Points(image_0, target_points);
+    Image2Points(image_1, source_points);
+
+    pcl::visualization::PCLVisualizer::Ptr viewer(new pcl::visualization::PCLVisualizer("viewer"));
+    viewer->setBackgroundColor(0, 0, 0);
+    pcl::PointCloud<pcl::PointXYZ>::Ptr target_cloud(new pcl::PointCloud<pcl::PointXYZ>);
+    pcl::PointCloud<pcl::PointXYZ>::Ptr source_cloud(new pcl::PointCloud<pcl::PointXYZ>);
+
+    for (const auto& p : target_points) {
+        target_cloud->points.emplace_back(p.x(), p.y(), 0);
+    }
+    for (const auto& p : source_points) {
+        source_cloud->points.emplace_back(p.x(), p.y(), 0);
+    }
+
+    // target_cloud->width = target_cloud->points.size();
+    // target_cloud->height = 1;
+    // target_cloud->is_dense = true;
+    // source_cloud->width = source_cloud->points.size();
+    // source_cloud->height = 1;
+    // source_cloud->is_dense = true;
+
+    // viewer->addPointCloud<pcl::PointXYZ>(target_cloud, "target_cloud");
+    // viewer->setPointCloudRenderingProperties(pcl::visualization::PCL_VISUALIZER_POINT_SIZE, 3, "target_cloud");
+    
+    // viewer->addPointCloud<pcl::PointXYZ>(source_cloud, "source_cloud");
+    // viewer->setPointCloudRenderingProperties(pcl::visualization::PCL_VISUALIZER_POINT_SIZE, 3, "source_cloud");
+
+    // while(!viewer->wasStopped()) {
+    //     viewer->spinOnce(10);
+    // }
+
+
+    // 体素滤波降低点云数量
+    float                        voxel_size = 10;
+    VoxelFilter                  filter(voxel_size);
+    std::vector<Eigen::Vector2f> target_filtered_points = filter.filter(target_points);
+    std::vector<Eigen::Vector2f> source_filtered_points = filter.filter(source_points);
+
+
+    target_cloud->points.clear();
+    source_cloud->points.clear();
+    for (const auto& p : target_filtered_points) {
+        target_cloud->points.emplace_back(p.x(), p.y(), 0);
+    }
+    for (const auto& p : source_filtered_points) {
+        source_cloud->points.emplace_back(p.x(), p.y(), 0);
+    }
+
+    // target_cloud->width = target_cloud->points.size();
+    // target_cloud->height = 1;
+    // target_cloud->is_dense = true;
+    // source_cloud->width = source_cloud->points.size();
+    // source_cloud->height = 1;
+    // source_cloud->is_dense = true;
+
+    // viewer->addPointCloud<pcl::PointXYZ>(target_cloud, "target_cloud");
+    // viewer->setPointCloudRenderingProperties(pcl::visualization::PCL_VISUALIZER_POINT_SIZE, 3, "target_cloud");
+    
+    // viewer->addPointCloud<pcl::PointXYZ>(source_cloud, "source_cloud");
+    // viewer->setPointCloudRenderingProperties(pcl::visualization::PCL_VISUALIZER_POINT_SIZE, 3, "source_cloud");
+
+    // while(!viewer->wasStopped()) {
+    //     viewer->spinOnce(10);
+    // }
+
+    std::vector<Eigen::Vector2f> target_bfnn_points;
+    std::vector<Eigen::Vector2f> source_bfnn_points;
+
+    // debug使用的变量，保存icp计算后的点云
+    std::vector<Eigen::Vector2f> re_points;
+    std::cout << "size: " << source_filtered_points.size() << " " << target_filtered_points.size() << std::endl;    
+
+
+    // 计算一次近邻点，使用可以计算出近邻点的数据点，避免两帧激光的质心计算误差较大
+    for (int i = 0; i < target_filtered_points.size(); ++i) {
+        int closet_index = BfnnPoint(source_filtered_points, target_filtered_points[i]);
+
+        const Eigen::Vector2f &nearest_point = source_filtered_points[closet_index];
+        float                  distance      = (target_filtered_points[i] - nearest_point).norm();
+
+        if (distance < 0.5) {
+            source_bfnn_points.emplace_back(nearest_point);
+            target_bfnn_points.emplace_back(target_filtered_points[i]);
+        }
+    }
+
+    // icp
+    std::pair<Eigen::Vector2f, float> tran = ICP(source_bfnn_points, target_bfnn_points, re_points, 100, 0.1);
+    float detla = std::sqrt(std::pow(tran.first.x(), 2) + std::pow(tran.first.y(), 2));
+    // std::cout << "icp tran: {} {} {}", tran.first.x(), tran.first.y(), tran.second << std::endl;
+    // std::cout << fmt::format("icp detla: {}", detla) << std::endl;
+    // std::cout << fmt::format("icp cost time: {}ms", laser_t) << std::endl;
+
+    Eigen::Vector2f t = tran.first;
+    float theta = tran.second;
+
+    Eigen::Matrix2f R;
+    R << std::cos(theta), -std::sin(theta),
+        std::sin(theta),  std::cos(theta);
+
+    std::vector<Eigen::Vector2f> aligned_points;
+    aligned_points.reserve(source_points.size());
+
+    for(const auto& p : source_points)
+    {
+        Eigen::Vector2f p_new = R * p + t;
+        aligned_points.push_back(p_new);
+    }
+
+    std::cout << aligned_points.size() << std::endl;
+
+    source_cloud->clear();
+    for(const auto& p : aligned_points)
+    {
+        source_cloud->points.emplace_back(p.x(), p.y(), 0.f);
+    }
+
+    source_cloud->width = source_cloud->points.size();
+    source_cloud->height = 1;
+    source_cloud->is_dense = true;
+
+    viewer->addPointCloud<pcl::PointXYZ>(source_cloud, "source_cloud");
+    viewer->setPointCloudRenderingProperties(pcl::visualization::PCL_VISUALIZER_POINT_SIZE, 3, "source_cloud");
+    viewer->resetCamera();
+
+    while(!viewer->wasStopped()) {
+        viewer->spinOnce(10);
+    }
+    
+    
+    
+
 #if OPENCVFEATUREMATCHING
 
     cv::Mat binary_image_0;
     cv::threshold(image_0, binary_image_0, 1, 255, cv::THRESH_BINARY_INV);  // 黑色障碍物点变成白色，其它点变为黑色
     cv::Mat binary_image_1;
     cv::threshold(image_1, binary_image_1, 1, 255, cv::THRESH_BINARY_INV);  // 黑色障碍物点变成白色，其它点变为黑色
-    // cv::namedWindow("binary_image_0", cv::WINDOW_NORMAL);
-    // cv::imshow("binary_image_0", binary_image_0);
-    // cv::waitKey(1);
+    cv::namedWindow("binary_image_0", cv::WINDOW_NORMAL);
+    cv::imshow("binary_image_0", binary_image_0);
+    cv::waitKey(1);
 
     cv::Mat filter_binary_image_0;
-    RemoveSmallRegion(binary_image_0, filter_binary_image_0, 5, 1, 1);
+    RemoveSmallRegion(binary_image_0, filter_binary_image_0, 9, 1, 1);
     cv::Mat filter_binary_image_1;
     RemoveSmallRegion(binary_image_1, filter_binary_image_1, 5, 1, 1);
-    // cv::namedWindow("filter_binary_image_1", cv::WINDOW_NORMAL);
-    // cv::imshow("filter_binary_image_1", filter_binary_image_1);
-    // cv::waitKey(1);
+    cv::namedWindow("filter_binary_image_0", cv::WINDOW_NORMAL);
+    cv::imshow("filter_binary_image_0", filter_binary_image_0);
+    cv::waitKey(0);
 
     cv::Mat morph_0;
     cv::Mat morph_1;
@@ -418,24 +438,6 @@ int main (int argc, char** argv) {
     // for (auto& line : merged_1) {
     //     cv::line(result_1, cv::Point(line[0], line[1]), cv::Point(line[2], line[3]), cv::Scalar(0,0,255), 1);
     // }
-    
-    // std::vector<Point2D> intersections_0;
-    // std::vector<Point2D> intersections_1;
-    // calIntersection(image_0.cols, image_0.rows, lines_0, intersections_0);
-    // calIntersection(image_1.cols, image_1.rows, lines_1, intersections_1);
-    // std::cout << "intersections_0: " << intersections_0.size() << std::endl;
-    // std::cout << "intersections_1: " << intersections_1.size() << std::endl;
-    
-    // 绘制交点
-    // for (auto& p : intersections_0) {
-    //     // std::cout << p.x << " " << p.y << " ";
-    //     cv::circle(result_0, cv::Point(static_cast<int>(p.x), static_cast<int>(p.y)), 2, cv::Scalar(0, 0, 255), -1);
-    // }
-    // for (auto& p : intersections_1) {
-    //     // std::cout << p.x << " " << p.y << " ";
-    //     cv::circle(result_1, cv::Point(static_cast<int>(p.x), static_cast<int>(p.y)), 2, cv::Scalar(0, 0, 255), -1);
-    // }
-    // std::cout << std::endl;
 
     std::vector<cv::Point2f> corner_0;
     std::vector<cv::Point2f> corner_1;
@@ -445,22 +447,12 @@ int main (int argc, char** argv) {
     std::cout << "intersections_1: " << corner_1.size() << std::endl;
 
     for (auto& p : corner_0) {
-        // std::cout << p.x << " " << p.y << " ";
         cv::circle(result_0, cv::Point(static_cast<int>(p.x), static_cast<int>(p.y)), 2, cv::Scalar(0, 0, 255), -1);
     }
     for (auto& p : corner_1) {
-        // std::cout << p.x << " " << p.y << " ";
         cv::circle(result_1, cv::Point(static_cast<int>(p.x), static_cast<int>(p.y)), 2, cv::Scalar(0, 0, 255), -1);
     }
     std::cout << std::endl;
-
-    std::vector<Triangle> triangles_0 = buildTriangles(corner_0);
-    std::vector<Triangle> triangles_1 = buildTriangles(corner_1);
-    std::cout << "triangles 0: " << triangles_0.size() << std::endl;
-    std::cout << "triangles 1: " << triangles_1.size() << std::endl;
-
-    DrawTriangles(result_0, triangles_0);
-    DrawTriangles(result_1, triangles_1);
 
     // TriangleMatcher matcher;
     // std::vector<TriangleFeature> triangles_0;
@@ -470,42 +462,6 @@ int main (int argc, char** argv) {
 
     // std::cout << "triangles_0: " << triangles_0.size() << std::endl;
     // std::cout << "triangles_1: " << triangles_1.size() << std::endl;
-
-    // for (auto& triangle : triangles_0) {
-    //     // 为每个三角形生成随机颜色
-    //     cv::Scalar randomColor = generateRandomColor();
-        
-    //     // 绘制三角形的边
-    //     cv::line(result_0, cv::Point(static_cast<int>(triangle.p1.x), static_cast<int>(triangle.p1.y)),
-    //             cv::Point(static_cast<int>(triangle.p2.x), static_cast<int>(triangle.p2.y)),
-    //             randomColor, 2);  // 随机颜色，线宽为2
-
-    //     cv::line(result_0, cv::Point(static_cast<int>(triangle.p2.x), static_cast<int>(triangle.p2.y)),
-    //             cv::Point(static_cast<int>(triangle.p3.x), static_cast<int>(triangle.p3.y)),
-    //             randomColor, 2);  // 随机颜色，线宽为2
-
-    //     cv::line(result_0, cv::Point(static_cast<int>(triangle.p3.x), static_cast<int>(triangle.p3.y)),
-    //             cv::Point(static_cast<int>(triangle.p1.x), static_cast<int>(triangle.p1.y)),
-    //             randomColor, 2);  // 随机颜色，线宽为2
-    // }
-
-    // for (auto& triangle : triangles_1) {
-    //     // 为每个三角形生成随机颜色
-    //     cv::Scalar randomColor = generateRandomColor();
-        
-    //     // 绘制三角形的边
-    //     cv::line(result_1, cv::Point(static_cast<int>(triangle.p1.x), static_cast<int>(triangle.p1.y)),
-    //             cv::Point(static_cast<int>(triangle.p2.x), static_cast<int>(triangle.p2.y)),
-    //             randomColor, 2);  // 随机颜色，线宽为2
-
-    //     cv::line(result_1, cv::Point(static_cast<int>(triangle.p2.x), static_cast<int>(triangle.p2.y)),
-    //             cv::Point(static_cast<int>(triangle.p3.x), static_cast<int>(triangle.p3.y)),
-    //             randomColor, 2);  // 随机颜色，线宽为2
-
-    //     cv::line(result_1, cv::Point(static_cast<int>(triangle.p3.x), static_cast<int>(triangle.p3.y)),
-    //             cv::Point(static_cast<int>(triangle.p1.x), static_cast<int>(triangle.p1.y)),
-    //             randomColor, 2);  // 随机颜色，线宽为2
-    // }
 
     // MapMatcher map_matcher;
     // Eigen::Vector2f translation;

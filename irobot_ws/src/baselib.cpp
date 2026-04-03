@@ -21,6 +21,21 @@ void Image2Points(cv::Mat& image, std::vector<LaserPoint>& points, int threshold
     }
 }
 
+void Image2Points(cv::Mat& image, std::vector<Eigen::Vector2f>& points, int threshold) {
+    int width = image.cols;
+    int height = image.rows;
+    int c_x = width / 2;
+    int c_y = height / 2;
+
+    for (int y = 0; y < height; ++y) {
+        for (int x = 0; x < width; ++x) {
+            if (image.at<uchar>(y, x) < threshold) {
+                points.emplace_back(Eigen::Vector2f(x - c_x, c_y - y));
+            }
+        }
+    }
+}
+
 void Image2Grid(cv::Mat& image, Grid2D& grid, int threshold) {
     int width = image.cols;
     int height = image.rows;

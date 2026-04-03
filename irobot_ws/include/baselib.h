@@ -19,6 +19,8 @@ struct Point2D;
 
 void Image2Points(cv::Mat& image, std::vector<LaserPoint>& points, int threshold = 200);
 
+void Image2Points(cv::Mat& image, std::vector<Eigen::Vector2f>& points, int threshold = 50);
+
 void Image2Grid(cv::Mat& image, Grid2D& grid, int threshold=50);
 
 void Grid2Image(const Grid2D& grid, cv::Mat& image, double prob=0.8);
@@ -284,4 +286,39 @@ private:
     float x;
     float y;
     float z;
+};
+
+// 定义体素滤波器
+class VoxelFilter {
+public:
+    VoxelFilter(float voxel_size) : voxel_size(voxel_size) {}
+
+    std::vector<Eigen::Vector2f> filter(const std::vector<Eigen::Vector2f> &points) const {
+        std::unordered_map<int, std::vector<Eigen::Vector2f>> voxel_map;
+
+        // 将点云数据划分到体素中
+        for (const auto &point : points) {
+            int x_index     = static_cast<int>(std::floor(point[0] / voxel_size));
+            int y_index     = static_cast<int>(std::floor(point[1] / voxel_size));
+            int voxel_index = x_index * 100000 + y_index;  // 假设 x_index 和 y_index 不会超过 100000
+            voxel_map[voxel_index].push_back(point);
+        }
+
+        // 计算每个体素的代表点（例如，体素内的平均值）
+        std::vector<Eigen::Vector2f> filtered_points;
+        for (const auto &entry : voxel_map) {
+            const auto     &voxel_points = entry.second;
+            Eigen::Vector2f centroid(0, 0);
+            for (const auto &point : voxel_points) {
+                centroid += point;
+            }
+            centroid /= static_cast<float>(voxel_points.size());
+            filtered_points.push_back(centroid);
+        }
+
+        return filtered_points;
+    }
+
+private:
+    float voxel_size;
 };
